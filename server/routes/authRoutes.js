@@ -19,7 +19,7 @@ module.exports = (app) => {
 
   app.get('/auth/facebook/callback',
   passport.authenticate('facebook'), (req, res) => {
-    res.json(req.user);
+    res.redirect('/current_user');
   });
 
 
@@ -48,7 +48,7 @@ module.exports = (app) => {
      req.session.destroy();
     res.send(`You successfuly logged out!`)
   });
-  app.get('/api/current_user', loggedIn,
+  app.get('/api/current_user',
    (req, res) => {
     res.send(req.user);
   });

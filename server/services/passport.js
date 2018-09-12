@@ -69,12 +69,11 @@ passport.use(new GoogleStrategy({
 passport.use(new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password',
-}, (email, password, done) => {
-  debugger;
-  User.findByCredentials(email, password)
-  .then( user => done(null, user) )
-  .catch( err => done(null, false, { message: err }) );
-  })
-
-
-);
+}, async (email, password, done) => {
+  try {
+   const user = await User.findByCredentials(email, password);
+   done(null, user)
+  } catch(err) {
+    done(null, false, { message: err })
+  }
+}));
