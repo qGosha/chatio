@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { BrowserRouter, Route } from 'react-router-dom';
-import { Header } from '../components/header.js'
+import Header from '../components/header.js'
 import * as actions from '../actions';
 import {connect} from 'react-redux';
 class App extends Component {
