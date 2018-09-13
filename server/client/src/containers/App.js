@@ -1,6 +1,8 @@
-import React, { Component } from "react";
-import { BrowserRouter, Route } from 'react-router-dom';
+import React, { Component, Fragment } from "react";
+import { BrowserRouter as Router, Route,  Redirect, withRouter } from 'react-router-dom';
+import { PrivateRoute } from '../helpers/routing';
 import Header from '../components/header.js'
+import Login from './Login'
 import * as actions from '../actions';
 import {connect} from 'react-redux';
 class App extends Component {
@@ -9,16 +11,22 @@ class App extends Component {
   }
   render () {
     return(
-      <div>
-        <BrowserRouter>
+      <Fragment>
+        <Router>
          <div>
-          <Route exact path='/' component={Header}/>
+          <PrivateRoute exact path='/' component={Header}/>
+          <Route exact path='/login' component={Login}/>
          </div>
-        </BrowserRouter>
-      </div>
+        </Router>
+      </Fragment>
     )
   }
 
 };
 
-export default connect(null, actions)(App);
+
+function mapStateToProps({ auth }) {
+  return {auth};
+}
+
+export default connect(mapStateToProps, actions)(App);

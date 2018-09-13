@@ -24,7 +24,7 @@ module.exports = (app) => {
 
 
   app.post('/login', (req, res, next) => {
-    if(req.user) return res.redirect('/');
+    if(req.user) return res.redirect('/dashboard');
     passport.authenticate('local', function(err, user, info) {
       if (err) { return next(err) }
       if (!user) { return res.json( { message: info.message }) }
