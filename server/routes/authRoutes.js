@@ -19,15 +19,17 @@ module.exports = (app) => {
 
   app.get('/auth/facebook/callback',
   passport.authenticate('facebook'), (req, res) => {
-    res.redirect('/current_user');
+    if(req.user) {
+      res.redirect('/');
+    }
   });
 
 
-  app.post('/login', (req, res, next) => {
+  app.post('/api/login', (req, res, next) => {
     if(req.user) return res.redirect('/dashboard');
-    passport.authenticate('local', function(err, user, info) {
+    passport.authenticate('local', (err, user, info) => {
       if (err) { return next(err) }
-      if (!user) { return res.json( { message: info.message }) }
+      if (!user) { return res.json( { success : false, message: info.message }) }
       req.login(user, loginErr => {
         if (loginErr) {
           return next(loginErr);
@@ -39,15 +41,17 @@ module.exports = (app) => {
 
   app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
     if(req.user) {
-      res.redirect('/api/current_user');
+      res.redirect('/');
     }
   });
 
   app.get('/api/logout', (req, res) => {
     req.logout();
-     req.session.destroy();
-    res.send(`You successfuly logged out!`)
+    req.session.destroy();
+    res.send({success: true});
   });
+
+
   app.get('/api/current_user',
    (req, res) => {
     res.send(req.user);

@@ -1,49 +1,74 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Button, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react'
+import { reduxForm, Field } from 'redux-form';
+import { InputComponent } from '../helpers/common';
+import { Button, Form, Grid, Header, Image, Message, Segment, Icon } from 'semantic-ui-react'
+import * as actions from '../actions';
+import { validate } from '../helpers/validation';
+import SocialButtons from '../components/socialButtons'
 
-class Login extends Component {
-  render() {
-    console.log(this.props)
+const Login = ({error, handleSubmit, pristine, reset, submitting, localLoginUser, showLoadingScreen}) => {
     return(
-      <div className='login-form'>
-         <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle'>
-           <Grid.Column style={{ maxWidth: 450 }}>
+         <Grid textAlign='center' verticalAlign='middle' container stackable divided  columns={2} relaxed style={{paddingTop: '3rem'}}>
+          <Grid.Row>
+           <Grid.Column>
              <Header as='h2' color='teal' textAlign='center'>
-               <Image src='/logo.png' /> Log-in to your account
+              Log-in to your account
              </Header>
-             <Form size='large'>
+             <Form
+               size='large'
+               onSubmit={handleSubmit(localLoginUser)}
+               error={!!error}>
                <Segment stacked>
-                 <Form.Input fluid icon='user' iconPosition='left' placeholder='E-mail address' />
-                 <Form.Input
-                   fluid
-                   icon='lock'
-                   iconPosition='left'
-                   placeholder='Password'
-                   type='password'
-                 />
-
-                 <Button color='teal' fluid size='large'>
+               <Field
+                name="email"
+                fluid
+                icon='user'
+                iconPosition='left'
+                placeholder='E-mail address'
+                component={InputComponent}
+               />
+               <Field
+                 fluid
+                 name="password"
+                 icon='lock'
+                 iconPosition='left'
+                 placeholder='Password'
+                 type='password'
+                 component={InputComponent}
+               />
+                 <Form.Button
+                   color='blue'
+                   fluid size='large'
+                   loading={submitting}
+                   disabled={submitting}>
                    Login
-                 </Button>
+                 </Form.Button>
                </Segment>
+
+               { error && ( <Message negative style={{textAlign: 'left'}}>
+                 <Icon name='times circle' color='red'/>
+                 <span>{error.message}</span>
+               </Message>) }
              </Form>
              <Message>
-               New to us? <a href='#'>Sign Up</a>
+               New to us? <Link to='/signup'>Sign Up</Link>
              </Message>
            </Grid.Column>
+           <Grid.Column>
+            <SocialButtons showLoadingScreen={showLoadingScreen} />
+           </Grid.Column>
+           </Grid.Row>
          </Grid>
-       </div>
      )
-  }
 
 };
 
-
-function mapStateToProps({ auth }) {
-  return {auth};
-}
+const ConnectedLogin = connect(null, actions)(Login);
 
 
-export default connect(mapStateToProps)(Login);
+export default reduxForm({
+    form: 'loginForm',
+    validate
+})(ConnectedLogin);

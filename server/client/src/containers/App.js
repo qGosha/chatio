@@ -1,32 +1,51 @@
 import React, { Component, Fragment } from "react";
-import { BrowserRouter as Router, Route,  Redirect, withRouter } from 'react-router-dom';
-import { PrivateRoute } from '../helpers/routing';
-import Header from '../components/header.js'
-import Login from './Login'
+import { Router, Route,  Redirect, withRouter, Switch } from 'react-router-dom';
+import { PrivateRoute, RootRoute, EnterRoute, ConfirmRoute } from '../helpers/routing';
+import Dashboard from './Dashboard';
+import Confirmation from './Confirmation';
+import NoMatch from '../components/noMatch';
+import Login from './Login';
+import Signup from './Signup';
+import Loadable from 'react-loading-overlay';
 import * as actions from '../actions';
 import {connect} from 'react-redux';
+import history from '../helpers/history';
+
 class App extends Component {
-  componentDidMount() {
+
+ componentDidMount() {
    this.props.fetchUser();
   }
   render () {
+    const { auth, isLoading } = this.props;
+    if(!auth) return null;
     return(
-      <Fragment>
-        <Router>
-         <div>
-          <PrivateRoute exact path='/' component={Header}/>
-          <Route exact path='/login' component={Login}/>
-         </div>
+      <Loadable
+        active={isLoading}
+        spinner
+        style={{position: isLoading ? 'fixed' : 'absolute', top: 0, bottom: 0, left: 0, right: 0}}
+        text='Loading...'
+        >
+        <Router history={history}>
+         <Switch>
+          <PrivateRoute exact path='/' auth={auth} component={Dashboard}/>
+          <PrivateRoute exact path='/dashboard' auth={auth} component={Dashboard}/>
+          <EnterRoute exact path='/login' auth={auth} component={Login}/>
+          <EnterRoute exact path='/signup' auth={auth} component={Signup}/>
+          <ConfirmRoute exact path='/confirmation' auth={auth} component={Confirmation}/>
+          <Route component={NoMatch} />
+         </Switch>
         </Router>
-      </Fragment>
+      </Loadable>
     )
   }
 
 };
 
 
-function mapStateToProps({ auth }) {
-  return {auth};
-}
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  isLoading: state.isLoading
+});
 
 export default connect(mapStateToProps, actions)(App);

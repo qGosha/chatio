@@ -1,5 +1,6 @@
 require('./config/config.js')
 require('./models/users');
+require('./models/verifToken');
 require('./services/passport');
 const session = require('express-session');
 const mongodbStore = require('connect-mongo')(session);

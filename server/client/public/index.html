@@ -8,6 +8,7 @@
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
     -->
+    <link rel="stylesheet" href="style.css"></link>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css"></link>
 
     <!--
@@ -20,6 +21,16 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <script type="text/javascript">
+      if (window.location.hash == '#_=_'){
+        if (history.replaceState) {
+            var cleanHref = window.location.href.split('#')[0];
+            history.replaceState(null, null, cleanHref);
+        } else {
+            window.location.hash = '';
+        }
+  }
+    </script>
   </head>
   <body>
     <noscript>

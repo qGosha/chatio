@@ -4,10 +4,10 @@ const bcrypt = require('bcryptjs');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-  firstName: String,
-  lastName: String,
+  name: String,
   gender: String,
-  dateOfBirth: String,
+  dateOfBirth: Date,
+  city: String,
   photos:[],
   email: {
     type: String,
@@ -29,6 +29,10 @@ const userSchema = new Schema({
    facebook: {
      facebookId: String,
      facebookEmail: String
+   },
+   isConfirmed: {
+     type: Boolean,
+     default: false
    }
 });
 
@@ -48,11 +52,11 @@ userSchema.pre('save', function(next) {
 });
 
 userSchema.statics.uniqEmailCheck = function (email, password) {
-  var User = this;
+  const User = this;
 
   return User.findOne({email}).then((user) => {
     if (user) {
-      return Promise.reject('User with this email already exist');
+      return Promise.reject('User with this email already exists');
     } else {
       return Promise.resolve();
     }

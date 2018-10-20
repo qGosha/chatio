@@ -31,12 +31,13 @@ passport.use(new FacebookStrategy({
       const user = await User.findOne({'facebook.facebookId': profile.id});
       if(user) return done(null, user);
       const newUser = await new User({
+      email: profile.emails && profile.emails.length ? profile.emails[0].value: '',
       'facebook.facebookId': profile.id,
       'facebook.facebookEmail': profile.emails && profile.emails.length ? profile.emails[0].value : '',
-       firstName: profile.name && profile.name.givenName,
-       lastName: profile.name && profile.name.familyName,
+       name: profile.name && profile.name.givenName,
        photos: profile.photos,
-       gender: profile.gender
+       gender: profile.gender,
+       isConfirmed: true
     }).save();
     done(null, newUser);
     } catch(err) {
@@ -54,11 +55,12 @@ passport.use(new GoogleStrategy({
    const user = await User.findOne({'google.googleId': profile.id});
    if(user) return done(null, user);
    const newUser = await new User({
+    email: profile.emails && profile.emails.length ? profile.emails[0].value : '',
     'google.googleId': profile.id,
     'google.googleEmail': profile.emails && profile.emails.length ? profile.emails[0].value : '',
-    firstName: profile.name && profile.name.givenName,
-    lastName: profile.name && profile.name.familyName,
-    photos: profile.photos
+    name: profile.name && profile.name.givenName,
+    photos: profile.photos,
+    isConfirmed: true
    }).save();
    done(null, newUser);
  } catch(err) {
