@@ -1,9 +1,9 @@
-import React, { Component, Fragment } from "react";
+import React from "react";
 import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
 import { reduxForm, Field } from 'redux-form';
 import { InputComponent } from '../helpers/common';
-import { Button, Form, Grid, Header, Image, Message, Segment, Icon } from 'semantic-ui-react'
+import { Form, Grid, Header, Message, Segment, Icon } from 'semantic-ui-react'
 import * as actions from '../actions';
 import { validate } from '../helpers/validation';
 import SocialButtons from '../components/socialButtons'

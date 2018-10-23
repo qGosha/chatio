@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SIGNUP_USER, ERROR, LOGIN_USER, CONFIRM_USER } from './types';
+import { ERROR, LOGIN_USER, CONFIRM_USER } from './types';
 import history from '../helpers/history';
 import {  SubmissionError } from 'redux-form';
 

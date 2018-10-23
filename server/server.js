@@ -2,6 +2,8 @@ require('./config/config.js')
 require('./models/users');
 require('./models/verifToken');
 require('./services/passport');
+require('./services/passport');
+
 const session = require('express-session');
 const mongodbStore = require('connect-mongo')(session);
 const passport = require('passport');
@@ -33,6 +35,8 @@ app.use(passport.session());
 require('./routes/authRoutes')(app);
 require('./routes/signUpRoutes')(app);
 require('./routes/basicRoutes')(app);
+require('./routes/profileRoutes')(app);
+
 const port = process.env.PORT || 5000;
 
 

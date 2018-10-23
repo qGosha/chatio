@@ -1,48 +1,44 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import {connect} from 'react-redux';
-import { Link, withRouter } from 'react-router-dom';
 import * as actions from '../actions';
-import AuthButton from '../helpers/authButton';
-import { Segment, Dimmer, Loader } from 'semantic-ui-react';
-
+import { Segment, Button } from 'semantic-ui-react';
+import ModalWindow from '../components/modal';
 
 class Dashboard extends Component {
+  state = { modalOpen: false };
 
-  // async componentDidMount() {
-  //  setTimeout(this.onLongLoading.bind(this), 800);
-  //  await Promise.resolve(this.props.fetchUser());
-  //  this.props.hideLoadingScreen()
-  // }
-
-  // onLongLoading() {
-  //   if (!this.props.auth) {
-  //     this.props.showLoadingScreen();
-  //   }
-  // }
   render() {
-  const { auth, loading } = this.props;
+  const { auth, deleteUser, logoutUser } = this.props;
   const user = auth.user;
     return(
-      <Dimmer.Dimmable as={Segment} dimmed={loading}>
-          <Dimmer active={loading} inverted>
-            <Loader>Loading</Loader>
-          </Dimmer>
+      <Fragment>
         <h2>
          {`Hello ${user.name}`}
         </h2>
-        <div>
-        <AuthButton/>
-        </div>
-        <div><img src={user.photos.length && user.photos[0].value} /></div>
-        </Dimmer.Dimmable>
+        <Segment>
+          <Button onClick={logoutUser}>Sign out</Button>
+          <Button onClick={() => this.setState({ modalOpen: true })}>Delete profile</Button>
+        </Segment>
+        <Segment>
+          <img alt='profile photo' src={user.photos.length && user.photos[0].value} />
+        </Segment>
+        <ModalWindow
+         open={this.state.modalOpen}
+         onClose={() => this.setState({ modalOpen: false})}
+         headertext={'Delete Your Account'}
+         contenttext={'Are you sure you want to delete your account?'}
+         onNegative={() => this.setState({ modalOpen: false})}
+         onPositive={() => deleteUser()}
+         />
+      </Fragment>
     )
   }
 
 };
 
 
-function mapStateToProps({ auth, loading }) {
-  return {auth, loading};
+function mapStateToProps({ auth }) {
+  return {auth};
 }
 
 

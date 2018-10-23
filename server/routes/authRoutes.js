@@ -20,7 +20,7 @@ module.exports = (app) => {
   app.get('/auth/facebook/callback',
   passport.authenticate('facebook'), (req, res) => {
     if(req.user) {
-      res.redirect('/');
+      res.redirect('/dashboard');
     }
   });
 
@@ -41,7 +41,7 @@ module.exports = (app) => {
 
   app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
     if(req.user) {
-      res.redirect('/');
+      res.redirect('/dashboard');
     }
   });
 

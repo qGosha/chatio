@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import axios from 'axios';
 import {connect} from 'react-redux';
-import { Link } from 'react-router-dom';
-import {  reduxForm, Field, SubmissionError, registerField } from 'redux-form';
+import {  reduxForm, SubmissionError } from 'redux-form';
 import SignUpGrid from '../components/signUpGrid'
 import * as actions from '../actions';
 import { validate } from '../helpers/validation';

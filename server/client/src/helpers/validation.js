@@ -11,6 +11,11 @@ export const validate = (values, props) => {
   } else if (values.password.length < 6) {
      errors.password = 'Password must be more than 6 characters'
   }
+  if (!values.repPassword) {
+    errors.repPassword = 'Required'
+  } else if (values.password !== values.repPassword) {
+     errors.repPassword = 'Passwords don\'t match'
+  }
   if (!values.birthDay) {
    errors.birthDay = 'Select day'
   }

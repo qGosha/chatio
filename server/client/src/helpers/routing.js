@@ -8,21 +8,17 @@ export const PrivateRoute = ({ component: Component, auth, ...rest }) => (
       if (auth.isAuthenticated && auth.user.isConfirmed) { return <Component {...props} />; }
       if(auth.isAuthenticated && !auth.user.isConfirmed) {
         return (
-          <Redirect
-            to={{
+          <Redirect to={{
               pathname: "/confirmation",
               state: { from: props.location }
-            }}
-          />
+            }}/>
         )
       } else {
         return (
-          <Redirect
-            to={{
+          <Redirect to={{
               pathname: "/login",
               state: { from: props.location }
-            }}
-          />
+            }}/>
         )
       }
     }

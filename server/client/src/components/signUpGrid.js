@@ -1,6 +1,6 @@
 import React from "react";
 import { InputComponent, SelectComponent, SearchComponent } from '../helpers/common';
-import { Button, Form, Grid, Header, Image, Message, Segment, Icon, Label } from 'semantic-ui-react';
+import { Form, Grid, Header, Message, Segment, Icon } from 'semantic-ui-react';
 import {  Field } from 'redux-form';
 import { Link } from 'react-router-dom';
 import SocialButtons from '../components/socialButtons';
@@ -8,7 +8,7 @@ import SocialButtons from '../components/socialButtons';
 
 
 const SignUpGrid = ({submitForm, monthOptions, yearOptions, dayOptions, genderOptions, handleSearchChange, results, props}) => {
-  const { error, handleSubmit, pristine, reset, submitting, showLoadingScreen } = props;
+  const { error, handleSubmit, submitting, showLoadingScreen } = props;
   const label = {
     display: 'block',
     margin: '0 0 .28571429rem 0',
@@ -113,6 +113,18 @@ const SignUpGrid = ({submitForm, monthOptions, yearOptions, dayOptions, genderOp
             icon='lock'
             iconPosition='left'
             placeholder='Password'
+            type='password'
+            component={InputComponent}
+          />
+          <span style={label}>
+           Repeat your password
+          </span>
+          <Field
+            fluid
+            name="repPassword"
+            icon='lock'
+            iconPosition='left'
+            placeholder='Repeat your password'
             type='password'
             component={InputComponent}
           />

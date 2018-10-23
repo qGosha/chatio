@@ -18,7 +18,7 @@ export const fetchUser = () => async dispatch => {
       const { data } = res;
       if(data.success) {
         dispatch({type: LOGIN_USER, payload: data.message});
-        history.push('/');
+        history.replace('/dashboard')
       } else {
         throw Error(data.message);
       }
@@ -31,4 +31,5 @@ export const fetchUser = () => async dispatch => {
 export const logoutUser = () => async dispatch => {
       const user = await axios.get('/api/logout');
       dispatch({type: LOGOUT_USER});
+      history.push('/');
     }

@@ -1,6 +1,6 @@
-import React, { Component, Fragment } from "react";
-import { Router, Route,  Redirect, withRouter, Switch } from 'react-router-dom';
-import { PrivateRoute, RootRoute, EnterRoute, ConfirmRoute } from '../helpers/routing';
+import React, { Component } from "react";
+import { Router, Route, Switch } from 'react-router-dom';
+import { PrivateRoute, EnterRoute, ConfirmRoute } from '../helpers/routing';
 import Dashboard from './Dashboard';
 import Confirmation from './Confirmation';
 import NoMatch from '../components/noMatch';
@@ -9,7 +9,8 @@ import Signup from './Signup';
 import Loadable from 'react-loading-overlay';
 import * as actions from '../actions';
 import {connect} from 'react-redux';
-import history from '../helpers/history';
+import history  from '../helpers/history';
+
 
 class App extends Component {
 
@@ -31,7 +32,7 @@ class App extends Component {
           <PrivateRoute exact path='/' auth={auth} component={Dashboard}/>
           <PrivateRoute exact path='/dashboard' auth={auth} component={Dashboard}/>
           <EnterRoute exact path='/login' auth={auth} component={Login}/>
-          <EnterRoute exact path='/signup' auth={auth} component={Signup}/>
+          <Route exact path='/signup' auth={auth} component={Signup}/>
           <ConfirmRoute exact path='/confirmation' auth={auth} component={Confirmation}/>
           <Route component={NoMatch} />
          </Switch>
