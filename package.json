@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/server.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client",
     "startdev": "export NODE_ENV=development || SET \"NODE_ENV=development\" && nodemon server/server.js",
     "startdevd": "export NODE_ENV=development || SET \"NODE_ENV=development\" && node --inspect-brk server/server.js",
     "client": "npm run start --prefix server/client",
