@@ -19,7 +19,7 @@ const sendTokenEmail = async (req, user) => {
       pass: process.env.GMAIL_PASSWORD
     }
   });
- const link = `http://${req.headers.host}/api/confirmation/${token.token}`;
+ const link = `https://${req.headers.host}/api/confirmation/${token.token}`;
  const letter = mail(link, token.pin);
 
  const mailOptions = {
