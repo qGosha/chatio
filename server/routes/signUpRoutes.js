@@ -23,7 +23,7 @@ const sendTokenEmail = async (req, user) => {
  const letter = mail(link, token.pin);
 
  const mailOptions = {
-    from: 'no-reply@myapp.com',
+    from: 'zxoxz@mail.ru',
     to: user.email,
     subject: 'Account Verification Token',
     html: letter
