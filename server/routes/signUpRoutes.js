@@ -23,7 +23,7 @@ const sendTokenEmail = async (req, user) => {
  const letter = mail(link, token.pin);
 
  const mailOptions = {
-    from: 'zxoxz@mail.ru',
+    from: process.env.GMAIL_USERNAME,
     to: user.email,
     subject: 'Account Verification Token',
     html: letter
