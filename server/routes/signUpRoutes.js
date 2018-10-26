@@ -13,7 +13,7 @@ const sendTokenEmail = async (req, user) => {
     pin: Math.floor((Math.random()*1000000000)+1).toString().slice(0,4)
   }).save();
   const transporter = nodemailer.createTransport({
-    service: 'Gmail',
+    service: 'Mail.ru',
     auth: {
       user: process.env.GMAIL_USERNAME,
       pass: process.env.GMAIL_PASSWORD
