@@ -33,7 +33,12 @@ const userSchema = new Schema({
    isConfirmed: {
      type: Boolean,
      default: false
-   }
+   },
+   state: {
+     online: true,
+     available: false
+   },
+
 });
 
 userSchema.pre('save', function(next) {
