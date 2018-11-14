@@ -2,50 +2,22 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 
-const tokenSchema = new Schema({
-    _userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'users'
+const messageSchema = new Schema({
+    message:{
+        text: {
+          type: {},
+          required:true
+        },
     },
-    token: {
-      type: String,
-      required: true
-    },
-    pin: {
-      type: String,
-      required: true
-    },
-    createdAt: {
-      type: Date,
-      required: true,
-      default: Date.now,
-      expires: 43200
-    }
+    users:[{
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true }
+    }],
+    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
+    delivered: { type: Boolean },
+    deliveredAt: { type: Date },
+    read: { type: Date },
+
 });
 
-tokenSchema.statics.findByToken = function (token) {
- const Token = this;
 
- return Token.findOne({token}).then((token) => {
-   if (!token) {
-     return Promise.reject('Token is not valid');
-   } else {
-     return Promise.resolve(token);
-   }
- });
-};
-
-tokenSchema.statics.findByPin = function (pin) {
- const Token = this;
-
- return Token.findOne({pin}).then((pin) => {
-   if (!pin) {
-     return Promise.reject('Pin is not valid');
-   } else {
-     return Promise.resolve(pin);
-   }
- });
-}
-
-mongoose.model('verifTokens', tokenSchema);
+mongoose.model('messages', messageSchema);
