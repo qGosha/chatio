@@ -1,9 +1,8 @@
 const passport = require('passport');
 const loggedIn = require('../helpers/middleware');
-const changeUserStatus = require('../helpers/help_functions');
 const _ = require('lodash');
 
-module.exports = (app) => {
+module.exports = (app, io) => {
 
   app.get('/auth/google', passport.authenticate('google', {
     scope: ['profile', 'email']
@@ -13,39 +12,35 @@ module.exports = (app) => {
   passport.authenticate('facebook', { scope: ['email'] }));
 
   app.get('/auth/facebook/callback',
-  passport.authenticate('facebook'), async (req, res) => {
+  passport.authenticate('facebook'), (req, res) => {
     if(req.user) {
-      await changeUserStatus(req.user, res, true);
       res.redirect('/dashboard');
     }
   });
-
 
   app.post('/api/login', (req, res, next) => {
     if(req.user) return res.redirect('/dashboard');
     passport.authenticate('local', (err, user, info) => {
       if (err) { return next(err) }
       if (!user) { return res.json( { success : false, message: info.message }) }
-      req.login(user, async loginErr => {
+      req.login(user, loginErr => {
         if (loginErr) {
           return next(loginErr);
         }
-        const updatedUser = await changeUserStatus(user, res, true);
-        const editedUser = _.omit(updatedUser.data, ['password']);
+        const editedUser = _.omit(user, ['password']);
         return res.send({ success : true, message : editedUser });
       });
     })(req, res, next);
   });
 
-  app.get('/auth/google/callback', passport.authenticate('google'), async (req, res) => {
+  app.get('/auth/google/callback', passport.authenticate('google'), (req, res) => {
     if(req.user) {
-      await changeUserStatus(req.user, res, true);
       res.redirect('/dashboard');
     }
   });
 
-  app.get('/api/logout', async (req, res) => {
-    await changeUserStatus(req.user, res, false);
+  app.get('/api/logout', (req, res) => {
+    
     req.logout();
     req.session.destroy();
     res.send({success: true});

@@ -19,5 +19,4 @@ const messageSchema = new Schema({
 
 });
 
-
 mongoose.model('messages', messageSchema);

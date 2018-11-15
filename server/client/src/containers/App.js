@@ -10,23 +10,11 @@ import Loadable from 'react-loading-overlay';
 import * as actions from '../actions';
 import {connect} from 'react-redux';
 import history  from '../helpers/history';
-import io from 'socket.io-client';
 
 
 class App extends Component {
- state = {
-   response: null
- }
  componentDidMount() {
    this.props.fetchUser();
-   const socket = io('http://localhost:5000');
-   socket.on('connect', () => {
-      console.log("sdpogpdogdsg", socket.id); // true
-    });
-    socket.on('fromAPI', (message) => {
-       console.log(message);
-     });
-   // socket.on("FromAPI", data => this.setState({ response: data }));
   }
   render () {
     const { auth, isLoading } = this.props;

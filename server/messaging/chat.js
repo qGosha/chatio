@@ -1,10 +1,26 @@
 const mongoose = require('mongoose');
-const User = mongoose.model('users');
+const Message = mongoose.model('messages');
+const passport = require('passport');
+const changeUserStatus = require('../helpers/help_functions');
 
-module.exports = (io) => {
-  io.on('connection', (socket) => {
-    console.log('new user joined');
-    socket.emit('fromAPI', 'Hello from server');
+
+module.exports = (io, sessionMiddleware) => {
+  io.on('connection', async (socket) => {
+    if(socket.request.session.passport) {
+      const userId = socket.request.session.passport.user;
+      try {
+        await changeUserStatus(userId, true)
+      } catch(err) {
+        throw new Error(err)
+      }
+      console.log('new user joined');
+      socket.emit('fromAPI', io);
+      socket.on('sendMessage', (msg, callback) => {
+        if(!msg) throw new Error('No messsage provided');
+
+      })
+
+
 
     socket.on('createMessage', (newMessage, callback) => {
 
@@ -35,12 +51,14 @@ module.exports = (io) => {
     //   }
     // })
     //
-    // socket.on('disconnect', () => {
-    //   const user = users.removeUser(socket.id);
-    //   if (user) {
-    //     io.to(user.room).emit('updateUserList', users.getUserList(user.room));
-    //     io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left`));
-    //   }
-    // });
+    socket.on('disconnect', async () => {
+      try {
+        await changeUserStatus(userId, true)
+      } catch(err) {
+        throw new Error(err)
+      }
+    });
+      }
   });
+
 }
