@@ -8,13 +8,19 @@ import io from 'socket.io-client';
 
 
 class Dashboard extends Component {
-  state = { modalOpen: false };
+  state = { modalOpen: false, socket: null };
   sendMessage = this.sendMessage.bind(this);
+  logout = this.logout.bind(this);
+  logout() {
+    this.state.socket.disconnect();
+    this.props.logoutUser();
+  }
   sendMessage() {
     // socket.emit('sendMessage', 'NewMessageFromMyApp');
   }
   componentDidMount() {
   const socket = io('http://localhost:5000');
+  this.setState({socket});
     socket.on('connect', () => {
        console.log("sdpogpdogdsg", socket.id); // true
        socket.on('fromAPI', (message) => {
@@ -33,7 +39,7 @@ class Dashboard extends Component {
          {`Hello ${user.name}`}
         </h2>
         <Segment>
-          <Button onClick={logoutUser}>Sign out</Button>
+          <Button onClick={this.logout}>Sign out</Button>
           <Button onClick={() => this.setState({ modalOpen: true })}>Delete profile</Button>
           <Button onClick={this.sendMessage}>Send a message</Button>
         </Segment>

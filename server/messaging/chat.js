@@ -6,21 +6,25 @@ const changeUserStatus = require('../helpers/help_functions');
 
 module.exports = (io, sessionMiddleware) => {
   io.on('connection', async (socket) => {
+
     if(socket.request.session.passport) {
       const userId = socket.request.session.passport.user;
       try {
-        await changeUserStatus(userId, true)
+        await changeUserStatus(userId, true);
+        console.log('new user joined');
+        socket.emit('fromAPI', {'fdfdf': 'handshake'});
+        // socket.on('sendMessage', (msg, callback) => {
+        //   if(!msg) throw new Error('No messsage provided');
+        //
+        // })
+
       } catch(err) {
         throw new Error(err)
       }
-      console.log('new user joined');
-      socket.emit('fromAPI', io);
-      socket.on('sendMessage', (msg, callback) => {
-        if(!msg) throw new Error('No messsage provided');
+      socket.on('disconnect', async () => {
+        await changeUserStatus(userId, false);
 
       })
-
-
 
     socket.on('createMessage', (newMessage, callback) => {
 
@@ -50,14 +54,7 @@ module.exports = (io, sessionMiddleware) => {
     //     io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude))
     //   }
     // })
-    //
-    socket.on('disconnect', async () => {
-      try {
-        await changeUserStatus(userId, true)
-      } catch(err) {
-        throw new Error(err)
-      }
-    });
+    //;
       }
   });
 
