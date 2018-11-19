@@ -11,13 +11,8 @@ module.exports = (io, sessionMiddleware) => {
       const userId = socket.request.session.passport.user;
       try {
         await changeUserStatus(userId, true);
-        console.log('new user joined');
+        console.log('new user joined', userId);
         socket.emit('fromAPI', {'fdfdf': 'handshake'});
-        // socket.on('sendMessage', (msg, callback) => {
-        //   if(!msg) throw new Error('No messsage provided');
-        //
-        // })
-
       } catch(err) {
         throw new Error(err)
       }
@@ -26,8 +21,12 @@ module.exports = (io, sessionMiddleware) => {
 
       })
 
-    socket.on('createMessage', (newMessage, callback) => {
-
+    socket.on('createMessage', async (newMessage, callback) => {
+      io.emit('fromAPI', newMessage);
+      const message = await new Message({
+        ...newMessage,
+        sender: userId
+      }).save();
       // const user = users.getUser(socket.id);
       // if (user && isRealString(newMessage.text)) {
       //   io.to(user.room).emit('newMessage', generateMessage(user.name, newMessage.text));

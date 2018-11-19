@@ -13,9 +13,10 @@ const messageSchema = new Schema({
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true }
     }],
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
-    delivered: { type: Boolean },
+    delivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
-    read: { type: Date },
+    read: { type: Boolean, default: false },
+    timestamp: { type: Date, default: new Date() }
 
 });
 

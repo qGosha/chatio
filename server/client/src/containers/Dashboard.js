@@ -4,6 +4,7 @@ import * as actions from '../actions';
 import { Segment, Button } from 'semantic-ui-react';
 import ModalWindow from '../components/modal';
 import io from 'socket.io-client';
+import { Dropdown } from 'semantic-ui-react'
 
 
 
@@ -16,7 +17,14 @@ class Dashboard extends Component {
     this.props.logoutUser();
   }
   sendMessage() {
-    // socket.emit('sendMessage', 'NewMessageFromMyApp');
+    const newMessage = {
+      message: {
+        text: 'SuperText'
+      },
+      users: [ {user: '5beba4b1f0ca3614a491f1f4'} ],
+
+    }
+    this.state.socket.emit('createMessage', newMessage);
   }
   componentDidMount() {
   const socket = io('http://localhost:5000');
@@ -27,7 +35,7 @@ class Dashboard extends Component {
           console.log(message);
         });
      });
-
+   this.props.getPeers();
     // socket.on("FromAPI", data => this.setState({ response: data }));
   }
   render() {
@@ -42,6 +50,8 @@ class Dashboard extends Component {
           <Button onClick={this.logout}>Sign out</Button>
           <Button onClick={() => this.setState({ modalOpen: true })}>Delete profile</Button>
           <Button onClick={this.sendMessage}>Send a message</Button>
+        </Segment>
+        <Segment>
         </Segment>
         <Segment>
           <img alt='profile photo' src={user.photos.length && user.photos[0].value} />

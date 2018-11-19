@@ -1,11 +1,9 @@
 const loggedIn = require('../helpers/middleware');
 const axios = require('axios');
-
+const mongoose = require('mongoose');
+const User = mongoose.model('users');
 
 module.exports = (app) => {
-  // app.get('/', loggedIn, (req, res) => {
-  //   res.status(200);
-  // });
   app.post('/api/search/city', async (req, res) => {
     try {
      const results = await axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${req.body.value}&types=(cities)&key=${process.env.GOOGLE_API_KEY}`);
@@ -15,6 +13,21 @@ module.exports = (app) => {
          results: results.data.predictions
        })
      }
+   } catch (error) {
+     res.send({
+       success: false,
+       error
+     })
+   }
+  });
+
+  app.get('/api/search/allUsers', loggedIn, async (req, res) => {
+    try {
+     const users = await User.find( { _id: { $ne: req.user._id } }, { name: 1, gender: 1, online: 1 } );
+     res.send({
+       success: true,
+       message: users
+     })
    } catch (error) {
      res.send({
        success: false,
