@@ -8,3 +8,5 @@ export const SIGNUP_USER = 'SIGNUP_USER';
 export const CONFIRM_USER = 'CONFIRM_USER';
 export const DELETE_USER = 'DELETE_USER';
 export const GET_PEERS = 'GET_PEERS';
+export const USER_CHANGESTATUS = 'USER_CHANGESTATUS';
+export const OPEN_DIALOG = 'OPEN_DIALOG';

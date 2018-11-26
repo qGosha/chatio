@@ -2,6 +2,8 @@ const loggedIn = require('../helpers/middleware');
 const axios = require('axios');
 const mongoose = require('mongoose');
 const User = mongoose.model('users');
+const Message = mongoose.model('messages');
+const { ObjectId } = require('mongodb');
 
 module.exports = (app) => {
   app.post('/api/search/city', async (req, res) => {
@@ -23,7 +25,7 @@ module.exports = (app) => {
 
   app.get('/api/search/allUsers', loggedIn, async (req, res) => {
     try {
-     const users = await User.find( { _id: { $ne: req.user._id } }, { name: 1, gender: 1, online: 1 } );
+     const users = await User.find( { _id: { $ne: req.user._id } }, { name: 1, gender: 1, online: 1, photos: { $slice: 1 } } );
      res.send({
        success: true,
        message: users
@@ -35,4 +37,25 @@ module.exports = (app) => {
      })
    }
   });
+
+  app.post('/api/chat/dialogs', loggedIn, async (req, res) => {
+    console.log(req.body.id);
+    try {
+      const messages = await Message.find({ sender: ObjectId(req.user._id), users: { "$in" : [ObjectId(req.body.id)] } })
+      .sort({ timestamp: -1 })
+      .limit(20);
+
+     res.send({
+       success: true,
+       message: messages
+     })
+   } catch (error) {
+     res.send({
+       success: false,
+       error
+     })
+   }
+  });
+
+
 }

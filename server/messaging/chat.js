@@ -11,14 +11,13 @@ module.exports = (io, sessionMiddleware) => {
       const userId = socket.request.session.passport.user;
       try {
         await changeUserStatus(userId, true);
-        console.log('new user joined', userId);
-        socket.emit('fromAPI', {'fdfdf': 'handshake'});
+        socket.broadcast.emit('userChangedStatus', {id: userId, online: true});
       } catch(err) {
         throw new Error(err)
       }
       socket.on('disconnect', async () => {
         await changeUserStatus(userId, false);
-
+        socket.broadcast.emit('userChangedStatus', {id: userId, online: false});
       })
 
     socket.on('createMessage', async (newMessage, callback) => {
