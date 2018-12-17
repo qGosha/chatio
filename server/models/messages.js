@@ -9,9 +9,7 @@ const messageSchema = new Schema({
           required:true
         },
     },
-    users:[{
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true }
-    }],
+    recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
     delivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },

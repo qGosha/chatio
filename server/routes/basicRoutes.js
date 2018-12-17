@@ -41,7 +41,7 @@ module.exports = (app) => {
   app.post('/api/chat/dialogs', loggedIn, async (req, res) => {
     console.log(req.body.id);
     try {
-      const messages = await Message.find({ sender: ObjectId(req.user._id), users: { "$in" : [ObjectId(req.body.id)] } })
+      const messages = await Message.find({ sender: { $in: [ObjectId(req.user._id), ObjectId(req.body.id)] }, recipient: { $in: [ObjectId(req.body.id), ObjectId(req.user._id)] } })
       .sort({ timestamp: -1 })
       .limit(20);
 

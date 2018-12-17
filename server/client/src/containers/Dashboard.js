@@ -4,7 +4,8 @@ import * as actions from '../actions';
 import { Segment, Button, Form, Grid, Header, Message, Icon, Input, Image } from 'semantic-ui-react';
 import ModalWindow from '../components/modal';
 import io from 'socket.io-client';
-import SidePanel from '../components/SidePanel'
+import SidePanel from '../components/SidePanel';
+import Messages from '../components/Messages'
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
 
@@ -41,11 +42,12 @@ class Dashboard extends Component {
   }
 
   sendMessage() {
+    const { activeDialogWith } = this.props.dashboard;
     const newMessage = {
       message: {
         text: 'SuperText'
       },
-      users: [ {user: '5beba4b1f0ca3614a491f1f4'} ],
+      recipient: activeDialogWith,
 
     }
     this.state.socket.emit('createMessage', newMessage);
@@ -67,7 +69,7 @@ class Dashboard extends Component {
   }
   render() {
   const { auth, deleteUser, logoutUser, dashboard, openDialog } = this.props;
-
+  const { currentMessages } = dashboard;
   const user = auth.user;
     return(
       <div style={styles.grid}>
@@ -91,7 +93,7 @@ class Dashboard extends Component {
         </div>
         <div style={{gridArea: 'main'}}>
           <Segment style={styles.dialog}>
-           jaasvasvasvasvasvas
+           <Messages messages={currentMessages} friendOptions={dashboard.allUsers} />
           </Segment>
           <ModalWindow
            open={this.state.modalOpen}

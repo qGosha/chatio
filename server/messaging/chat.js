@@ -19,9 +19,21 @@ module.exports = (io, sessionMiddleware) => {
         await changeUserStatus(userId, false);
         socket.broadcast.emit('userChangedStatus', {id: userId, online: false});
       })
+      socket.on('error', async () => {
+        await changeUserStatus(userId, false);
+        socket.broadcast.emit('userChangedStatus', {id: userId, online: false});
+      })
+      socket.on('connect_timeout', async () => {
+        await changeUserStatus(userId, false);
+        socket.broadcast.emit('userChangedStatus', {id: userId, online: false});
+      })
+      socket.on('connect_error', async () => {
+        await changeUserStatus(userId, false);
+        socket.broadcast.emit('userChangedStatus', {id: userId, online: false});
+      })
 
     socket.on('createMessage', async (newMessage, callback) => {
-      io.emit('fromAPI', newMessage);
+      
       const message = await new Message({
         ...newMessage,
         sender: userId
