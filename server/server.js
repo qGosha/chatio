@@ -2,6 +2,7 @@ require('./config/config.js');
 require('./models/users');
 require('./models/verifToken');
 require('./models/messages');
+require('./models/conversations');
 require('./services/passport');
 require('./services/passport');
 
