@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 
 const messageSchema = new Schema({
-    conversationId: { type : mongoose.Schema.Types.ObjectId, ref: 'conversations' }
+    conversationId: { type : mongoose.Schema.Types.ObjectId, ref: 'conversations' },
     message:{
         text: {
           type: {},

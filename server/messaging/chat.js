@@ -32,12 +32,13 @@ module.exports = (io, sessionMiddleware) => {
         socket.broadcast.emit('userChangedStatus', {id: userId, online: false});
       })
 
-    socket.on('createMessage', async (newMessage, callback) => {
-      
+    socket.on('outboundMessage', async (newMessage, callback) => {
+
       const message = await new Message({
         ...newMessage,
         sender: userId
       }).save();
+     io.sockets.in(newMessage.activeDialogWith).emit('inboundMessage', message)
       // const user = users.getUser(socket.id);
       // if (user && isRealString(newMessage.text)) {
       //   io.to(user.room).emit('newMessage', generateMessage(user.name, newMessage.text));
@@ -48,14 +49,14 @@ module.exports = (io, sessionMiddleware) => {
       // if (!isRealString(params.name) || !isRealString(params.room)) {
       //   return callback('Name and room name are requireed');
       // }
-      // socket.join(params.room);
+      socket.join(socket.id);
       // users.removeUser(socket.id);
       // users.addUser(socket.id, params.name, params.room);
       //
       // io.to(params.room).emit('updateUserList', users.getUserList(params.room));
-      // socket.emit('newMessage', generateMessage('Admin', 'Welcome'))
+      // socket.emit('fromAPI', io.sockets)
       // socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} joined`));
-      callback();
+      // callback();
     })
 
     // socket.on('createLocationMessage', (coords) => {

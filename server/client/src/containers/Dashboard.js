@@ -28,11 +28,15 @@ const styles = {
  dialog: {
    height: '300px',
    overflowY: 'scroll'
+ },
+ sendButton: {
+   display: 'flex',
+   flexDirection: 'row'
  }
 }
 
 class Dashboard extends Component {
-  state = { modalOpen: false, socket: null };
+  state = { modalOpen: false, socket: null, messageText: null };
   sendMessage = this.sendMessage.bind(this);
   logout = this.logout.bind(this);
 
@@ -45,15 +49,17 @@ class Dashboard extends Component {
     const { activeDialogWith } = this.props.dashboard;
     const newMessage = {
       message: {
-        text: 'SuperText'
+        text: this.state.messageText
       },
       recipient: activeDialogWith,
 
     }
-    this.state.socket.emit('createMessage', newMessage);
+    this.state.socket.emit('outboundMessage', newMessage);
   }
   componentDidMount() {
   const socket = io('http://localhost:5000');
+  socket.emit('join', {});
+
   this.setState({socket});
     socket.on('connect', () => {
        console.log("sdpogpdogdsg", socket.id); // true
@@ -63,6 +69,9 @@ class Dashboard extends Component {
       socket.on('userChangedStatus', (message) => {
          this.props.userChangedStatus(message);
        });
+     socket.on('inboundMessage', (message) => {
+        this.props.addMessage(message);
+      });
      });
    this.props.getPeers();
     // socket.on("FromAPI", data => this.setState({ response: data }));
@@ -105,7 +114,8 @@ class Dashboard extends Component {
            />
          </div>
          <div style={{gridArea: 'footer'}}>
-           <Input fluid action='Send' placeholder='Send...' />
+           <Input value={this.state.messageText} fluid placeholder='Send...' onChange={(e) => this.setState({messageText: e.target.value})}/>
+           <Button onClick={this.sendMessage}>Send</Button>
          </div>
       </div>
     )

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_PEERS, USER_CHANGESTATUS, OPEN_DIALOG } from './types';
+import { GET_PEERS, USER_CHANGESTATUS, OPEN_DIALOG, ADD_MESSAGE } from './types';
 
 export const getPeers = () => async dispatch => {
       const res = await axios.get('/api/search/allUsers');
@@ -35,6 +35,15 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
           dispatch({
             payload: { peerId: id, messages: res.data.message },
             type: OPEN_DIALOG
+          });
+        }
+      }
+
+  export const addMessage = (message) => async dispatch => {
+        if(message) {
+          dispatch({
+            payload: message,
+            type: ADD_MESSAGE
           });
         }
       }

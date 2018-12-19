@@ -1,4 +1,4 @@
-import { GET_PEERS, USER_CHANGESTATUS, OPEN_DIALOG } from '../actions/types';
+import { GET_PEERS, USER_CHANGESTATUS, OPEN_DIALOG, ADD_MESSAGE } from '../actions/types';
 const initialState = {
    allUsers: null,
    activeDialogWith: null,
@@ -13,6 +13,9 @@ export function dashboard(state = initialState, action) {
   return { ...state, allUsers:  payload };
  case OPEN_DIALOG:
   return { ...state, activeDialogWith: payload.peerId,  currentMessages: payload.messages };
+ case ADD_MESSAGE:
+  return { ...state, currentMessages:  [ ...state.currentMessages, payload ] };
+
  default: return state;
  }
 }
