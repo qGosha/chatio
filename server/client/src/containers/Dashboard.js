@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from "react";
 import {connect} from 'react-redux';
 import * as actions from '../actions';
-import { Segment, Button, Form, Grid, Header, Message, Icon, Input, Image } from 'semantic-ui-react';
+import { Segment, Button, Form, Grid, Header, Message, Icon, Input, Image, Ref } from 'semantic-ui-react';
 import ModalWindow from '../components/modal';
 import io from 'socket.io-client';
 import SidePanel from '../components/SidePanel';
@@ -36,17 +36,53 @@ const styles = {
 }
 
 class Dashboard extends Component {
-  state = { modalOpen: false, socket: null, messageText: null };
-  sendMessage = this.sendMessage.bind(this);
-  logout = this.logout.bind(this);
+  constructor(props) {
+    super(props);
+    this.state = { modalOpen: false, socket: null, messageText: '', };
+    this.uploadNewTrigger = false;
+    this.uploadTriggerCount = 0;
+    this.sendMessage = this.sendMessage.bind(this);
+    this.logout = this.logout.bind(this);
+    this.handleOpenDialog = this.handleOpenDialog.bind(this);
+    this.handleDialogScroll = this.handleDialogScroll.bind(this);
+    this.handleRef = element => {
+      this.dialog = element;
+    };
+  }
+// ((temp1.scrollHeight - temp1.scrollTop) / temp1.scrollHeight)*100
 
   logout() {
     this.state.socket.disconnect();
     this.props.logoutUser();
   }
 
+  async handleDialogScroll(e) {
+    if (this.uploadNewTrigger) return;
+    const target = e.target;
+    const height = ((target.scrollHeight - target.scrollTop) / target.scrollHeight) * 100;
+    if (height > 70) {
+      this.uploadNewTrigger = true;
+      const { activeDialogWith } = this.props.dashboard;
+      const skip = this.uploadTriggerCount + 20;
+      this.uploadTriggerCount = skip;
+      console.log('alaaaarm');
+      await this.props.uploadMessagesOnScroll(activeDialogWith, skip);
+      this.uploadNewTrigger = false;
+    }
+  }
+
+  async handleOpenDialog(id) {
+    this.uploadTriggerCount = 0;
+    this.uploadNewTrigger = false;
+    await this.props.openDialog(id);
+    if (this.dialog) {
+      this.dialog.scrollTop = this.dialog.scrollHeight;
+    }
+  }
+
   sendMessage() {
     const { activeDialogWith } = this.props.dashboard;
+    const { user } = this.props.auth;
     const newMessage = {
       message: {
         text: this.state.messageText
@@ -55,10 +91,10 @@ class Dashboard extends Component {
 
     }
     this.state.socket.emit('outboundMessage', newMessage);
+
   }
   componentDidMount() {
   const socket = io('http://localhost:5000');
-  socket.emit('join', {});
 
   this.setState({socket});
     socket.on('connect', () => {
@@ -70,10 +106,22 @@ class Dashboard extends Component {
          this.props.userChangedStatus(message);
        });
      socket.on('inboundMessage', (message) => {
+       const dialog = this.dialog;
+       let scroll;
+        if (dialog) {
+          if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
+            scroll = true;
+          }
         this.props.addMessage(message);
+        if(scroll) {
+          dialog.scrollTop = dialog.scrollHeight;
+         }
+        }
       });
+      socket.on('disconnect', (e) => console.log('disconnected', e))
      });
    this.props.getPeers();
+
     // socket.on("FromAPI", data => this.setState({ response: data }));
   }
   render() {
@@ -83,7 +131,7 @@ class Dashboard extends Component {
     return(
       <div style={styles.grid}>
        <div style={{gridArea: 'menu'}}>
-        <SidePanel friendOptions={dashboard.allUsers} openDialog={openDialog}/>
+        <SidePanel friendOptions={dashboard.allUsers} openDialog={(id) => this.handleOpenDialog(id)}/>
        </div>
        <div style={{gridArea: 'header'}}>
         <div style={styles.header}>
@@ -100,10 +148,12 @@ class Dashboard extends Component {
           </Segment>
         </div>
         </div>
-        <div style={{gridArea: 'main'}}>
-          <Segment style={styles.dialog}>
-           <Messages messages={currentMessages} friendOptions={dashboard.allUsers} />
+        <div style={{gridArea: 'main'}}  >
+         <Ref innerRef={this.handleRef}>
+          <Segment style={styles.dialog} onScroll={this.handleDialogScroll}>
+            <Messages messages={currentMessages} dashboard={dashboard} auth={auth}/>
           </Segment>
+          </Ref>
           <ModalWindow
            open={this.state.modalOpen}
            onClose={() => this.setState({ modalOpen: false})}

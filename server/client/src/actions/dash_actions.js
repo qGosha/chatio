@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_PEERS, USER_CHANGESTATUS, OPEN_DIALOG, ADD_MESSAGE } from './types';
+import { GET_PEERS, USER_CHANGESTATUS, OPEN_DIALOG, ADD_MESSAGE, UPLOAD_MESSAGES_ONSCROLL } from './types';
 
 export const getPeers = () => async dispatch => {
       const res = await axios.get('/api/search/allUsers');
@@ -27,7 +27,15 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
       });
     }
   }
-
+  export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
+        const res = await axios.post('/api/chat/dialogs', { id, skip });
+        if(res.data.success) {
+          dispatch({
+            payload: { messages: res.data.message },
+            type: UPLOAD_MESSAGES_ONSCROLL
+          });
+        }
+      }
 
   export const openDialog = (id) => async dispatch => {
         const res = await axios.post('/api/chat/dialogs', { id });

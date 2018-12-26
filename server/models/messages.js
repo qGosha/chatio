@@ -15,7 +15,7 @@ const messageSchema = new Schema({
     delivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
     read: { type: Boolean, default: false },
-    timestamp: { type: Date, default: new Date() }
+    timestamp: { type: Date, default: Date.now }
 
 });
 

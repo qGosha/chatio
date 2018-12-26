@@ -23,7 +23,10 @@ const port = process.env.PORT || 5000;
 const server = app.listen(port, () => {
   console.log('started on port ' + port)
 });
-const io = socketIO.listen(server);
+const io = socketIO.listen(server, {
+  pingInterval: 60000,
+  pingTimeout: 25000
+});
 io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });

@@ -1,8 +1,8 @@
-import { GET_PEERS, USER_CHANGESTATUS, OPEN_DIALOG, ADD_MESSAGE } from '../actions/types';
+import { GET_PEERS, USER_CHANGESTATUS, OPEN_DIALOG, ADD_MESSAGE, UPLOAD_MESSAGES_ONSCROLL } from '../actions/types';
 const initialState = {
    allUsers: null,
    activeDialogWith: null,
-   currentMessages: null
+   currentMessages: []
 }
 export function dashboard(state = initialState, action) {
   const payload = action.payload;
@@ -13,6 +13,8 @@ export function dashboard(state = initialState, action) {
   return { ...state, allUsers:  payload };
  case OPEN_DIALOG:
   return { ...state, activeDialogWith: payload.peerId,  currentMessages: payload.messages };
+ case UPLOAD_MESSAGES_ONSCROLL:
+  return { ...state, currentMessages: [ ...state.currentMessages, ...payload.messages ] };
  case ADD_MESSAGE:
   return { ...state, currentMessages:  [ ...state.currentMessages, payload ] };
 

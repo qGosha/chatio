@@ -12,7 +12,8 @@ const styles = {
   },
   avatar: {
     height: '40px',
-    weight: '40px'
+    weight: '40px',
+    borderRadius: '100%'
   },
   text: {
     wordBreak: 'break',
@@ -20,11 +21,22 @@ const styles = {
   }
 }
 
-const Messages = ({messages, friendOptions}) => {
-  const message = messages && messages.map( item => {
+const Messages = ({messages, dashboard, auth}) => {
+  if(!dashboard || !auth || !messages.length) return null;
+  const sortedMessages = messages.sort( (a, b) =>  {
+    return new Date(a.timestamp) - new Date(b.timestamp)
+  })
+  const { activeDialogWith, allUsers } = dashboard;
+  const { user } = auth;
+  const myAvatar = user.photos.length ? user.photos[0].value : standartImage;
+  const peer = allUsers.filter( user => user._id === activeDialogWith)[0];
+  const peerAvatar = (peer && peer.photos.length) ? peer.photos[0].value : standartImage;
+
+  const message = sortedMessages.map( item => {
+    const mine = (item.sender === activeDialogWith) ? false : true;
     return(
       <div key={item._id} style={styles.messageContainer}>
-       <Image src={standartImage} style={styles.avatar}/>
+       <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar}/>
        <span style={styles.text}>{item.message && item.message.text}</span>
       </div>
     )

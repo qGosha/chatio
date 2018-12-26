@@ -42,6 +42,7 @@ module.exports = (app) => {
     console.log(req.body.id);
     try {
       const messages = await Message.find({ sender: { $in: [ObjectId(req.user._id), ObjectId(req.body.id)] }, recipient: { $in: [ObjectId(req.body.id), ObjectId(req.user._id)] } })
+      .skip(req.body.skip || 0)
       .sort({ timestamp: -1 })
       .limit(20);
 
