@@ -17,7 +17,6 @@ const styles = {
   },
   text: {
     wordBreak: 'break',
-    marginLeft: '8px'
   }
 }
 
@@ -35,9 +34,9 @@ const Messages = ({messages, dashboard, auth}) => {
   const message = sortedMessages.map( item => {
     const mine = (item.sender === activeDialogWith) ? false : true;
     return(
-      <div key={item._id} style={styles.messageContainer}>
-       <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar}/>
-       <span style={styles.text}>{item.message && item.message.text}</span>
+      <div key={item._id} style={{...styles.messageContainer, justifyContent: mine ? 'flex-start' : 'flex-end' }}>
+       <Image src={mine ? myAvatar : peerAvatar} style={{...styles.avatar, order: mine ? 0 : 1}}/>
+       <span style={{...styles.text, marginLeft: mine ? '8px' : '0px', marginRight: mine ? '0px' : '8px'}}>{item.message && item.message.text}</span>
       </div>
     )
   })

@@ -49,7 +49,6 @@ class Dashboard extends Component {
       this.dialog = element;
     };
   }
-// ((temp1.scrollHeight - temp1.scrollTop) / temp1.scrollHeight)*100
 
   logout() {
     this.state.socket.disconnect();
@@ -57,7 +56,8 @@ class Dashboard extends Component {
   }
 
   async handleDialogScroll(e) {
-    if (this.uploadNewTrigger) return;
+    const { haveAllMessagesBeenFetched } = this.props.dashboard;
+    if (this.uploadNewTrigger || haveAllMessagesBeenFetched) return;
     const target = e.target;
     const height = ((target.scrollHeight - target.scrollTop) / target.scrollHeight) * 100;
     if (height > 70) {
@@ -113,6 +113,7 @@ class Dashboard extends Component {
             scroll = true;
           }
         this.props.addMessage(message);
+        this.uploadTriggerCount++;
         if(scroll) {
           dialog.scrollTop = dialog.scrollHeight;
          }
@@ -172,13 +173,7 @@ class Dashboard extends Component {
   }
 
 };
-// const friendOptions = dashboard.allUsers && dashboard.allUsers.map( user => ({
-//     text: user.name,
-//     value: user.name,
-// }) )
-// <Segment>
-//   <Dropdown placeholder='Select Friend' fluid selection options={friendOptions} />
-// </Segment>
+
 function mapStateToProps({ auth, dashboard }) {
   return {auth, dashboard};
 }
