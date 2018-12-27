@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 
 const messageSchema = new Schema({
+    conversationId: { type : mongoose.Schema.Types.ObjectId, ref: 'conversations' },
     message:{
         text: {
           type: {},
@@ -14,7 +15,7 @@ const messageSchema = new Schema({
     delivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
     read: { type: Boolean, default: false },
-    timestamp: { type: Date, default: new Date() }
+    timestamp: { type: Date, default: Date.now }
 
 });
 
