@@ -17,6 +17,10 @@ const styles = {
   },
   text: {
     wordBreak: 'break',
+  },
+  timestamp: {
+    fontSize: '9px',
+    color: 'gray'
   }
 }
 
@@ -36,7 +40,10 @@ const Messages = ({messages, dashboard, auth}) => {
     return(
       <div key={item._id} style={{...styles.messageContainer, justifyContent: mine ? 'flex-start' : 'flex-end' }}>
        <Image src={mine ? myAvatar : peerAvatar} style={{...styles.avatar, order: mine ? 0 : 1}}/>
-       <span style={{...styles.text, marginLeft: mine ? '8px' : '0px', marginRight: mine ? '0px' : '8px'}}>{item.message && item.message.text}</span>
+       <div style={{...styles.text, marginLeft: mine ? '8px' : '0px', marginRight: mine ? '0px' : '8px'}}>
+         <div>{item.message && item.message.text}</div>
+         <span style={styles.timestamp}>{new Date(item.timestamp).toString()}</span>
+       </div>
       </div>
     )
   })
