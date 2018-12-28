@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 import { Segment, Image } from 'semantic-ui-react'
+const moment = require('moment');
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
 
@@ -34,20 +35,22 @@ const Messages = ({messages, dashboard, auth}) => {
   const myAvatar = user.photos.length ? user.photos[0].value : standartImage;
   const peer = allUsers.filter( user => user._id === activeDialogWith)[0];
   const peerAvatar = (peer && peer.photos.length) ? peer.photos[0].value : standartImage;
+  let shouldUseAvatar = true;
+  let lastMessageWasMine;
 
   const message = sortedMessages.map( item => {
     const mine = (item.sender === activeDialogWith) ? false : true;
     return(
       <div key={item._id} style={{...styles.messageContainer, justifyContent: mine ? 'flex-start' : 'flex-end' }}>
-       <Image src={mine ? myAvatar : peerAvatar} style={{...styles.avatar, order: mine ? 0 : 1}}/>
+       { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={{...styles.avatar, order: mine ? 0 : 1}}/> : null }
        <div style={{...styles.text, marginLeft: mine ? '8px' : '0px', marginRight: mine ? '0px' : '8px'}}>
          <div>{item.message && item.message.text}</div>
-         <span style={styles.timestamp}>{new Date(item.timestamp).toString()}</span>
+         <span style={styles.timestamp}>{moment(item.timestamp).format('MMMM-do HH:mm')}</span>
        </div>
       </div>
     )
   })
- return message
+ return message;
 }
 
 export default Messages;
