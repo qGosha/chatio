@@ -9,7 +9,8 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     marginBottom: '10px',
-    alignItems: 'center'
+    alignItems: 'center',
+    overflowX: 'hidden'
   },
   avatar: {
     height: '40px',
@@ -36,19 +37,42 @@ const Messages = ({messages, dashboard, auth}) => {
   const peer = allUsers.filter( user => user._id === activeDialogWith)[0];
   const peerAvatar = (peer && peer.photos.length) ? peer.photos[0].value : standartImage;
   let shouldUseAvatar = true;
-  let lastMessageWasMine;
+  let lastMessageFrom = sortedMessages[0].sender;
 
-  const message = sortedMessages.map( item => {
+  const message = sortedMessages.map( (item, i) => {
+    if (lastMessageFrom === item.sender && i) {
+      shouldUseAvatar = false;
+    } else {
+      shouldUseAvatar = true;
+      lastMessageFrom = item.sender;
+    }
     const mine = (item.sender === activeDialogWith) ? false : true;
+    const dynamicTexStyle = {
+      marginLeft: shouldUseAvatar ? '8px' : '48px',
+    }
     return(
-      <div key={item._id} style={{...styles.messageContainer, justifyContent: mine ? 'flex-start' : 'flex-end' }}>
-       { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={{...styles.avatar, order: mine ? 0 : 1}}/> : null }
-       <div style={{...styles.text, marginLeft: mine ? '8px' : '0px', marginRight: mine ? '0px' : '8px'}}>
+      <div key={item._id} style={styles.messageContainer}>
+       { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar}/> : null }
+       <div style={{...styles.text, ...dynamicTexStyle}}>
          <div>{item.message && item.message.text}</div>
-         <span style={styles.timestamp}>{moment(item.timestamp).format('MMMM-do HH:mm')}</span>
+         <span style={styles.timestamp}>{moment(item.timestamp).format('HH:mm')}</span>
        </div>
       </div>
     )
+    // const dynamicTexStyle = {
+    //   marginLeft: mine ? '8px' : '0px',
+    //   marginRight: mine ? '0px' : '8px',
+    //
+    // }
+    // return(
+    //   <div key={item._id} style={{...styles.messageContainer, justifyContent: mine ? 'flex-start' : 'flex-end' }}>
+    //    { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={{...styles.avatar, order: mine ? 0 : 1}}/> : null }
+    //    <div style={{...styles.text, ...dynamicTexStyle}}>
+    //      <div>{item.message && item.message.text}</div>
+    //      <span style={styles.timestamp}>{moment(item.timestamp).format('MMMM-do HH:mm')}</span>
+    //    </div>
+    //   </div>
+    // )
   })
  return message;
 }

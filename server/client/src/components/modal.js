@@ -24,8 +24,8 @@ const ModalWindow = ({
       closeIcon={closeIcon}
     >
       <Modal.Header>{headertext}</Modal.Header>
-      <Modal.Content>
-        <p>{contenttext}</p>
+      <Modal.Content image scrolling>
+        {contenttext}
       </Modal.Content>
       <Modal.Actions>
         <Button onClick={() => onNegative()} negative>

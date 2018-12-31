@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from "react";
 import {connect} from 'react-redux';
 import * as actions from '../actions';
-import { Segment, Button, Form, Grid, Header, Message, Icon, Input, Image, Ref } from 'semantic-ui-react';
+import { Segment, Button, Form, Grid, Header, Message, Icon, Input, Image, Ref, Label } from 'semantic-ui-react';
 import ModalWindow from '../components/modal';
 import io from 'socket.io-client';
 import SidePanel from '../components/SidePanel';
-import Messages from '../components/Messages'
+import Messages from '../components/Messages';
+import Uploader from '../components/uploadButton';
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
 
@@ -14,9 +15,10 @@ const styles = {
   grid: {
     display: 'grid',
     gridTemplateAreas:
-    `'menu header header header header header'
-    'menu main main main main main'
-    'menu footer footer footer footer footer'`,
+    `'menu header header header header '
+    'menu main main main main '
+    'menu footer footer footer footer '`,
+    gridTemplateColumns: '1fr 4fr 4fr 4fr',
     gridGap: '10px',
     width:'100vw',
     height: '100vh',
@@ -27,24 +29,38 @@ const styles = {
  },
  dialog: {
    height: '300px',
-   overflowY: 'scroll'
+   overflowY: 'scroll',
+   padding: '10px'
  },
  sendButton: {
    display: 'flex',
    flexDirection: 'row'
+ },
+ footer: {
+   gridArea: 'footer',
+   display: 'grid',
+   gridTemplateColumns: '5fr 1fr 1fr',
+   gridTemplateRows: '0.4fr'
  }
 }
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
-    this.state = { modalOpen: false, socket: null, messageText: '', };
+    this.state = {
+      uploaderOpen: false,
+      modalOpen: false,
+      socket: null,
+      messageText: '',
+      pictures: []
+    };
     this.uploadNewTrigger = false;
     this.uploadTriggerCount = 0;
     this.sendMessage = this.sendMessage.bind(this);
     this.logout = this.logout.bind(this);
     this.handleOpenDialog = this.handleOpenDialog.bind(this);
     this.handleDialogScroll = this.handleDialogScroll.bind(this);
+    this.onDrop = this.onDrop.bind(this);
     this.handleRef = element => {
       this.dialog = element;
     };
@@ -79,6 +95,12 @@ class Dashboard extends Component {
       this.dialog.scrollTop = this.dialog.scrollHeight;
     }
   }
+
+  onDrop(picture) {
+        this.setState({
+            pictures: this.state.pictures.concat(picture),
+        });
+    }
 
   sendMessage() {
     const { activeDialogWith } = this.props.dashboard;
@@ -163,16 +185,42 @@ class Dashboard extends Component {
            onNegative={() => this.setState({ modalOpen: false})}
            onPositive={() => deleteUser()}
            />
+          <Uploader
+           open={this.state.uploaderOpen}
+           onClose={() => this.setState({ uploaderOpen: false})}
+           onDrop={this.onDrop}
+           pictures={this.state.pictures}
+             />
          </div>
-         <div style={{gridArea: 'footer'}}>
+         <div style={styles.footer}>
            <Input value={this.state.messageText} fluid placeholder='Send...' onChange={(e) => this.setState({messageText: e.target.value})}/>
            <Button onClick={this.sendMessage}>Send</Button>
+           <Button onClick={() => this.setState({ uploaderOpen: true })}>Attach image(s)</Button>
+
          </div>
       </div>
     )
   }
 
 };
+
+// <Label
+//  as="label"
+//  basic
+//  htmlFor="upload">
+//    <Button
+//      icon="upload"
+//      label={{
+//          basic: true,
+//          content: 'Attach file(s)'
+//      }}
+//      labelPosition="right"/>
+//    <input
+//      hidden
+//      id="upload"
+//      multiple
+//      type="file"/>
+//  </Label>
 
 function mapStateToProps({ auth, dashboard }) {
   return {auth, dashboard};
