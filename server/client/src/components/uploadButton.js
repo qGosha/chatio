@@ -1,18 +1,10 @@
 import React from "react";
-import ImageUploader from 'react-images-upload-demo';
+import ImageUploader from 'react-images-upload';
 import { Modal, Button } from 'semantic-ui-react';
 import ModalWindow from '../components/modal';
 
 
 const Uploader = ({open, onClose, onDrop, pictures}) => {
-  const getBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  })
-}
   return (
     <ModalWindow
      open={open}
@@ -21,7 +13,6 @@ const Uploader = ({open, onClose, onDrop, pictures}) => {
      headertext={'Upload image(s)'}
      contenttext={
              <ImageUploader
-                  defaultImages={pictures}
                   withIcon={true}
                   buttonText='Choose images'
                   onChange={onDrop}

@@ -150,6 +150,7 @@ class Dashboard extends Component {
   render() {
   const { auth, deleteUser, logoutUser, dashboard, openDialog } = this.props;
   const { currentMessages } = dashboard;
+  const { pictures } = this.state;
   const user = auth.user;
     return(
       <div style={styles.grid}>
@@ -195,7 +196,12 @@ class Dashboard extends Component {
          <div style={styles.footer}>
            <Input value={this.state.messageText} fluid placeholder='Send...' onChange={(e) => this.setState({messageText: e.target.value})}/>
            <Button onClick={this.sendMessage}>Send</Button>
-           <Button onClick={() => this.setState({ uploaderOpen: true })}>Attach image(s)</Button>
+           <Button onClick={() => this.setState({ uploaderOpen: true })} style={{position: 'relative'}}>
+            Attach image(s)
+            { pictures.length ? <Label color='teal' floating style={{right: 0}}>
+              {pictures.length}
+            </Label> : null }
+           </Button>
 
          </div>
       </div>
