@@ -54,9 +54,17 @@ const Messages = ({messages, dashboard, auth}) => {
     const dynamicTexStyle = {
       marginLeft: shouldUseAvatar ? '8px' : '48px',
     }
+    const dynamicImageStyle = {
+      backgroundImage: `url(${item.message.text}), url(${standartImage})`,
+      width: '300px',
+      height: '300px',
+      backgroundSize:'cover',
+      backgroundPosition:'center',
+      backgroundRepeat:'no-repeat'
+    };
 
     const content = item.message.image.image ?
-    <Image src={item.message.image.uploaded ? item.message.text : standartImage} style={styles.image}/>
+    <div style={dynamicImageStyle}></div>
     : <div>{item.message && item.message.text}</div>;
 
     return(
