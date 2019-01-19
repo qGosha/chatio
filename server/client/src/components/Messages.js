@@ -23,6 +23,10 @@ const styles = {
   timestamp: {
     fontSize: '9px',
     color: 'gray'
+  },
+  image: {
+    maxWidth: '300px',
+    maxHeight: '300px'
   }
 }
 
@@ -50,29 +54,20 @@ const Messages = ({messages, dashboard, auth}) => {
     const dynamicTexStyle = {
       marginLeft: shouldUseAvatar ? '8px' : '48px',
     }
+
+    const content = item.message.image.image ?
+    <Image src={item.message.image.uploaded ? item.message.text : standartImage} style={styles.image}/>
+    : <div>{item.message && item.message.text}</div>;
+
     return(
       <div key={item._id} style={styles.messageContainer}>
        { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar}/> : null }
        <div style={{...styles.text, ...dynamicTexStyle}}>
-         <div>{item.message && item.message.text}</div>
+         { content }
          <span style={styles.timestamp}>{moment(item.timestamp).format('HH:mm')}</span>
        </div>
       </div>
     )
-    // const dynamicTexStyle = {
-    //   marginLeft: mine ? '8px' : '0px',
-    //   marginRight: mine ? '0px' : '8px',
-    //
-    // }
-    // return(
-    //   <div key={item._id} style={{...styles.messageContainer, justifyContent: mine ? 'flex-start' : 'flex-end' }}>
-    //    { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={{...styles.avatar, order: mine ? 0 : 1}}/> : null }
-    //    <div style={{...styles.text, ...dynamicTexStyle}}>
-    //      <div>{item.message && item.message.text}</div>
-    //      <span style={styles.timestamp}>{moment(item.timestamp).format('MMMM-do HH:mm')}</span>
-    //    </div>
-    //   </div>
-    // )
   })
  return message;
 }

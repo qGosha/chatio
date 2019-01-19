@@ -5,7 +5,11 @@ import {
   OPEN_DIALOG,
   ADD_MESSAGE,
   UPLOAD_MESSAGES_ONSCROLL,
-  UPLOAD_MESSAGES_END
+  UPLOAD_MESSAGES_END,
+  SEND_IMAGES,
+  SHOW_LOADING,
+  HIDE_LOADING,
+  ADD_IMAGE_URL
 } from './types';
 
 export const getPeers = () => async dispatch => {
@@ -67,3 +71,28 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
           });
         }
       }
+  export const addImageUrl = (message) => async dispatch => {
+        if(message) {
+
+          dispatch({
+            payload: message,
+            type: ADD_IMAGE_URL
+          });
+        }
+      }
+
+  export const sendImages = (data) => async dispatch => {
+     // dispatch({
+     //   type: SHOW_LOADING
+     // });
+    const res = await axios.post('/api/chat/uploadImages', data);
+    // dispatch({
+    //   type: HIDE_LOADING
+    // });
+      if(res.data.success) {
+        dispatch({
+          payload: {  },
+          type: SEND_IMAGES
+        });
+      }
+    }

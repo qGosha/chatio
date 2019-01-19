@@ -4,7 +4,8 @@ import {
   OPEN_DIALOG,
   ADD_MESSAGE,
   UPLOAD_MESSAGES_ONSCROLL,
-  UPLOAD_MESSAGES_END
+  UPLOAD_MESSAGES_END,
+  ADD_IMAGE_URL
 } from '../actions/types';
 const initialState = {
    allUsers: null,
@@ -20,7 +21,7 @@ export function dashboard(state = initialState, action) {
  case USER_CHANGESTATUS:
   return { ...state, allUsers:  payload };
  case OPEN_DIALOG:
-  return { 
+  return {
     ...state,
     activeDialogWith: payload.peerId,
     currentMessages: payload.messages,
@@ -30,6 +31,16 @@ export function dashboard(state = initialState, action) {
   return { ...state, currentMessages: [ ...state.currentMessages, ...payload.messages ] };
  case ADD_MESSAGE:
   return { ...state, currentMessages:  [ ...state.currentMessages, payload ] };
+ case ADD_IMAGE_URL:
+  const currentMessages = state.currentMessages.map( x => {
+    if (x._id === payload._id) {
+      return { ...x, ...payload }
+      // x.message.text = payload.message.text;
+      // x.message.image.uploaded = payload.message.image.uploaded;
+    }
+    return x;
+  })
+  return { ...state, currentMessages };    
  case UPLOAD_MESSAGES_END:
   return { ...state, haveAllMessagesBeenFetched: true };
 

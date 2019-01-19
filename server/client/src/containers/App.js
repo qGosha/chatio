@@ -23,7 +23,14 @@ class App extends Component {
       <Loadable
         active={isLoading}
         spinner
-        style={{position: isLoading ? 'fixed' : 'absolute', top: 0, bottom: 0, left: 0, right: 0}}
+        style={{
+          position: isLoading ? 'fixed' : 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10000
+        }}
         text='Loading...'
         >
         <Router history={history}>

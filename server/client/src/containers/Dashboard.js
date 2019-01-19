@@ -48,11 +48,12 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      uploaderOpen: false,
       modalOpen: false,
       socket: null,
       messageText: '',
-      pictures: []
+      pictures: [],
+      uploaderVisible: false,
+      imagesWereUploaded: false
     };
     this.uploadNewTrigger = false;
     this.uploadTriggerCount = 0;
@@ -61,6 +62,7 @@ class Dashboard extends Component {
     this.handleOpenDialog = this.handleOpenDialog.bind(this);
     this.handleDialogScroll = this.handleDialogScroll.bind(this);
     this.onDrop = this.onDrop.bind(this);
+    this.sendImages = this.sendImages.bind(this);
     this.handleRef = element => {
       this.dialog = element;
     };
@@ -96,25 +98,37 @@ class Dashboard extends Component {
     }
   }
 
-  onDrop(picture) {
-        this.setState({
-            pictures: this.state.pictures.concat(picture),
-        });
+  onDrop(pictures) {
+      this.setState({ pictures });
     }
 
+ sendImages () {
+   const { pictures } = this.state;
+   const { activeDialogWith } = this.props.dashboard;
+
+   if (!pictures.length || !activeDialogWith) return;
+   let formData = new FormData()
+   pictures.forEach((file, i) => {
+      formData.append(i, file)
+    })
+    formData.append('activeDialogWith', activeDialogWith);
+    this.props.sendImages(formData);
+    this.setState({imagesWereUploaded: true, pictures: []})
+ }
   sendMessage() {
+    const { messageText } = this.state;
     const { activeDialogWith } = this.props.dashboard;
-    const { user } = this.props.auth;
+    if (!messageText || !activeDialogWith) return;
     const newMessage = {
       message: {
-        text: this.state.messageText
+        text: messageText
       },
       recipient: activeDialogWith,
-
     }
     this.state.socket.emit('outboundMessage', newMessage);
-
+    this.setState({messageText: ''})
   }
+
   componentDidMount() {
   const socket = io('http://localhost:5000');
 
@@ -127,7 +141,20 @@ class Dashboard extends Component {
       socket.on('userChangedStatus', (message) => {
          this.props.userChangedStatus(message);
        });
-     socket.on('inboundMessage', (message) => {
+     socket.on('imageHasBeenUploaded', message => {
+       const dialog = this.dialog;
+       let scroll;
+        if (dialog) {
+          if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
+            scroll = true;
+          }
+        this.props.addImageUrl(message);
+        if(scroll) {
+          dialog.scrollTop = dialog.scrollHeight;
+         }
+        }
+     });
+      socket.on('inboundMessage', (message) => {
        const dialog = this.dialog;
        let scroll;
         if (dialog) {
@@ -145,12 +172,11 @@ class Dashboard extends Component {
      });
    this.props.getPeers();
 
-    // socket.on("FromAPI", data => this.setState({ response: data }));
   }
   render() {
   const { auth, deleteUser, logoutUser, dashboard, openDialog } = this.props;
   const { currentMessages } = dashboard;
-  const { pictures } = this.state;
+  const { pictures, imagesWereUploaded, uploaderVisible, messageText } = this.state;
   const user = auth.user;
     return(
       <div style={styles.grid}>
@@ -186,47 +212,24 @@ class Dashboard extends Component {
            onNegative={() => this.setState({ modalOpen: false})}
            onPositive={() => deleteUser()}
            />
-          <Uploader
-           open={this.state.uploaderOpen}
-           onClose={() => this.setState({ uploaderOpen: false})}
-           onDrop={this.onDrop}
-           pictures={this.state.pictures}
-             />
-         </div>
-         <div style={styles.footer}>
-           <Input value={this.state.messageText} fluid placeholder='Send...' onChange={(e) => this.setState({messageText: e.target.value})}/>
-           <Button onClick={this.sendMessage}>Send</Button>
-           <Button onClick={() => this.setState({ uploaderOpen: true })} style={{position: 'relative'}}>
-            Attach image(s)
-            { pictures.length ? <Label color='teal' floating style={{right: 0}}>
-              {pictures.length}
-            </Label> : null }
-           </Button>
 
          </div>
+         <div style={styles.footer}>
+           <Input value={messageText} fluid placeholder='Send...' onChange={(e) => this.setState({messageText: e.target.value})}/>
+           <Button onClick={this.sendMessage}>Send</Button>
+           <Button icon='attach' onClick={() => this.setState({ uploaderVisible: true, imagesWereUploaded: false })} />
+         </div>
+         { imagesWereUploaded ? null : <Uploader
+          onClose={() => this.setState({ uploaderVisible: false})}
+          onDrop={this.onDrop}
+          visible={uploaderVisible}
+          onUpload={this.sendImages}
+            /> }
       </div>
     )
   }
 
 };
-
-// <Label
-//  as="label"
-//  basic
-//  htmlFor="upload">
-//    <Button
-//      icon="upload"
-//      label={{
-//          basic: true,
-//          content: 'Attach file(s)'
-//      }}
-//      labelPosition="right"/>
-//    <input
-//      hidden
-//      id="upload"
-//      multiple
-//      type="file"/>
-//  </Label>
 
 function mapStateToProps({ auth, dashboard }) {
   return {auth, dashboard};
