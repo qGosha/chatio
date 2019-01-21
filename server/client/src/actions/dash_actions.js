@@ -15,8 +15,13 @@ import {
 export const getPeers = () => async dispatch => {
       const res = await axios.get('/api/search/allUsers');
       if(res.data.success) {
+        const { allUsers, iHaveDialogWith} = res.data.message
+        let all = {}
+        allUsers.forEach( user => {
+          all[user._id] = user
+        })
         dispatch({
-          payload: res.data.message,
+          payload: { all, iHaveDialogWith },
           type: GET_PEERS
         });
       }
@@ -24,13 +29,21 @@ export const getPeers = () => async dispatch => {
 
 export const userChangedStatus = (data) => async (dispatch, getState) => {
   const { dashboard } = getState();
+  const { auth } = getState();
   const { id, online } = data;
-  const allUsers = dashboard && dashboard.allUsers && dashboard.allUsers.map( user => {
-    if(user._id === id) {
-      user.online = online
-    }
-    return user;
-  })
+  console.log(id, ' : ', online)
+  const user = dashboard.allUsers[id];
+  user.online = online
+// const allUsers = dashboard && dashboard.allUsers && dashboard.allUsers.map( user => {
+  //   if(user._id === id) {
+  //     user.online = online
+  //   }
+  //   return user;
+  // })
+  const allUsers = {
+    ...dashboard.allUsers,
+    user
+  }
     if(data) {
       dispatch({
         payload: allUsers,
@@ -53,11 +66,12 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
         }
       }
 
+
   export const openDialog = (id) => async dispatch => {
-        const res = await axios.post('/api/chat/dialogs', { id });
+        const res = await axios.post('/api/chat/openDialog', { id });
         if(res.data.success) {
           dispatch({
-            payload: { peerId: id, messages: res.data.message },
+            payload: { peerId: id, messages: res.data.message.messages, isNewContact: res.data.message.newContactInList},
             type: OPEN_DIALOG
           });
         }

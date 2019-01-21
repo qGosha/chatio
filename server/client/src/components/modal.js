@@ -22,6 +22,7 @@ const ModalWindow = ({
       closeOnDimmerClick={closeOnDimmerClick}
       size={size}
       closeIcon={closeIcon}
+      style={{zIndex: 1000}}
     >
       <Modal.Header>{headertext}</Modal.Header>
       <Modal.Content image scrolling>

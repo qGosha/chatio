@@ -7,7 +7,6 @@ const styles = {
   container: {
     width: '75px',
     height: '100%',
-    // margin: '5% 0 5% 0'
   },
   img_block: {
     marginBottom: '7px',
@@ -29,8 +28,9 @@ const styles = {
   }
 }
 
-const SidePanel = ({friendOptions, openDialog}) => {
-    const avatars = friendOptions && friendOptions.map( user => {
+const SidePanel = ({friendOptions, allUsers, openDialog}) => {
+    const avatars = friendOptions && friendOptions.map( friend => {
+      const user = allUsers[friend];
       const photos = user.photos[0];
       return (
         <div key={user._id} style={styles.img_block} onClick={() => openDialog(user._id)}>

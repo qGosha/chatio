@@ -7,6 +7,7 @@ import io from 'socket.io-client';
 import SidePanel from '../components/SidePanel';
 import Messages from '../components/Messages';
 import Uploader from '../components/uploadButton';
+import WelcomePage from '../components/WelcomePage';
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
 
@@ -57,23 +58,17 @@ class Dashboard extends Component {
     };
     this.uploadNewTrigger = false;
     this.uploadTriggerCount = 0;
-    this.sendMessage = this.sendMessage.bind(this);
-    this.logout = this.logout.bind(this);
-    this.handleOpenDialog = this.handleOpenDialog.bind(this);
-    this.handleDialogScroll = this.handleDialogScroll.bind(this);
-    this.onDrop = this.onDrop.bind(this);
-    this.sendImages = this.sendImages.bind(this);
     this.handleRef = element => {
       this.dialog = element;
     };
   }
 
-  logout() {
+  logout = () => {
     this.state.socket.disconnect();
     this.props.logoutUser();
   }
 
-  async handleDialogScroll(e) {
+  handleDialogScroll = async (e) => {
     const { haveAllMessagesBeenFetched } = this.props.dashboard;
     if (this.uploadNewTrigger || haveAllMessagesBeenFetched) return;
     const target = e.target;
@@ -89,7 +84,8 @@ class Dashboard extends Component {
     }
   }
 
-  async handleOpenDialog(id) {
+   handleOpenDialog = async (id) => {
+    const { allUsers } = this.props.dashboard;
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
     await this.props.openDialog(id);
@@ -98,11 +94,11 @@ class Dashboard extends Component {
     }
   }
 
-  onDrop(pictures) {
+  onDrop = (pictures) => {
       this.setState({ pictures });
     }
 
- sendImages () {
+ sendImages = () => {
    const { pictures } = this.state;
    const { activeDialogWith } = this.props.dashboard;
 
@@ -115,7 +111,7 @@ class Dashboard extends Component {
     this.props.sendImages(formData);
     this.setState({imagesWereUploaded: true, pictures: []})
  }
-  sendMessage() {
+  sendMessage = () => {
     const { messageText } = this.state;
     const { activeDialogWith } = this.props.dashboard;
     if (!messageText || !activeDialogWith) return;
@@ -134,14 +130,10 @@ class Dashboard extends Component {
 
   this.setState({socket});
     socket.on('connect', () => {
-       console.log("sdpogpdogdsg", socket.id); // true
-       socket.on('fromAPI', (message) => {
-          console.log(message);
-        });
       socket.on('userChangedStatus', (message) => {
          this.props.userChangedStatus(message);
        });
-     socket.on('imageHasBeenUploaded', message => {
+      socket.on('imageHasBeenUploaded', message => {
        const dialog = this.dialog;
        let scroll;
         if (dialog) {
@@ -168,63 +160,69 @@ class Dashboard extends Component {
          }
         }
       });
-      socket.on('disconnect', (e) => console.log('disconnected', e))
+      socket.on('disconnect', (e) => console.log('disconnected', e));
      });
    this.props.getPeers();
-
   }
+
   render() {
   const { auth, deleteUser, logoutUser, dashboard, openDialog } = this.props;
-  const { currentMessages } = dashboard;
+  const { currentMessages, activeDialogWith, iHaveDialogWith, allUsers } = dashboard;
   const { pictures, imagesWereUploaded, uploaderVisible, messageText } = this.state;
   const user = auth.user;
     return(
       <div style={styles.grid}>
-       <div style={{gridArea: 'menu'}}>
-        <SidePanel friendOptions={dashboard.allUsers} openDialog={(id) => this.handleOpenDialog(id)}/>
-       </div>
-       <div style={{gridArea: 'header'}}>
-        <div style={styles.header}>
-         <div>
-          <h2>
-           {`Hello ${user.name}`}
-          </h2>
-          <Image alt='profile photo' src={user.photos.length ? user.photos[0].value : standartImage} size='tiny' bordered />
+        <ModalWindow
+         open={this.state.modalOpen}
+         onClose={() => this.setState({ modalOpen: false})}
+         headertext={'Delete Your Account'}
+         contenttext={'Are you sure you want to delete your account?'}
+         onNegative={() => this.setState({ modalOpen: false})}
+         onPositive={() => deleteUser()}
+         />
+         <div style={{gridArea: 'menu'}}>
+          <SidePanel friendOptions={iHaveDialogWith} allUsers={allUsers} openDialog={(id) => this.handleOpenDialog(id)}/>
          </div>
-          <Segment>
-            <Button onClick={this.logout}>Sign out</Button>
-            <Button onClick={() => this.setState({ modalOpen: true })}>Delete profile</Button>
-            <Button onClick={this.sendMessage}>Send a message</Button>
-          </Segment>
-        </div>
-        </div>
-        <div style={{gridArea: 'main'}}  >
-         <Ref innerRef={this.handleRef}>
-          <Segment style={styles.dialog} onScroll={this.handleDialogScroll}>
-            <Messages messages={currentMessages} dashboard={dashboard} auth={auth}/>
-          </Segment>
-          </Ref>
-          <ModalWindow
-           open={this.state.modalOpen}
-           onClose={() => this.setState({ modalOpen: false})}
-           headertext={'Delete Your Account'}
-           contenttext={'Are you sure you want to delete your account?'}
-           onNegative={() => this.setState({ modalOpen: false})}
-           onPositive={() => deleteUser()}
-           />
+         <div style={{gridArea: 'header'}}>
+          <div style={styles.header}>
+           <div>
+            <h2>
+             {`Hello ${user.name}`}
+            </h2>
+            <Image alt='profile photo' src={user.photos.length ? user.photos[0].value : standartImage} size='tiny' bordered />
+            <span>My status: {allUsers && allUsers[auth.user._id].online ? 'Online' : 'Offline'}</span>
+           </div>
+            <Segment>
+              <Button onClick={this.logout}>Sign out</Button>
+              <Button onClick={() => this.setState({ modalOpen: true })}>Delete profile</Button>
+              <Button onClick={this.sendMessage}>Send a message</Button>
+            </Segment>
+          </div>
+          </div>
+          <div style={{gridArea: 'main'}}>
+           { activeDialogWith ? <Ref innerRef={this.handleRef}>
+            <Segment style={styles.dialog} onScroll={this.handleDialogScroll}>
+              <Messages messages={currentMessages} dashboard={dashboard} auth={auth}/>
+            </Segment>
+            </Ref> : <WelcomePage />}
 
-         </div>
-         <div style={styles.footer}>
-           <Input value={messageText} fluid placeholder='Send...' onChange={(e) => this.setState({messageText: e.target.value})}/>
-           <Button onClick={this.sendMessage}>Send</Button>
-           <Button icon='attach' onClick={() => this.setState({ uploaderVisible: true, imagesWereUploaded: false })} />
-         </div>
-         { imagesWereUploaded ? null : <Uploader
-          onClose={() => this.setState({ uploaderVisible: false})}
-          onDrop={this.onDrop}
-          visible={uploaderVisible}
-          onUpload={this.sendImages}
-            /> }
+
+           </div>
+            <form style={styles.footer} onSubmit={(e) => {
+              e.preventDefault();
+              this.sendMessage();
+            }}>
+             <Input value={messageText} fluid placeholder='Send...' onChange={(e) => this.setState({messageText: e.target.value})}/>
+
+             <Button onClick={this.sendMessage}>Send</Button>
+             <Button icon='attach' onClick={() => this.setState({ uploaderVisible: true, imagesWereUploaded: false })} />
+           </form>
+           { imagesWereUploaded ? null : <Uploader
+            onClose={() => this.setState({ uploaderVisible: false})}
+            onDrop={this.onDrop}
+            visible={uploaderVisible}
+            onUpload={this.sendImages}
+              /> }
       </div>
     )
   }

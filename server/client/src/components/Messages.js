@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Segment, Image } from 'semantic-ui-react'
+import { Segment, Image, Divider } from 'semantic-ui-react'
 const moment = require('moment');
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
@@ -38,11 +38,11 @@ const Messages = ({messages, dashboard, auth}) => {
   const { activeDialogWith, allUsers } = dashboard;
   const { user } = auth;
   const myAvatar = user.photos.length ? user.photos[0].value : standartImage;
-  const peer = allUsers.filter( user => user._id === activeDialogWith)[0];
+  const peer = allUsers[activeDialogWith];
   const peerAvatar = (peer && peer.photos.length) ? peer.photos[0].value : standartImage;
   let shouldUseAvatar = true;
   let lastMessageFrom = sortedMessages[0].sender;
-
+  let currentDate = 0;
   const message = sortedMessages.map( (item, i) => {
     if (lastMessageFrom === item.sender && i) {
       shouldUseAvatar = false;
@@ -50,6 +50,10 @@ const Messages = ({messages, dashboard, auth}) => {
       shouldUseAvatar = true;
       lastMessageFrom = item.sender;
     }
+    const formattedDate = moment(item.timestamp).format('YYYY-MM-DD');
+
+    const shouldShowDivider = (currentDate !== formattedDate) ? true : false;
+    currentDate = formattedDate;
     const mine = (item.sender === activeDialogWith) ? false : true;
     const dynamicTexStyle = {
       marginLeft: shouldUseAvatar ? '8px' : '48px',
@@ -68,13 +72,16 @@ const Messages = ({messages, dashboard, auth}) => {
     : <div>{item.message && item.message.text}</div>;
 
     return(
-      <div key={item._id} style={styles.messageContainer}>
-       { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar}/> : null }
-       <div style={{...styles.text, ...dynamicTexStyle}}>
-         { content }
-         <span style={styles.timestamp}>{moment(item.timestamp).format('HH:mm')}</span>
-       </div>
-      </div>
+      <Fragment key={item._id}>
+        { shouldShowDivider ? <Divider horizontal><span style={styles.timestamp}>{currentDate}</span></Divider> : null }
+        <div style={styles.messageContainer}>
+         { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar}/> : null }
+         <div style={{...styles.text, ...dynamicTexStyle}}>
+           { content }
+           <span style={styles.timestamp}>{moment(item.timestamp).format('HH:mm')}</span>
+         </div>
+        </div>
+      </Fragment>
     )
   })
  return message;

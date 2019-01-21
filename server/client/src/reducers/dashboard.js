@@ -9,6 +9,7 @@ import {
 } from '../actions/types';
 const initialState = {
    allUsers: null,
+   iHaveDialogWith: null,
    activeDialogWith: null,
    currentMessages: [],
    haveAllMessagesBeenFetched: false
@@ -17,7 +18,7 @@ export function dashboard(state = initialState, action) {
   const payload = action.payload;
  switch (action.type) {
  case GET_PEERS:
-  return { ...state, allUsers:  payload};
+  return { ...state, allUsers:  payload.all, iHaveDialogWith: payload.iHaveDialogWith};
  case USER_CHANGESTATUS:
   return { ...state, allUsers:  payload };
  case OPEN_DIALOG:
@@ -25,6 +26,7 @@ export function dashboard(state = initialState, action) {
     ...state,
     activeDialogWith: payload.peerId,
     currentMessages: payload.messages,
+    iHaveDialogWith: payload.isNewContact ? [...state.iHaveDialogWith, payload.isNewContact] : state.iHaveDialogWith,
     haveAllMessagesBeenFetched: false
   };
  case UPLOAD_MESSAGES_ONSCROLL:
@@ -40,7 +42,7 @@ export function dashboard(state = initialState, action) {
     }
     return x;
   })
-  return { ...state, currentMessages };    
+  return { ...state, currentMessages };
  case UPLOAD_MESSAGES_END:
   return { ...state, haveAllMessagesBeenFetched: true };
 

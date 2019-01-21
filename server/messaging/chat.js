@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Message = mongoose.model('messages');
+const Conversation = mongoose.model('conversations');
 const passport = require('passport');
 const changeUserStatus = require('../helpers/help_functions');
 
@@ -34,18 +35,17 @@ module.exports = (io, sessionMiddleware) => {
       })
 
     socket.on('outboundMessage', async (newMessage, callback) => {
+      try {
 
-      const message = await new Message({
-        ...newMessage,
-        sender: userId
-      }).save();
-     io.to(newMessage.recipient).emit('inboundMessage', message);
-     io.to(userId).emit('inboundMessage', message);
-      // const user = users.getUser(socket.id);
-      // if (user && isRealString(newMessage.text)) {
-      //   io.to(user.room).emit('newMessage', generateMessage(user.name, newMessage.text));
-      // }
-      // callback('This is from the sever');
+        const message = await new Message({
+          ...newMessage,
+          sender: userId
+        }).save();
+       io.to(newMessage.recipient).emit('inboundMessage', message);
+       io.to(userId).emit('inboundMessage', message);
+     } catch (e) {
+       console.log(E);
+     }
     })
 
       }
