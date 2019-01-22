@@ -5,7 +5,8 @@ import {
   ADD_MESSAGE,
   UPLOAD_MESSAGES_ONSCROLL,
   UPLOAD_MESSAGES_END,
-  ADD_IMAGE_URL
+  ADD_IMAGE_URL,
+  LOGOUT_USER
 } from '../actions/types';
 const initialState = {
    allUsers: null,
@@ -45,6 +46,8 @@ export function dashboard(state = initialState, action) {
   return { ...state, currentMessages };
  case UPLOAD_MESSAGES_END:
   return { ...state, haveAllMessagesBeenFetched: true };
+ case LOGOUT_USER:
+  return initialState;  
 
  default: return state;
  }

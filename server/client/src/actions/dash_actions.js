@@ -31,19 +31,12 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
   const { dashboard } = getState();
   const { auth } = getState();
   const { id, online } = data;
-  console.log(id, ' : ', online)
-  const user = dashboard.allUsers[id];
-  user.online = online
-// const allUsers = dashboard && dashboard.allUsers && dashboard.allUsers.map( user => {
-  //   if(user._id === id) {
-  //     user.online = online
-  //   }
-  //   return user;
-  // })
-  const allUsers = {
-    ...dashboard.allUsers,
-    user
-  }
+  console.log(id, ' : ', online);
+  const allUsers = dashboard.allUsers;
+  const user = allUsers && allUsers[id];
+  if (!user) return;
+  user.online = online;
+  allUsers[id] = user;
     if(data) {
       dispatch({
         payload: allUsers,
@@ -77,7 +70,14 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
         }
       }
 
-  export const addMessage = (message) => async dispatch => {
+  export const addMessage = (message) => async (dispatch, getState) => {
+    const { dashboard } = getState();
+    const { currentMessages } = dashboard;
+    // const isDuplicate = currentMessages.some( i => i._id === message._id);
+    // if (isDuplicate) {
+    //   console.log('DUPLICATE');
+    //   return;
+    // }
         if(message) {
           dispatch({
             payload: message,

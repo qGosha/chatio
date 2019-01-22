@@ -12,7 +12,6 @@ const styles = {
     marginBottom: '7px',
     textAlign: 'center',
     cursor: 'pointer',
-    position: 'relative'
   },
   img: {
     width: '3em',
@@ -23,8 +22,8 @@ const styles = {
     width: '10px',
     height: '10px',
     borderRadius: '100%',
-    bottom: '35%',
-    left: '45%'
+    bottom: '50%',
+    left: '0'
   }
 }
 
@@ -34,17 +33,21 @@ const SidePanel = ({friendOptions, allUsers, openDialog}) => {
       const photos = user.photos[0];
       return (
         <div key={user._id} style={styles.img_block} onClick={() => openDialog(user._id)}>
-          <Image src={photos ? photos.value : standartImage} style={styles.img} avatar />
-          <div style={{ ...styles.indicator, backgroundColor: user.online ? 'green' : 'red' }}></div>
+          <div style={{ position: 'relative' }}>
+            <Image src={photos ? photos.value : standartImage} style={styles.img} avatar />
+            <div style={{ ...styles.indicator, backgroundColor: user.online ? 'green' : 'red' }}></div>
+          </div>
           <span>{user.name}</span>
         </div>
       )
     })
 
   return (
+    <div style={{gridArea: 'menu'}}>
      <Segment style={styles.container}>
        {avatars}
      </Segment>
+    </div>
   )
 }
 
