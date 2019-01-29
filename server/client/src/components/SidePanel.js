@@ -27,9 +27,12 @@ const styles = {
   }
 }
 
-const SidePanel = ({friendOptions, allUsers, openDialog}) => {
-    const avatars = friendOptions && friendOptions.map( friend => {
+const SidePanel = ({dashboard, openDialog}) => {
+    const { iHaveDialogWith, allUsers } = dashboard;
+    if (!allUsers) return null;
+    const avatars = iHaveDialogWith && iHaveDialogWith.map( friend => {
       const user = allUsers[friend];
+      if (!user) return null;
       const photos = user.photos[0];
       return (
         <div key={user._id} style={styles.img_block} onClick={() => openDialog(user._id)}>

@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from "react";
 import {connect} from 'react-redux';
 import * as actions from '../actions';
-import { Segment, Button, Form, Grid, Header, Message, Icon, Input, Image, Ref, Label } from 'semantic-ui-react';
 import ModalWindow from '../components/modal';
 import io from 'socket.io-client';
 import SidePanel from '../components/SidePanel';
@@ -187,7 +186,7 @@ class Dashboard extends Component {
          onNegative={() => this.setState({ modalOpen: false})}
          onPositive={() => deleteUser()}
          />
-          <SidePanel friendOptions={iHaveDialogWith} allUsers={allUsers} openDialog={(id) => this.handleOpenDialog(id)}/>
+          <SidePanel dashboard={dashboard} openDialog={(id) => this.handleOpenDialog(id)}/>
           <PageHeader
            auth={auth}
            allUsers={allUsers}
