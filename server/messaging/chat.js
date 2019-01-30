@@ -27,6 +27,11 @@ module.exports = (io, sessionMiddleware) => {
       } catch(err) {
         throw new Error(err)
       }
+      socket.on('reconnect', async () => {
+        await changeUserStatus(userId, true);
+        sendEvents(userId, true);
+        iHaveDialogWith.forEach( user => sendEvents(user, true));
+      })
       socket.on('disconnect', async () => {
         await changeUserStatus(userId, false);
         sendEvents(userId, false);

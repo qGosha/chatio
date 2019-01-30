@@ -6,7 +6,9 @@ import {
   UPLOAD_MESSAGES_ONSCROLL,
   UPLOAD_MESSAGES_END,
   ADD_IMAGE_URL,
-  LOGOUT_USER
+  LOGOUT_USER,
+  CLOSE_DIALOG,
+  MARK_MSG_READ
 } from '../actions/types';
 const initialState = {
    allUsers: null,
@@ -30,6 +32,8 @@ export function dashboard(state = initialState, action) {
     iHaveDialogWith: payload.isNewContact ? [...state.iHaveDialogWith, payload.isNewContact] : state.iHaveDialogWith,
     haveAllMessagesBeenFetched: false
   };
+ case CLOSE_DIALOG:
+  return { ...state, activeDialogWith: null }
  case UPLOAD_MESSAGES_ONSCROLL:
   return { ...state, currentMessages: [ ...state.currentMessages, ...payload.messages ] };
  case ADD_MESSAGE:
@@ -38,16 +42,16 @@ export function dashboard(state = initialState, action) {
   const currentMessages = state.currentMessages.map( x => {
     if (x._id === payload._id) {
       return { ...x, ...payload }
-      // x.message.text = payload.message.text;
-      // x.message.image.uploaded = payload.message.image.uploaded;
     }
     return x;
   })
   return { ...state, currentMessages };
  case UPLOAD_MESSAGES_END:
   return { ...state, haveAllMessagesBeenFetched: true };
+ case MARK_MSG_READ:
+  return { ...state, currentMessages: payload };  
  case LOGOUT_USER:
-  return initialState;  
+  return initialState;
 
  default: return state;
  }

@@ -166,6 +166,8 @@ class Dashboard extends Component {
        auth={auth}
        handleDialogScroll={this.handleDialogScroll}
        handleRef={this.handleRef}
+       closeDialog={this.props.closeDialog}
+       markMsgRead={this.props.markMsgRead}
        />
       <Footer
         onSubmit={(e) => { e.preventDefault(); this.sendMessage(); }}

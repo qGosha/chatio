@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import { Segment, Icon, Ref } from 'semantic-ui-react';
 import Messages from '../components/Messages';
+import { useState, useEffect } from 'react';
 
 const styles = {
   dialog: {
@@ -8,24 +9,43 @@ const styles = {
     overflowY: 'scroll',
     padding: '10px'
   },
+  close: {
+    cursor: 'pointer'
+  }
 }
 
 const ChatSection = (props) => {
-  const { dashboard, auth, handleDialogScroll, handleRef } = props;
-  const { currentMessages } = dashboard;
+  const { dashboard, auth, handleDialogScroll, handleRef, closeDialog, markMsgRead } = props;
+  const { currentMessages, activeDialogWith } = dashboard;
   const user = auth.user;
-
+  const notReadMsg = currentMessages.some( msg => msg.recipient === user._id && !msg.read );
+  useEffect( () => {
+    if (notReadMsg) {
+      let timer = setTimeout(() => {
+       let ids = [];
+       const updatedMsg = currentMessages.map( msg => {
+        if (msg.recipient === user._id && !msg.read) {
+          msg.read = true;
+          ids.push(msg._id);
+        }
+        return msg;
+      });
+      markMsgRead(ids, updatedMsg);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [activeDialogWith]);
   return (
   <div style={{gridArea: 'main'}}>
    <Fragment>
-    <Icon name='times'/>
+    <Icon name='times' style={styles.close} onClick={closeDialog}/>
     <Ref innerRef={handleRef}>
      <Segment style={styles.dialog} onScroll={handleDialogScroll}>
        <Messages messages={currentMessages} dashboard={dashboard} auth={auth}/>
      </Segment>
     </Ref>
    </Fragment>
-  </div> 
+  </div>
   )
 }
 

@@ -9,7 +9,9 @@ import {
   SEND_IMAGES,
   SHOW_LOADING,
   HIDE_LOADING,
-  ADD_IMAGE_URL
+  ADD_IMAGE_URL,
+  CLOSE_DIALOG,
+  MARK_MSG_READ
 } from './types';
 
 export const getPeers = () => async dispatch => {
@@ -69,6 +71,18 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
           });
         }
       }
+   export const closeDialog = () => async dispatch => {
+     dispatch({
+       type: CLOSE_DIALOG
+     })
+   }
+  export const markMsgRead = (ids, updatedMsg) => async dispatch => {
+    
+     dispatch({
+       payload: updatedMsg,
+       type: MARK_MSG_READ
+     })
+   }
 
   export const addMessage = (message) => async (dispatch, getState) => {
     const { dashboard } = getState();

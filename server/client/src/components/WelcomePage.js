@@ -7,7 +7,7 @@ const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-ima
 const styles = {
   container: {
     width: '100%',
-
+    gridArea: 'main / main / main / main'
   },
   img_block: {
     textAlign: 'center',
@@ -32,8 +32,9 @@ const styles = {
 }
 
 const WelcomePage = ({allUsers, auth, openDialog}) => {
+    if (!allUsers) return null;
     const me = auth.user._id;
-    const users = allUsers && Object.values(allUsers).filter( i => i._id !== me);
+    const users = Object.values(allUsers).filter( i => i._id !== me);
     const avatars = users && users.map( user => {
       const photos = user.photos[0];
       return (

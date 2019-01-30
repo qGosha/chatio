@@ -28,7 +28,7 @@ const PageHeader = (props) => {
       </Segment>
     </div>
     </div>
-  
+
   )
 }
 

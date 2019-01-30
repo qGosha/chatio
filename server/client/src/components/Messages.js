@@ -74,7 +74,7 @@ const Messages = ({messages, dashboard, auth}) => {
     return(
       <Fragment key={item._id}>
         { shouldShowDivider ? <Divider horizontal><span style={styles.timestamp}>{currentDate}</span></Divider> : null }
-        <div style={styles.messageContainer}>
+        <div style={{...styles.messageContainer, backgroundColor: item.read ? '#fff' : 'beige'}}>
          { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar}/> : null }
          <div style={{...styles.text, ...dynamicTexStyle}}>
            { content }

@@ -42,7 +42,7 @@ module.exports = (app, io) => {
 
   app.get('/api/search/allUsers', loggedIn, async (req, res) => {
     try {
-     const allUsers = await User.find( {}, { name: 1, gender: 1, online: 1, photos: { $slice: 1 } } );
+     const allUsers = await User.find( { }, { name: 1, gender: 1, online: 1, photos: { $slice: 1 } } );
      const getIHaveDialogWith = await Conversation.find({members: { $all: [req.user._id] }})
      const userIdString = req.user._id.toString();
      const iHaveDialogWith = getIHaveDialogWith.map( i => i.members.filter( r => r.toString() !== userIdString)[0].toString());
