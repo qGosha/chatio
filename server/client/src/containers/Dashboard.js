@@ -55,6 +55,7 @@ class Dashboard extends Component {
     this.eventKey = null;
     this.newMsgTabNotification = null;
     this.normalTitle = document.title;
+    this.audio = new Audio('../sounds/msg.mp3');
   }
 
   logout = () => {
@@ -185,6 +186,14 @@ class Dashboard extends Component {
     socket.on('inboundMessage', async message => {
       const { dashboard, auth, markMsgRead, newMessageForAnotherDialog, messageFromUnknown } = this.props;
       const { activeDialogWith, currentMessages, iHaveDialogWith } = dashboard;
+      if(message.sender !== auth.user._id) {
+        console.log(this.audio);
+        try {
+          await this.audio.play();
+        } catch(e) {
+          throw new Error(e);
+        }
+      }
       if (!this.state.isTabActive && message.sender !== auth.user._id) {
         this.newMsgTabNotification = setInterval(this.newMsgNewTitle, 500);
       }
