@@ -43,13 +43,18 @@ class Dashboard extends Component {
       messageText: '',
       pictures: [],
       uploaderVisible: false,
-      imagesWereUploaded: false
+      imagesWereUploaded: false,
+      isTabActive: true
     };
     this.uploadNewTrigger = false;
     this.uploadTriggerCount = 0;
     this.handleRef = element => {
       this.dialog = element;
     };
+    this.eventName = null;
+    this.eventKey = null;
+    this.newMsgTabNotification = null;
+    this.normalTitle = document.title;
   }
 
   logout = () => {
@@ -119,67 +124,108 @@ class Dashboard extends Component {
     this.state.socket.emit('outboundMessage', newMessage);
     if (!iHaveDialogWith.includes(activeDialogWith)) {
       createNewConversation(activeDialogWith);
-    } 
+    }
     this.setState({messageText: ''})
   }
 
+ handleTabVisibility = e => {
+   const isTabActive = !e.target[this.eventKey];
+   if (this.newMsgTabNotification) {
+     clearInterval(this.newMsgTabNotification);
+     document.title = this.normalTitle;
+   }
+   this.setState({isTabActive})
+ }
+
+  newMsgNewTitle = () => {
+    if (document.title === this.normalTitle) {
+      document.title = 'You have new message(s)!';
+    } else {
+      document.title = this.normalTitle;
+    }
+  }
+
   componentDidMount() {
-  const socket = io('http://localhost:5000');
+    const socket = io('http://localhost:5000');
+    this.setState({socket});
+    const keys = {
+       hidden: "visibilitychange",
+       webkitHidden: "webkitvisibilitychange",
+       mozHidden: "mozvisibilitychange",
+       msHidden: "msvisibilitychange"
+     };
 
-  this.setState({socket});
-      socket.on('userChangedStatus', (message) => {
-         this.props.userChangedStatus(message);
-       });
-      socket.on('imageHasBeenUploaded', message => {
-       const dialog = this.dialog;
-       let scroll;
-        if (dialog) {
-          if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
-            scroll = true;
-          }
-        this.props.addImageUrl(message);
-        if(scroll) {
-          dialog.scrollTop = dialog.scrollHeight;
-         }
-        }
+    for (let stateKey in keys) {
+       if (stateKey in document) {
+           this.eventKey = stateKey
+           this.eventName = keys[stateKey]
+           break
+       }
+     };
+
+   document.addEventListener(this.eventName, this.handleTabVisibility);
+
+
+    socket.on('userChangedStatus', (message) => {
+       this.props.userChangedStatus(message);
      });
-      socket.on('inboundMessage', async message => {
-        const { dashboard, auth, markMsgRead, newMessageForAnotherDialog, messageFromUnknown } = this.props;
-        const { activeDialogWith, currentMessages, iHaveDialogWith } = dashboard;
-        if (message.recipient !== activeDialogWith && message.sender !== activeDialogWith) {
-          const id = iHaveDialogWith.find( msg => msg === message.sender );
-          if (!id) {
-            messageFromUnknown(message.sender);
-            return;
-          }
-          newMessageForAnotherDialog(id);
-          return
-        };
-        const dialog = this.dialog;
-        let scroll;
-        if (dialog) {
-          if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
-            scroll = true;
-          }
-        await this.props.addMessage(message);
-
-        this.uploadTriggerCount++;
-        if(scroll) {
-          dialog.scrollTop = dialog.scrollHeight;
-         }
+    socket.on('imageHasBeenUploaded', message => {
+     const dialog = this.dialog;
+     let scroll;
+      if (dialog) {
+        if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
+          scroll = true;
         }
-      });
-     socket.on('msgHasBeenReadByPeer', async ids => {
-       const { dashboard, msgReadByPeer } = this.props;
-       const { activeDialogWith, currentMessages } = dashboard;
-       const updatedMsg = currentMessages.map( msg => {
-         if (ids.includes(msg._id)) msg.read = true;
-         return msg;
-       })
-       msgReadByPeer(updatedMsg);
+      this.props.addImageUrl(message);
+      if(scroll) {
+        dialog.scrollTop = dialog.scrollHeight;
+       }
+      }
+   });
+    socket.on('inboundMessage', async message => {
+      const { dashboard, auth, markMsgRead, newMessageForAnotherDialog, messageFromUnknown } = this.props;
+      const { activeDialogWith, currentMessages, iHaveDialogWith } = dashboard;
+      if (!this.state.isTabActive && message.sender !== auth.user._id) {
+        this.newMsgTabNotification = setInterval(this.newMsgNewTitle, 500);
+      }
+      if (message.recipient !== activeDialogWith && message.sender !== activeDialogWith) {
+        const id = iHaveDialogWith.find( msg => msg === message.sender );
+        if (!id) {
+          messageFromUnknown(message.sender);
+          return;
+        }
+        newMessageForAnotherDialog(id);
+        return
+      };
+      const dialog = this.dialog;
+      let scroll;
+      if (dialog) {
+        if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
+          scroll = true;
+        }
+      await this.props.addMessage(message);
+
+      this.uploadTriggerCount++;
+      if(scroll) {
+        dialog.scrollTop = dialog.scrollHeight;
+       }
+      }
+    });
+   socket.on('msgHasBeenReadByPeer', async ids => {
+     const { dashboard, msgReadByPeer } = this.props;
+     const { activeDialogWith, currentMessages } = dashboard;
+     const updatedMsg = currentMessages.map( msg => {
+       if (ids.includes(msg._id)) msg.read = true;
+       return msg;
      })
-     socket.on('disconnect', (e) => console.log('disconnected', e));
-     this.props.getPeers();
+     msgReadByPeer(updatedMsg);
+   })
+   socket.on('disconnect', (e) => console.log('disconnected', e));
+   this.props.getPeers();
+  }
+
+  componentWillUnmount() {
+   document.removeEventListener(this.eventName, this.handleTabVisibility)
   }
 
   render() {
