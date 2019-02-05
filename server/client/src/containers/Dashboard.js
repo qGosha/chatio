@@ -74,8 +74,8 @@ class Dashboard extends Component {
   }
 
    handleOpenDialog = async (id) => {
-     if (id === activeDialogWith) return;
     const { allUsers, activeDialogWith} = this.props.dashboard;
+    if (id === activeDialogWith) return;
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
     await this.props.openDialog(id);
@@ -90,7 +90,8 @@ class Dashboard extends Component {
 
  sendImages = () => {
    const { pictures } = this.state;
-   const { activeDialogWith } = this.props.dashboard;
+   const { sendImages, createNewConversation, dashboard } = this.props;
+   const { activeDialogWith, iHaveDialogWith } = dashboard;
 
    if (!pictures.length || !activeDialogWith) return;
    let formData = new FormData()
@@ -98,12 +99,16 @@ class Dashboard extends Component {
       formData.append(i, file)
     })
     formData.append('activeDialogWith', activeDialogWith);
-    this.props.sendImages(formData);
+    sendImages(formData);
+    if (!iHaveDialogWith.includes(activeDialogWith)) {
+      createNewConversation(activeDialogWith);
+    }
     this.setState({imagesWereUploaded: true, pictures: []})
  }
   sendMessage = () => {
     const { messageText } = this.state;
-    const { activeDialogWith } = this.props.dashboard;
+    const { createNewConversation, dashboard } = this.props;
+    const { activeDialogWith, iHaveDialogWith } = dashboard;
     if (!messageText || !activeDialogWith) return;
     const newMessage = {
       message: {
@@ -112,6 +117,9 @@ class Dashboard extends Component {
       recipient: activeDialogWith,
     }
     this.state.socket.emit('outboundMessage', newMessage);
+    if (!iHaveDialogWith.includes(activeDialogWith)) {
+      createNewConversation(activeDialogWith);
+    } 
     this.setState({messageText: ''})
   }
 
@@ -135,26 +143,47 @@ class Dashboard extends Component {
          }
         }
      });
-      socket.on('inboundMessage', (message) => {
-       const dialog = this.dialog;
-       let scroll;
+      socket.on('inboundMessage', async message => {
+        const { dashboard, auth, markMsgRead, newMessageForAnotherDialog, messageFromUnknown } = this.props;
+        const { activeDialogWith, currentMessages, iHaveDialogWith } = dashboard;
+        if (message.recipient !== activeDialogWith && message.sender !== activeDialogWith) {
+          const id = iHaveDialogWith.find( msg => msg === message.sender );
+          if (!id) {
+            messageFromUnknown(message.sender);
+            return;
+          }
+          newMessageForAnotherDialog(id);
+          return
+        };
+        const dialog = this.dialog;
+        let scroll;
         if (dialog) {
           if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
             scroll = true;
           }
-        this.props.addMessage(message);
+        await this.props.addMessage(message);
+
         this.uploadTriggerCount++;
         if(scroll) {
           dialog.scrollTop = dialog.scrollHeight;
          }
         }
       });
-      socket.on('disconnect', (e) => console.log('disconnected', e));
-   this.props.getPeers();
+     socket.on('msgHasBeenReadByPeer', async ids => {
+       const { dashboard, msgReadByPeer } = this.props;
+       const { activeDialogWith, currentMessages } = dashboard;
+       const updatedMsg = currentMessages.map( msg => {
+         if (ids.includes(msg._id)) msg.read = true;
+         return msg;
+       })
+       msgReadByPeer(updatedMsg);
+     })
+     socket.on('disconnect', (e) => console.log('disconnected', e));
+     this.props.getPeers();
   }
 
   render() {
-  const { auth, deleteUser, logoutUser, dashboard, openDialog } = this.props;
+  const { auth, deleteUser, logoutUser, dashboard, openDialog, removeNotifications, closeDialog, markMsgRead } = this.props;
   const { currentMessages, activeDialogWith, iHaveDialogWith, allUsers } = dashboard;
   const { pictures, imagesWereUploaded, uploaderVisible, messageText } = this.state;
   const user = auth.user;
@@ -166,8 +195,9 @@ class Dashboard extends Component {
        auth={auth}
        handleDialogScroll={this.handleDialogScroll}
        handleRef={this.handleRef}
-       closeDialog={this.props.closeDialog}
-       markMsgRead={this.props.markMsgRead}
+       closeDialog={closeDialog}
+       markMsgRead={markMsgRead}
+       removeNotifications={removeNotifications}
        />
       <Footer
         onSubmit={(e) => { e.preventDefault(); this.sendMessage(); }}

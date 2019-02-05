@@ -8,20 +8,31 @@ import {
   ADD_IMAGE_URL,
   LOGOUT_USER,
   CLOSE_DIALOG,
-  MARK_MSG_READ
+  MARK_MSG_READ,
+  NEW_MSG_NOTIFICATION,
+  REMOVE_NOTIFICATIONS,
+  MSG_FROM_UNKNOWN,
+  CREATE_NEW_CONVERSATION
 } from '../actions/types';
 const initialState = {
    allUsers: null,
    iHaveDialogWith: null,
    activeDialogWith: null,
    currentMessages: [],
-   haveAllMessagesBeenFetched: false
+   haveAllMessagesBeenFetched: false,
+   newMsgNotifictions: {}
 }
 export function dashboard(state = initialState, action) {
   const payload = action.payload;
  switch (action.type) {
  case GET_PEERS:
-  return { ...state, allUsers:  payload.all, iHaveDialogWith: payload.iHaveDialogWith};
+ const { all, iHaveDialogWith, newMsgNotifictions } = payload;
+  return {
+    ...state,
+    allUsers:  all,
+    iHaveDialogWith,
+    newMsgNotifictions
+  };
  case USER_CHANGESTATUS:
   return { ...state, allUsers:  payload };
  case OPEN_DIALOG:
@@ -49,7 +60,21 @@ export function dashboard(state = initialState, action) {
  case UPLOAD_MESSAGES_END:
   return { ...state, haveAllMessagesBeenFetched: true };
  case MARK_MSG_READ:
-  return { ...state, currentMessages: payload };  
+  return { ...state, currentMessages: payload };
+ case MSG_FROM_UNKNOWN:
+  return {
+    ...state,
+    iHaveDialogWith: [...state.iHaveDialogWith, payload],
+    newMsgNotifictions: { ...state.newMsgNotifictions, [payload]: 1 }
+  };
+ case CREATE_NEW_CONVERSATION:
+  return { ...state,  iHaveDialogWith: [...state.iHaveDialogWith, payload] };
+ case REMOVE_NOTIFICATIONS:
+  return { ...state, newMsgNotifictions: { ...state.newMsgNotifictions, [payload]: undefined } };
+ case NEW_MSG_NOTIFICATION:
+  let peer = state.newMsgNotifictions[payload];
+  const newValue = peer ? ++peer : 1;
+  return { ...state, newMsgNotifictions: { ...state.newMsgNotifictions, [payload]:newValue } };
  case LOGOUT_USER:
   return initialState;
 

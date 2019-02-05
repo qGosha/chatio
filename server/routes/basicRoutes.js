@@ -45,10 +45,21 @@ module.exports = (app, io) => {
      const allUsers = await User.find( { }, { name: 1, gender: 1, online: 1, photos: { $slice: 1 } } );
      const getIHaveDialogWith = await Conversation.find({members: { $all: [req.user._id] }})
      const userIdString = req.user._id.toString();
-     const iHaveDialogWith = getIHaveDialogWith.map( i => i.members.filter( r => r.toString() !== userIdString)[0].toString());
+     const iHaveDialogWithIds = getIHaveDialogWith.map( i => i.members.filter( r => r.toString() !== userIdString)[0]);
+     const iHaveDialogWith = iHaveDialogWithIds.map( i => i.toString());
+     const getNewMsgNotifictions = await Message.find({ recipient: req.user._id, read: false, sender: { $in: iHaveDialogWithIds } }, {sender: 1, _id: 0});
+     let newMsgNotifictions = {};
+     getNewMsgNotifictions.forEach((item, i) => {
+       const s = item.sender;
+       if (newMsgNotifictions[s]) {
+         newMsgNotifictions[s]++;
+       } else {
+         newMsgNotifictions[s] = 1;
+       }
+     })
      res.send({
        success: true,
-       message: {allUsers, iHaveDialogWith}
+       message: { allUsers, iHaveDialogWith, newMsgNotifictions }
      })
    } catch (error) {
      res.send({
@@ -66,11 +77,11 @@ module.exports = (app, io) => {
     }
     try {
       let newContactInList;
-      const getIHaveDialogWith = await Conversation.find({members: { $all: [id, recipient] }})
-      if (!getIHaveDialogWith.length) {
-       await new Conversation({ members: [id, recipient] }).save();
-         newContactInList = recipient;
-      }
+      // const getIHaveDialogWith = await Conversation.find({members: { $all: [id, recipient] }})
+      // if (!getIHaveDialogWith.length) {
+      //  await new Conversation({ members: [id, recipient] }).save();
+      //    newContactInList = recipient;
+      // }
 
       const messages = await Message.find({ sender: { $in: [id, ObjectId(recipient)] }, recipient: { $in: [ObjectId(recipient), id] } })
       .sort({ timestamp: -1 })
@@ -167,4 +178,43 @@ module.exports = (app, io) => {
     })
 }
 })
+
+  app.post('/api/chat/markMsgRead', loggedIn, async (req, res) => {
+    const { ids, activeDialogWith } = req.body;
+    const objIds = ids.map( id => ObjectId(id) );
+    try {
+      await Message.updateMany( { _id: { $in: objIds } }, { $set: { read: true } } );
+      io.to(activeDialogWith).emit('msgHasBeenReadByPeer', ids);
+      res.send({
+        success: true,
+      })
+    } catch (error) {
+      res.send({
+        success: false,
+        error: error || error.message
+      })
+    }
+  })
+
+  app.post('/api/chat/createNewConversation', loggedIn, async (req, res) => {
+    const { id } = req.body;
+    if (!id) return;
+    const objId = ObjectId(id);
+    const me = req.user._id;
+    try {
+      const getIHaveDialogWith = await Conversation.find({members: { $all: [objId, me] }})
+      if (!getIHaveDialogWith.length) {
+       await new Conversation({ members: [objId, me] }).save();
+     };
+     res.send({
+       success: true,
+     });
+   } catch (error) {
+     res.send({
+       success: false,
+       error: error || error.message
+     })
+   };
+ });
+
 }

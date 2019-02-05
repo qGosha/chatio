@@ -15,8 +15,8 @@ const styles = {
 }
 
 const ChatSection = (props) => {
-  const { dashboard, auth, handleDialogScroll, handleRef, closeDialog, markMsgRead } = props;
-  const { currentMessages, activeDialogWith } = dashboard;
+  const { dashboard, auth, handleDialogScroll, handleRef, closeDialog, markMsgRead, removeNotifications } = props;
+  const { currentMessages, activeDialogWith, newMsgNotifictions } = dashboard;
   const user = auth.user;
   const notReadMsg = currentMessages.some( msg => msg.recipient === user._id && !msg.read );
   useEffect( () => {
@@ -30,7 +30,10 @@ const ChatSection = (props) => {
         }
         return msg;
       });
-      markMsgRead(ids, updatedMsg);
+      if (newMsgNotifictions[activeDialogWith]) {
+        removeNotifications(activeDialogWith);
+      }
+      markMsgRead(ids, updatedMsg, activeDialogWith);
       }, 1000);
       return () => clearTimeout(timer);
     }
