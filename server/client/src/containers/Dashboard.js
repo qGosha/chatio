@@ -9,7 +9,7 @@ import WelcomePage from '../components/WelcomePage';
 import PageHeader from '../components/Header';
 import ChatSection from '../components/ChatSection';
 import Footer from '../components/Footer';
-
+const sound = require('../sounds/msg.mp3');
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
 
@@ -54,8 +54,8 @@ class Dashboard extends Component {
     this.eventName = null;
     this.eventKey = null;
     this.newMsgTabNotification = null;
-    this.normalTitle = document.title;
-    this.audio = new Audio('../sounds/msg.mp3');
+    this.normalTitle;
+    this.audio = new Audio(sound);
   }
 
   logout = () => {
@@ -131,7 +131,7 @@ class Dashboard extends Component {
 
  handleTabVisibility = e => {
    const isTabActive = !e.target[this.eventKey];
-   if (this.newMsgTabNotification) {
+   if (isTabActive) {
      clearInterval(this.newMsgTabNotification);
      document.title = this.normalTitle;
    }
@@ -147,6 +147,8 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
+    this.audio.load();
+    this.normalTitle = document.title;
     const socket = io('http://localhost:5000');
     this.setState({socket});
     const keys = {
@@ -165,7 +167,6 @@ class Dashboard extends Component {
      };
 
    document.addEventListener(this.eventName, this.handleTabVisibility);
-
 
     socket.on('userChangedStatus', (message) => {
        this.props.userChangedStatus(message);
@@ -187,7 +188,6 @@ class Dashboard extends Component {
       const { dashboard, auth, markMsgRead, newMessageForAnotherDialog, messageFromUnknown } = this.props;
       const { activeDialogWith, currentMessages, iHaveDialogWith } = dashboard;
       if(message.sender !== auth.user._id) {
-        console.log(this.audio);
         try {
           await this.audio.play();
         } catch(e) {
@@ -234,7 +234,8 @@ class Dashboard extends Component {
   }
 
   componentWillUnmount() {
-   document.removeEventListener(this.eventName, this.handleTabVisibility)
+   document.removeEventListener(this.eventName, this.handleTabVisibility);
+   clearInterval(this.newMsgTabNotification);
   }
 
   render() {
