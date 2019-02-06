@@ -9,6 +9,9 @@ import WelcomePage from '../components/WelcomePage';
 import PageHeader from '../components/Header';
 import ChatSection from '../components/ChatSection';
 import Footer from '../components/Footer';
+import Settings from './Settings';
+import { Route, Link, Switch } from 'react-router-dom';
+
 const sound = require('../sounds/msg.mp3');
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
@@ -239,7 +242,7 @@ class Dashboard extends Component {
   }
 
   render() {
-  const { auth, deleteUser, logoutUser, dashboard, openDialog, removeNotifications, closeDialog, markMsgRead } = this.props;
+  const { auth, deleteUser, logoutUser, dashboard, openDialog, removeNotifications, closeDialog, markMsgRead, match } = this.props;
   const { currentMessages, activeDialogWith, iHaveDialogWith, allUsers } = dashboard;
   const { pictures, imagesWereUploaded, uploaderVisible, messageText } = this.state;
   const user = auth.user;
@@ -264,35 +267,55 @@ class Dashboard extends Component {
         />
     </Fragment>
   )
-    return(
-      <div style={styles.grid}>
-        <ModalWindow
-         open={this.state.modalOpen}
-         onClose={() => this.setState({ modalOpen: false})}
-         headertext={'Delete Your Account'}
-         contenttext={'Are you sure you want to delete your account?'}
-         onNegative={() => this.setState({ modalOpen: false})}
-         onPositive={() => deleteUser()}
-         />
-          <SidePanel dashboard={dashboard} openDialog={(id) => this.handleOpenDialog(id)}/>
-          <PageHeader
-           auth={auth}
-           allUsers={allUsers}
-           logout={this.logout}
-           sendMessage={this.sendMessage}
-           openModal={() => this.setState({ modalOpen: true })}
-           standartImage={standartImage}
-           />
-           { activeDialogWith ? chattingSection : welcomeSection }
-
-           { imagesWereUploaded ? null : <Uploader
-            onClose={() => this.setState({ uploaderVisible: false})}
-            onDrop={this.onDrop}
-            visible={uploaderVisible}
-            onUpload={this.sendImages}
-              /> }
-      </div>
+    // return(
+    //   <div style={styles.grid}>
+    //     <ModalWindow
+    //      open={this.state.modalOpen}
+    //      onClose={() => this.setState({ modalOpen: false})}
+    //      headertext={'Delete Your Account'}
+    //      contenttext={'Are you sure you want to delete your account?'}
+    //      onNegative={() => this.setState({ modalOpen: false})}
+    //      onPositive={() => deleteUser()}
+    //      />
+    //       <SidePanel dashboard={dashboard} openDialog={(id) => this.handleOpenDialog(id)}/>
+    //       <PageHeader
+    //        auth={auth}
+    //        allUsers={allUsers}
+    //        logout={this.logout}
+    //        sendMessage={this.sendMessage}
+    //        openModal={() => this.setState({ modalOpen: true })}
+    //        standartImage={standartImage}
+    //        match={match}
+    //        />
+    //        { activeDialogWith ? chattingSection : welcomeSection }
+    //          <div>
+    //           <Link to={match.url + "/settings"}>Settings click</Link>
+    //           <Route path={match.url + "/settings"} component={Settings} />
+    //         </div>
+    //        { imagesWereUploaded ? null : <Uploader
+    //         onClose={() => this.setState({ uploaderVisible: false})}
+    //         onDrop={this.onDrop}
+    //         visible={uploaderVisible}
+    //         onUpload={this.sendImages}
+    //           /> }
+    //   </div>
+    // )
+    return (
+      <div>
+      <Link to={'/dashboard/chat'}>Settings</Link>
+      <Link to={'/dashboard/welcome'}>Settings</Link>
+// the same way as before, not setting a path prop
+// makes it render on every /dashboard/** request
+ <Route component={() => <div>HeaDER</div>}/>
+ <Switch>
+   // longer path (with same root) than others first
+     <Route path="/dashboard/chat" component={() => <div>Chat ebanyi</div>}/>
+     <Route path="/dashboard/welcome" component={() => <div>Welcome yeba</div>}/>
+   </Switch>
+   </div>
     )
+
+
   }
 
 };
