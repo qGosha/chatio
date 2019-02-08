@@ -1,12 +1,19 @@
 import React, { Component, Fragment } from "react";
 import {connect} from 'react-redux';
 import * as actions from '../actions';
-import { Segment, Button, Form, Grid, Header, Message, Icon, Input, Image, Ref, Label } from 'semantic-ui-react';
 import ModalWindow from '../components/modal';
 import io from 'socket.io-client';
 import SidePanel from '../components/SidePanel';
-import Messages from '../components/Messages';
 import Uploader from '../components/uploadButton';
+import WelcomePage from '../components/WelcomePage';
+import PageHeader from '../components/Header';
+import ChatSection from '../components/ChatSection';
+import Footer from '../components/Footer';
+import Settings from './Settings';
+import AvatarBlock from '../components/AvatarBlock';
+import { Route, Link, Switch } from 'react-router-dom';
+
+const sound = require('../sounds/msg.mp3');
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
 
@@ -16,67 +23,57 @@ const styles = {
     display: 'grid',
     gridTemplateAreas:
     `'menu header header header header '
-    'menu main main main main '
-    'menu footer footer footer footer '`,
+     'menu avatar avatar avatar avatar '
+     'menu main main main main '
+     'menu footer footer footer footer '`,
     gridTemplateColumns: '1fr 4fr 4fr 4fr',
     gridGap: '10px',
     width:'100vw',
     height: '100vh',
   },
-  header: {
-   display: 'flex',
-   justifyContent: 'space-between'
- },
- dialog: {
-   height: '300px',
-   overflowY: 'scroll',
-   padding: '10px'
- },
+
  sendButton: {
    display: 'flex',
    flexDirection: 'row'
  },
- footer: {
-   gridArea: 'footer',
-   display: 'grid',
-   gridTemplateColumns: '5fr 1fr 1fr',
-   gridTemplateRows: '0.4fr'
- }
+
 }
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      uploaderOpen: false,
       modalOpen: false,
       socket: null,
       messageText: '',
-      pictures: []
+      pictures: [],
+      uploaderVisible: false,
+      imagesWereUploaded: false,
+      isTabActive: true
     };
     this.uploadNewTrigger = false;
     this.uploadTriggerCount = 0;
-    this.sendMessage = this.sendMessage.bind(this);
-    this.logout = this.logout.bind(this);
-    this.handleOpenDialog = this.handleOpenDialog.bind(this);
-    this.handleDialogScroll = this.handleDialogScroll.bind(this);
-    this.onDrop = this.onDrop.bind(this);
     this.handleRef = element => {
       this.dialog = element;
     };
+    this.eventName = null;
+    this.eventKey = null;
+    this.newMsgTabNotification = null;
+    this.normalTitle;
+    this.audio = new Audio(sound);
   }
 
-  logout() {
+  logout = () => {
     this.state.socket.disconnect();
     this.props.logoutUser();
   }
 
-  async handleDialogScroll(e) {
+  handleDialogScroll = async (e) => {
     const { haveAllMessagesBeenFetched } = this.props.dashboard;
     if (this.uploadNewTrigger || haveAllMessagesBeenFetched) return;
     const target = e.target;
     const height = ((target.scrollHeight - target.scrollTop) / target.scrollHeight) * 100;
-    if (height > 70) {
+    if (height > 50) {
       this.uploadNewTrigger = true;
       const { activeDialogWith } = this.props.dashboard;
       const skip = this.uploadTriggerCount + 20;
@@ -87,7 +84,9 @@ class Dashboard extends Component {
     }
   }
 
-  async handleOpenDialog(id) {
+   handleOpenDialog = async (id) => {
+    const { allUsers, activeDialogWith} = this.props.dashboard;
+    if (id === activeDialogWith) return;
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
     await this.props.openDialog(id);
@@ -96,137 +95,233 @@ class Dashboard extends Component {
     }
   }
 
-  onDrop(picture) {
-        this.setState({
-            pictures: this.state.pictures.concat(picture),
-        });
+  onDrop = (pictures) => {
+      this.setState({ pictures });
     }
 
-  sendMessage() {
-    const { activeDialogWith } = this.props.dashboard;
-    const { user } = this.props.auth;
+ sendImages = () => {
+   const { pictures } = this.state;
+   const { sendImages, createNewConversation, dashboard } = this.props;
+   const { activeDialogWith, iHaveDialogWith } = dashboard;
+
+   if (!pictures.length || !activeDialogWith) return;
+   let formData = new FormData()
+   pictures.forEach((file, i) => {
+      formData.append(i, file)
+    })
+    formData.append('activeDialogWith', activeDialogWith);
+    sendImages(formData);
+    if (!iHaveDialogWith.includes(activeDialogWith)) {
+      createNewConversation(activeDialogWith);
+    }
+    this.setState({imagesWereUploaded: true, pictures: []})
+ }
+  sendMessage = () => {
+    const { messageText } = this.state;
+    const { createNewConversation, dashboard } = this.props;
+    const { activeDialogWith, iHaveDialogWith } = dashboard;
+    if (!messageText || !activeDialogWith) return;
     const newMessage = {
       message: {
-        text: this.state.messageText
+        text: messageText
       },
       recipient: activeDialogWith,
-
     }
     this.state.socket.emit('outboundMessage', newMessage);
-
+    if (!iHaveDialogWith.includes(activeDialogWith)) {
+      createNewConversation(activeDialogWith);
+    }
+    this.setState({messageText: ''})
   }
+
+ handleTabVisibility = e => {
+   const isTabActive = !e.target[this.eventKey];
+   if (isTabActive) {
+     clearInterval(this.newMsgTabNotification);
+     document.title = this.normalTitle;
+   }
+   this.setState({isTabActive})
+ }
+
+  newMsgNewTitle = () => {
+    if (document.title === this.normalTitle) {
+      document.title = 'You have new message(s)!';
+    } else {
+      document.title = this.normalTitle;
+    }
+  }
+
   componentDidMount() {
-  const socket = io('http://localhost:5000');
+    this.audio.load();
+    this.normalTitle = document.title;
+    const socket = io('http://localhost:5000');
+    this.setState({socket});
+    const keys = {
+       hidden: "visibilitychange",
+       webkitHidden: "webkitvisibilitychange",
+       mozHidden: "mozvisibilitychange",
+       msHidden: "msvisibilitychange"
+     };
 
-  this.setState({socket});
-    socket.on('connect', () => {
-       console.log("sdpogpdogdsg", socket.id); // true
-       socket.on('fromAPI', (message) => {
-          console.log(message);
-        });
-      socket.on('userChangedStatus', (message) => {
-         this.props.userChangedStatus(message);
-       });
-     socket.on('inboundMessage', (message) => {
-       const dialog = this.dialog;
-       let scroll;
-        if (dialog) {
-          if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
-            scroll = true;
-          }
-        this.props.addMessage(message);
-        this.uploadTriggerCount++;
-        if(scroll) {
-          dialog.scrollTop = dialog.scrollHeight;
-         }
-        }
-      });
-      socket.on('disconnect', (e) => console.log('disconnected', e))
+    for (let stateKey in keys) {
+       if (stateKey in document) {
+           this.eventKey = stateKey
+           this.eventName = keys[stateKey]
+           break
+       }
+     };
+
+   document.addEventListener(this.eventName, this.handleTabVisibility);
+
+    socket.on('userChangedStatus', (message) => {
+       this.props.userChangedStatus(message);
      });
-   this.props.getPeers();
+    socket.on('imageHasBeenUploaded', message => {
+     const dialog = this.dialog;
+     let scroll;
+      if (dialog) {
+        if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
+          scroll = true;
+        }
+      this.props.addImageUrl(message);
+      if(scroll) {
+        dialog.scrollTop = dialog.scrollHeight;
+       }
+      }
+   });
+    socket.on('inboundMessage', async message => {
+      const { dashboard, auth, markMsgRead, newMessageForAnotherDialog, messageFromUnknown } = this.props;
+      const { activeDialogWith, currentMessages, iHaveDialogWith } = dashboard;
+      if(message.sender !== auth.user._id) {
+        try {
+          await this.audio.play();
+        } catch(e) {
+          throw new Error(e);
+        }
+      }
+      if (!this.state.isTabActive && message.sender !== auth.user._id) {
+        this.newMsgTabNotification = setInterval(this.newMsgNewTitle, 500);
+      }
+      if (message.recipient !== activeDialogWith && message.sender !== activeDialogWith) {
+        const id = iHaveDialogWith.find( msg => msg === message.sender );
+        if (!id) {
+          messageFromUnknown(message.sender);
+          return;
+        }
+        newMessageForAnotherDialog(id);
+        return
+      };
+      const dialog = this.dialog;
+      let scroll;
+      if (dialog) {
+        if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
+          scroll = true;
+        }
+      await this.props.addMessage(message);
 
-    // socket.on("FromAPI", data => this.setState({ response: data }));
+      this.uploadTriggerCount++;
+      if(scroll) {
+        dialog.scrollTop = dialog.scrollHeight;
+       }
+      }
+    });
+   socket.on('msgHasBeenReadByPeer', async ids => {
+     const { dashboard, msgReadByPeer } = this.props;
+     const { activeDialogWith, currentMessages } = dashboard;
+     const updatedMsg = currentMessages.map( msg => {
+       if (ids.includes(msg._id)) msg.read = true;
+       return msg;
+     })
+     msgReadByPeer(updatedMsg);
+   })
+   socket.on('disconnect', (e) => console.log('disconnected', e));
+   this.props.getPeers();
   }
+
+  componentWillUnmount() {
+   document.removeEventListener(this.eventName, this.handleTabVisibility);
+   clearInterval(this.newMsgTabNotification);
+  }
+
   render() {
-  const { auth, deleteUser, logoutUser, dashboard, openDialog } = this.props;
-  const { currentMessages } = dashboard;
-  const { pictures } = this.state;
+  const { auth, deleteUser, logoutUser, dashboard, openDialog, removeNotifications, closeDialog, markMsgRead, match } = this.props;
+  const { currentMessages, activeDialogWith, iHaveDialogWith, allUsers } = dashboard;
+  const { pictures, imagesWereUploaded, uploaderVisible, messageText } = this.state;
   const user = auth.user;
+  const welcomeSection = <WelcomePage allUsers={allUsers} auth={auth} openDialog={this.handleOpenDialog}/>;
+  const chattingSection = (
+    <Fragment>
+      <ChatSection
+       dashboard={dashboard}
+       auth={auth}
+       handleDialogScroll={this.handleDialogScroll}
+       handleRef={this.handleRef}
+       closeDialog={closeDialog}
+       markMsgRead={markMsgRead}
+       removeNotifications={removeNotifications}
+       />
+      <Footer
+        onSubmit={(e) => { e.preventDefault(); this.sendMessage(); }}
+        messageText={messageText}
+        onChange={(e) => this.setState({messageText: e.target.value})}
+        handleSendClick={this.sendMessage}
+        handleImageSendClick={() => this.setState({ uploaderVisible: true, imagesWereUploaded: false })}
+        />
+    </Fragment>
+  )
     return(
       <div style={styles.grid}>
-       <div style={{gridArea: 'menu'}}>
-        <SidePanel friendOptions={dashboard.allUsers} openDialog={(id) => this.handleOpenDialog(id)}/>
-       </div>
-       <div style={{gridArea: 'header'}}>
-        <div style={styles.header}>
-         <div>
-          <h2>
-           {`Hello ${user.name}`}
-          </h2>
-          <Image alt='profile photo' src={user.photos.length ? user.photos[0].value : standartImage} size='tiny' bordered />
-         </div>
-          <Segment>
-            <Button onClick={this.logout}>Sign out</Button>
-            <Button onClick={() => this.setState({ modalOpen: true })}>Delete profile</Button>
-            <Button onClick={this.sendMessage}>Send a message</Button>
-          </Segment>
-        </div>
-        </div>
-        <div style={{gridArea: 'main'}}  >
-         <Ref innerRef={this.handleRef}>
-          <Segment style={styles.dialog} onScroll={this.handleDialogScroll}>
-            <Messages messages={currentMessages} dashboard={dashboard} auth={auth}/>
-          </Segment>
-          </Ref>
-          <ModalWindow
-           open={this.state.modalOpen}
-           onClose={() => this.setState({ modalOpen: false})}
-           headertext={'Delete Your Account'}
-           contenttext={'Are you sure you want to delete your account?'}
-           onNegative={() => this.setState({ modalOpen: false})}
-           onPositive={() => deleteUser()}
+        <ModalWindow
+         open={this.state.modalOpen}
+         onClose={() => this.setState({ modalOpen: false})}
+         headertext={'Delete Your Account'}
+         contenttext={'Are you sure you want to delete your account?'}
+         onNegative={() => this.setState({ modalOpen: false})}
+         onPositive={() => deleteUser()}
+         />
+          <SidePanel dashboard={dashboard} openDialog={(id) => this.handleOpenDialog(id)}/>
+          <PageHeader
+           auth={auth}
+           allUsers={allUsers}
+           logout={this.logout}
+           openModal={() => this.setState({ modalOpen: true })}
+           standartImage={standartImage}
+           match={match}
            />
-          <Uploader
-           open={this.state.uploaderOpen}
-           onClose={() => this.setState({ uploaderOpen: false})}
-           onDrop={this.onDrop}
-           pictures={this.state.pictures}
-             />
-         </div>
-         <div style={styles.footer}>
-           <Input value={this.state.messageText} fluid placeholder='Send...' onChange={(e) => this.setState({messageText: e.target.value})}/>
-           <Button onClick={this.sendMessage}>Send</Button>
-           <Button onClick={() => this.setState({ uploaderOpen: true })} style={{position: 'relative'}}>
-            Attach image(s)
-            { pictures.length ? <Label color='teal' floating style={{right: 0}}>
-              {pictures.length}
-            </Label> : null }
-           </Button>
-
-         </div>
+           <AvatarBlock
+           auth={auth}
+           allUsers={allUsers}
+           activeDialogWith={activeDialogWith}
+           />
+           { activeDialogWith ? chattingSection : welcomeSection }
+           <Route path="/dashboard/settings" component={() => <div>Welcome yeba</div>}/>
+           { imagesWereUploaded ? null : <Uploader
+            onClose={() => this.setState({ uploaderVisible: false})}
+            onDrop={this.onDrop}
+            visible={uploaderVisible}
+            onUpload={this.sendImages}
+              /> }
       </div>
     )
+//     return (
+//       <div>
+//       <Link to={'/dashboard/chat'}>Settings</Link>
+//       <Link to={'/dashboard/welcome'}>Settings</Link>
+// // the same way as before, not setting a path prop
+// // makes it render on every /dashboard/** request
+//   <Route component={() => <div>HeaDER</div>}/>
+//     <Switch>
+//    // longer path (with same root) than others first
+//      <Route path="/dashboard/chat" component={() => <div>Chat ebanyi</div>}/>
+//      <Route path="/dashboard/welcome" component={() => <div>Welcome yeba</div>}/>
+//    </Switch>
+//    </div>
+//     )
+
+
   }
 
 };
-
-// <Label
-//  as="label"
-//  basic
-//  htmlFor="upload">
-//    <Button
-//      icon="upload"
-//      label={{
-//          basic: true,
-//          content: 'Attach file(s)'
-//      }}
-//      labelPosition="right"/>
-//    <input
-//      hidden
-//      id="upload"
-//      multiple
-//      type="file"/>
-//  </Label>
 
 function mapStateToProps({ auth, dashboard }) {
   return {auth, dashboard};

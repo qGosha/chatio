@@ -15,6 +15,8 @@ const bodyParser = require('body-parser');
 const {mongoose} = require('./db/mongoose');
 const {ObjectID} = require('mongodb');
 const socketIO = require('socket.io');
+const formData = require('express-form-data')
+
 // const sharedsession = require('express-socket.io-session');
 
 const app = express();
@@ -24,8 +26,8 @@ const server = app.listen(port, () => {
   console.log('started on port ' + port)
 });
 const io = socketIO.listen(server, {
-  pingInterval: 60000,
-  pingTimeout: 25000
+  pingInterval: 10,
+  pingTimeout: 4000
 });
 io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
@@ -46,12 +48,13 @@ const sessionMiddleware = session({
   secret: [process.env.cookieKey]
 })
 app.use(sessionMiddleware);
+app.use(formData.parse());
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
-require('./routes/authRoutes')(app, io);
+require('./routes/authRoutes')(app);
 require('./routes/signUpRoutes')(app);
-require('./routes/basicRoutes')(app);
+require('./routes/basicRoutes')(app, io);
 require('./routes/profileRoutes')(app);
 require('./messaging/chat')(io);
 

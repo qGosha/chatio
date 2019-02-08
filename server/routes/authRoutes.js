@@ -2,7 +2,7 @@ const passport = require('passport');
 const loggedIn = require('../helpers/middleware');
 const _ = require('lodash');
 
-module.exports = (app, io) => {
+module.exports = (app) => {
 
   app.get('/auth/google', passport.authenticate('google', {
     scope: ['profile', 'email']
@@ -27,6 +27,7 @@ module.exports = (app, io) => {
         if (loginErr) {
           return next(loginErr);
         }
+        user.password = undefined;
         const editedUser = _.omit(user, ['password']);
         return res.send({ success : true, message : editedUser });
       });
@@ -40,7 +41,7 @@ module.exports = (app, io) => {
   });
 
   app.get('/api/logout', (req, res) => {
-    
+
     req.logout();
     req.session.destroy();
     res.send({success: true});

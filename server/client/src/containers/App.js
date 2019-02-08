@@ -23,18 +23,24 @@ class App extends Component {
       <Loadable
         active={isLoading}
         spinner
-        style={{position: isLoading ? 'fixed' : 'absolute', top: 0, bottom: 0, left: 0, right: 0}}
+        style={{
+          position: isLoading ? 'fixed' : 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100
+        }}
         text='Loading...'
         >
         <Router history={history}>
          <Switch>
           <PrivateRoute exact path='/' auth={auth} component={Dashboard}/>
-          <PrivateRoute exact path='/dashboard' auth={auth} component={Dashboard}/>
-          <EnterRoute exact path='/login' auth={auth} component={Login}/>
+          <PrivateRoute path='/dashboard' auth={auth} component={Dashboard}/>
+          <EnterRoute path='/login' auth={auth} component={Login}/>
           <Route exact path='/signup' auth={auth} component={Signup}/>
-          <ConfirmRoute exact path='/confirmation' auth={auth} component={Confirmation}/>
-          <Route component={NoMatch} />
-         </Switch>
+          <ConfirmRoute path='/confirmation' auth={auth} component={Confirmation}/>
+=         </Switch>
         </Router>
       </Loadable>
     )

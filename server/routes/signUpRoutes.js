@@ -168,9 +168,5 @@ app.post('/api/confirmation', async (req, res) => {
       message: error
     });
   }
-
 })
-
-
-
 }
