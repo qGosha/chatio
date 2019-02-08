@@ -51,7 +51,7 @@ const SidePanel = ({dashboard, openDialog}) => {
     })
 
   return (
-    <div style={{gridArea: 'menu'}}>
+    <div style={{gridArea: 'menu', zIndex: '10'}}>
      <Segment style={styles.container}>
        {avatars}
      </Segment>

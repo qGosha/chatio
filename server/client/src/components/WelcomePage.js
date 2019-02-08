@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Segment, Image } from 'semantic-ui-react'
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
@@ -7,7 +7,10 @@ const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-ima
 const styles = {
   container: {
     width: '100%',
-    gridArea: 'main / main / main / main'
+    gridArea: 'main / main / main / main',
+    height: '350px',
+    overflowY: 'scroll',
+    padding: '10px',
   },
   img_block: {
     textAlign: 'center',
@@ -31,6 +34,7 @@ const styles = {
   }
 }
 
+
 const WelcomePage = ({allUsers, auth, openDialog}) => {
     if (!allUsers) return null;
     const me = auth.user._id;
@@ -50,12 +54,16 @@ const WelcomePage = ({allUsers, auth, openDialog}) => {
       )
     })
     return (
+    <Fragment>
       <Segment style={styles.container}>
-      <div>Welcome to Messenger. Choose a person you want to talk to</div>
-        <div style={styles.imgContainer}>{avatars}</div>
+       <div>Welcome to Messenger. Choose a person you want to talk to</div>
+       <div style={styles.imgContainer}>{avatars}</div>
       </Segment>
+    </Fragment>
     )
 }
-
-
+//
+// <div style={{gridArea: 'footer / footer / footer / footer'}}>
+//  <span>@Copyright</span>
+// </div>
 export default WelcomePage;

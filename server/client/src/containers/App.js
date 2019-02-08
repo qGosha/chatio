@@ -36,12 +36,11 @@ class App extends Component {
         <Router history={history}>
          <Switch>
           <PrivateRoute exact path='/' auth={auth} component={Dashboard}/>
-          <PrivateRoute exact path='/dashboard' auth={auth} component={Dashboard}/>
-          <EnterRoute exact path='/login' auth={auth} component={Login}/>
+          <PrivateRoute path='/dashboard' auth={auth} component={Dashboard}/>
+          <EnterRoute path='/login' auth={auth} component={Login}/>
           <Route exact path='/signup' auth={auth} component={Signup}/>
-          <ConfirmRoute exact path='/confirmation' auth={auth} component={Confirmation}/>
-          <Route component={NoMatch} />
-         </Switch>
+          <ConfirmRoute path='/confirmation' auth={auth} component={Confirmation}/>
+=         </Switch>
         </Router>
       </Loadable>
     )

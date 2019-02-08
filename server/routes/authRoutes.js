@@ -27,6 +27,7 @@ module.exports = (app) => {
         if (loginErr) {
           return next(loginErr);
         }
+        user.password = undefined;
         const editedUser = _.omit(user, ['password']);
         return res.send({ success : true, message : editedUser });
       });
