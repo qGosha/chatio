@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 const Message = mongoose.model('messages');
 const Conversation = mongoose.model('conversations');
-const passport = require('passport');
 const changeUserStatus = require('../helpers/help_functions');
 
 
-module.exports = (io, sessionMiddleware) => {
+module.exports = io => {
 
   io.on('connection', async (socket) => {
 
@@ -53,7 +52,7 @@ module.exports = (io, sessionMiddleware) => {
         iHaveDialogWith.forEach( user => sendEvents(user, false));
       })
 
-    socket.on('outboundMessage', async (newMessage, callback) => {
+    socket.on('outboundMessage', async newMessage => {
       try {
         const message = await new Message({
           ...newMessage,
@@ -62,7 +61,7 @@ module.exports = (io, sessionMiddleware) => {
        io.to(newMessage.recipient).emit('inboundMessage', message);
        io.to(userId).emit('inboundMessage', message);
      } catch (e) {
-       console.log(E);
+       console.log('Message sending error');
      }
     })
 

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { Segment, Image, Label } from 'semantic-ui-react'
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';

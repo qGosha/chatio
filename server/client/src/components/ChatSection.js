@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { Segment, Icon, Ref } from 'semantic-ui-react';
 import Messages from '../components/Messages';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 const styles = {
   dialog: {

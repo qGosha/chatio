@@ -28,7 +28,7 @@ const sendTokenEmail = async (req, user) => {
     subject: 'Account Verification Token',
     html: letter
   };
- const sending = await transporter.sendMail(mailOptions);
+ await transporter.sendMail(mailOptions);
 
 }
 
@@ -47,7 +47,7 @@ app.post('/api/signup', async (req, res) => {
     res.status(400).send(mes);
   }
   try {
-    const doesExistCheck = await User.uniqEmailCheck(userData.email);
+    await User.uniqEmailCheck(userData.email);
     const dateOfBirth = new Date(`${userData.birthDay}-${userData.birthMonth}-${userData.birthYear}`).toISOString();
     const user = await new User({
       name: userData.name,
@@ -111,7 +111,7 @@ app.get('/api/confirmation/:token', async (req, res) => {
       return res.status(400).send('This user has already been verified.');
     }
     user.isConfirmed = true;
-    const newUser = await user.save();
+    await user.save();
     await Token.findOneAndRemove({_id: token._id});
     return res.redirect('/dashboard')
   } catch (error) {

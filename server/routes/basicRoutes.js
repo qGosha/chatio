@@ -31,14 +31,6 @@ module.exports = (app, io) => {
    }
   });
 
-  // const doesConverstionExist = await Conversation.find({members: { $all: [newMessage.recipient, userId] }});
-  // if (!doesConverstionExist.length) {
-  //   await new Conversation({
-  //     sender: userId,
-  //     recipient: newMessage.recipient
-  //   }).save();
-  // }
-
 
   app.get('/api/search/allUsers', loggedIn, async (req, res) => {
     try {
@@ -49,7 +41,7 @@ module.exports = (app, io) => {
      const iHaveDialogWith = iHaveDialogWithIds.map( i => i.toString());
      const getNewMsgNotifictions = await Message.find({ recipient: req.user._id, read: false, sender: { $in: iHaveDialogWithIds } }, {sender: 1, _id: 0});
      let newMsgNotifictions = {};
-     getNewMsgNotifictions.forEach((item, i) => {
+     getNewMsgNotifictions.forEach( item => {
        const s = item.sender;
        if (newMsgNotifictions[s]) {
          newMsgNotifictions[s]++;
@@ -77,11 +69,6 @@ module.exports = (app, io) => {
     }
     try {
       let newContactInList;
-      // const getIHaveDialogWith = await Conversation.find({members: { $all: [id, recipient] }})
-      // if (!getIHaveDialogWith.length) {
-      //  await new Conversation({ members: [id, recipient] }).save();
-      //    newContactInList = recipient;
-      // }
 
       const messages = await Message.find({ sender: { $in: [id, ObjectId(recipient)] }, recipient: { $in: [ObjectId(recipient), id] } })
       .sort({ timestamp: -1 })
@@ -130,7 +117,7 @@ module.exports = (app, io) => {
     "height": 640,
     "crop": 'fit'
   }));
-    const uploadingImagesPromises = values.map( (i) => {
+    const uploadingImagesPromises = values.map( () => {
       const newMessage = {
         message: {
           text: ' ',
@@ -145,7 +132,7 @@ module.exports = (app, io) => {
     });
   try {
     const uploadingImages = await Promise.all(uploadingImagesPromises);
-    uploadingImages.map( message => {
+    uploadingImages.forEach( message => {
       io.to(activeDialogWith).emit('inboundMessage', message);
       io.to(id).emit('inboundMessage', message);
     });
@@ -167,14 +154,15 @@ module.exports = (app, io) => {
     });
     const updatedMessages = await Promise.all(messagesUpdatePromises);
 
-    updatedMessages.map( message => {
+    updatedMessages.forEach( message => {
       io.to(activeDialogWith).emit('imageHasBeenUploaded', message);
       io.to(id).emit('imageHasBeenUploaded', message);
-    })
+    });
+    res.send({success: true});
   } catch (error) {
     res.send({
       success: false,
-      error
+      error: 'Image uploading error'
     })
 }
 })

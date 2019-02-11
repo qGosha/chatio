@@ -6,17 +6,16 @@ import {
   ADD_MESSAGE,
   UPLOAD_MESSAGES_ONSCROLL,
   UPLOAD_MESSAGES_END,
-  SEND_IMAGES,
-  SHOW_LOADING,
-  HIDE_LOADING,
   ADD_IMAGE_URL,
   CLOSE_DIALOG,
   MARK_MSG_READ,
   NEW_MSG_NOTIFICATION,
   REMOVE_NOTIFICATIONS,
   MSG_FROM_UNKNOWN,
-  CREATE_NEW_CONVERSATION
+  CREATE_NEW_CONVERSATION,
+  ERROR
 } from './types';
+import history from '../helpers/history';
 
 export const getPeers = () => async dispatch => {
   const res = await axios.get('/api/search/allUsers');
@@ -45,9 +44,7 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
   const {
     dashboard
   } = getState();
-  const {
-    auth
-  } = getState();
+
   const {
     id,
     online
@@ -99,6 +96,7 @@ export const openDialog = (id) => async dispatch => {
       },
       type: OPEN_DIALOG
     });
+    // history.push(`/dashboard/chat${id.slice(0, 5)}`);
   }
 }
 
@@ -133,9 +131,6 @@ export const messageFromUnknown = id => async dispatch => {
 }
 
 export const markMsgRead = (ids, updatedMsg, activeDialogWith) => async dispatch => {
-  const {
-    recipient
-  } = updatedMsg;
   await axios.post('/api/chat/markMsgRead', {
     ids,
     activeDialogWith
@@ -165,7 +160,6 @@ export const addMessage = (message) => async (dispatch, getState) => {
     dashboard
   } = getState();
   const {
-    currentMessages,
     activeDialogWith
   } = dashboard;
   if (
@@ -197,17 +191,15 @@ export const addImageUrl = (message) => async dispatch => {
 }
 
 export const sendImages = (data) => async dispatch => {
-  // dispatch({
-  //   type: SHOW_LOADING
-  // });
-  const res = await axios.post('/api/chat/uploadImages', data);
-  // dispatch({
-  //   type: HIDE_LOADING
-  // });
-  if (res.data.success) {
-    dispatch({
-      payload: {},
-      type: SEND_IMAGES
-    });
-  }
+ try {
+   const res = await axios.post('/api/chat/uploadImages', data);
+   if (!res.data.success) {
+     throw new Error(res.data.error);
+   }
+ } catch(e) {
+   dispatch({
+     payload: e,
+     type: ERROR
+   });
+ }
 }

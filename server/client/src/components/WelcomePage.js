@@ -15,7 +15,10 @@ const styles = {
   img_block: {
     textAlign: 'center',
     cursor: 'pointer',
-    marginRight: '6px'
+    marginRight: '6px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   img: {
     width: '3em',
@@ -23,6 +26,11 @@ const styles = {
   },
   imgContainer: {
    display: 'flex',
+  },
+  cont: {
+    width: '3em',
+    height: '3em',
+    position: 'relative'
   },
   indicator: {
     position: 'absolute',
@@ -45,7 +53,7 @@ const WelcomePage = ({allUsers, auth, openDialog}) => {
         <div key={user._id} style={styles.img_block} onClick={
           () => openDialog(user._id)
         }>
-         <div style={{ position: 'relative' }}>
+         <div style={styles.cont}>
           <Image src={photos ? photos.value : standartImage} style={styles.img} avatar />
           <div style={{ ...styles.indicator, backgroundColor: user.online ? 'green' : 'red' }}></div>
          </div>
@@ -62,8 +70,5 @@ const WelcomePage = ({allUsers, auth, openDialog}) => {
     </Fragment>
     )
 }
-//
-// <div style={{gridArea: 'footer / footer / footer / footer'}}>
-//  <span>@Copyright</span>
-// </div>
+
 export default WelcomePage;

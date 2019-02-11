@@ -30,7 +30,7 @@ export const fetchUser = () => async dispatch => {
 
 
 export const logoutUser = () => async dispatch => {
-      const user = await axios.get('/api/logout');
+      await axios.get('/api/logout');
       dispatch({type: LOGOUT_USER});
       history.push('/');
     }

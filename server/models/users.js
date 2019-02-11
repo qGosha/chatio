@@ -45,18 +45,23 @@ userSchema.pre('save', function(next) {
   const user = this;
   //to check if pass was modified to prevent already hashed pass from hashing
   if(user.isModified('password')) {
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(user.password, salt, (err, hash) => {
-        user.password = hash;
-        next();
-      })
-    });
+    try {
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(user.password, salt, (err, hash) => {
+          user.password = hash;
+          next();
+        })
+      });
+    } catch (e) {
+      throw new Error('Cannot complete hashing')
+    }
+
   } else {
     next();
   }
 });
 
-userSchema.statics.uniqEmailCheck = function (email, password) {
+userSchema.statics.uniqEmailCheck = function (email) {
   const User = this;
 
   return User.findOne({email}).then((user) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Input, Image, Button } from 'semantic-ui-react';
+import { Input, Button } from 'semantic-ui-react';
 
 const styles = {
   footer: {

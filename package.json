@@ -46,6 +46,11 @@
     "validator": "^10.7.1"
   },
   "devDependencies": {
+    "eslint": "^5.13.0",
+    "eslint-config-google": "^0.12.0",
+    "eslint-config-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-promise": "^4.0.1",
     "remote-redux-devtools": "^0.5.13"
   }
 }

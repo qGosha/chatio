@@ -9,11 +9,9 @@ require('./services/passport');
 const session = require('express-session');
 const mongodbStore = require('connect-mongo')(session);
 const passport = require('passport');
-const bcrypt = require('bcryptjs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {mongoose} = require('./db/mongoose');
-const {ObjectID} = require('mongodb');
 const socketIO = require('socket.io');
 const formData = require('express-form-data')
 

@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
-import { Segment, Image, Divider } from 'semantic-ui-react'
+import { Image, Divider } from 'semantic-ui-react';
+
 const moment = require('moment');
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
@@ -58,19 +59,19 @@ const Messages = ({messages, dashboard, auth}) => {
     const dynamicTexStyle = {
       marginLeft: shouldUseAvatar ? '8px' : '48px',
     }
+  
     const dynamicImageStyle = {
-      backgroundImage: `url(${item.message.text}), url(${standartImage})`,
       width: '300px',
       height: '300px',
-      backgroundSize:'cover',
-      backgroundPosition:'center',
-      backgroundRepeat:'no-repeat'
     };
-
+    const imgS = {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover'
+    }
     const content = item.message.image.image ?
-    <div style={dynamicImageStyle}></div>
+    <div style={dynamicImageStyle}><Image style={imgS} src={item.message.text ? item.message.text : standartImage}/></div>
     : <div>{item.message && item.message.text}</div>;
-
     return(
       <Fragment key={item._id}>
         { shouldShowDivider ? <Divider horizontal><span style={styles.timestamp}>{currentDate}</span></Divider> : null }

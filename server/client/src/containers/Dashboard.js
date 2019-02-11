@@ -11,7 +11,7 @@ import ChatSection from '../components/ChatSection';
 import Footer from '../components/Footer';
 import Settings from './Settings';
 import AvatarBlock from '../components/AvatarBlock';
-import { Route, Link, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 const sound = require('../sounds/msg.mp3');
 
@@ -85,7 +85,7 @@ class Dashboard extends Component {
   }
 
    handleOpenDialog = async (id) => {
-    const { allUsers, activeDialogWith} = this.props.dashboard;
+    const { activeDialogWith} = this.props.dashboard;
     if (id === activeDialogWith) return;
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
@@ -105,7 +105,7 @@ class Dashboard extends Component {
    const { activeDialogWith, iHaveDialogWith } = dashboard;
 
    if (!pictures.length || !activeDialogWith) return;
-   let formData = new FormData()
+   let formData = new FormData();
    pictures.forEach((file, i) => {
       formData.append(i, file)
     })
@@ -114,7 +114,7 @@ class Dashboard extends Component {
     if (!iHaveDialogWith.includes(activeDialogWith)) {
       createNewConversation(activeDialogWith);
     }
-    this.setState({imagesWereUploaded: true, pictures: []})
+    this.setState({imagesWereUploaded: true, pictures: []});
  }
   sendMessage = () => {
     const { messageText } = this.state;
@@ -190,8 +190,8 @@ class Dashboard extends Component {
       }
    });
     socket.on('inboundMessage', async message => {
-      const { dashboard, auth, markMsgRead, newMessageForAnotherDialog, messageFromUnknown } = this.props;
-      const { activeDialogWith, currentMessages, iHaveDialogWith } = dashboard;
+      const { dashboard, auth, newMessageForAnotherDialog, messageFromUnknown } = this.props;
+      const { activeDialogWith, iHaveDialogWith } = dashboard;
       if(message.sender !== auth.user._id) {
         try {
           await this.audio.play();
@@ -227,7 +227,7 @@ class Dashboard extends Component {
     });
    socket.on('msgHasBeenReadByPeer', async ids => {
      const { dashboard, msgReadByPeer } = this.props;
-     const { activeDialogWith, currentMessages } = dashboard;
+     const { currentMessages } = dashboard;
      const updatedMsg = currentMessages.map( msg => {
        if (ids.includes(msg._id)) msg.read = true;
        return msg;
@@ -244,31 +244,31 @@ class Dashboard extends Component {
   }
 
   render() {
-  const { auth, deleteUser, logoutUser, dashboard, openDialog, removeNotifications, closeDialog, markMsgRead, match } = this.props;
-  const { currentMessages, activeDialogWith, iHaveDialogWith, allUsers } = dashboard;
-  const { pictures, imagesWereUploaded, uploaderVisible, messageText } = this.state;
-  const user = auth.user;
+  const { auth, deleteUser, dashboard, removeNotifications, closeDialog, markMsgRead, match } = this.props;
+  const { activeDialogWith, allUsers } = dashboard;
+  const { imagesWereUploaded, uploaderVisible, messageText } = this.state;
   const welcomeSection = <WelcomePage allUsers={allUsers} auth={auth} openDialog={this.handleOpenDialog}/>;
   const chattingSection = (
-    <Fragment>
-      <ChatSection
-       dashboard={dashboard}
-       auth={auth}
-       handleDialogScroll={this.handleDialogScroll}
-       handleRef={this.handleRef}
-       closeDialog={closeDialog}
-       markMsgRead={markMsgRead}
-       removeNotifications={removeNotifications}
-       />
-      <Footer
-        onSubmit={(e) => { e.preventDefault(); this.sendMessage(); }}
-        messageText={messageText}
-        onChange={(e) => this.setState({messageText: e.target.value})}
-        handleSendClick={this.sendMessage}
-        handleImageSendClick={() => this.setState({ uploaderVisible: true, imagesWereUploaded: false })}
-        />
-    </Fragment>
-  )
+      <Fragment>
+        <ChatSection
+         dashboard={dashboard}
+         auth={auth}
+         handleDialogScroll={this.handleDialogScroll}
+         handleRef={this.handleRef}
+         closeDialog={closeDialog}
+         markMsgRead={markMsgRead}
+         removeNotifications={removeNotifications}
+         />
+        <Footer
+          onSubmit={(e) => { e.preventDefault(); this.sendMessage(); }}
+          messageText={messageText}
+          onChange={(e) => this.setState({messageText: e.target.value})}
+          handleSendClick={this.sendMessage}
+          handleImageSendClick={() => this.setState({ uploaderVisible: true, imagesWereUploaded: false })}
+          />
+      </Fragment>
+    )
+  
     return(
       <div style={styles.grid}>
         <ModalWindow
@@ -289,12 +289,12 @@ class Dashboard extends Component {
            match={match}
            />
            <AvatarBlock
-           auth={auth}
-           allUsers={allUsers}
-           activeDialogWith={activeDialogWith}
+             auth={auth}
+             allUsers={allUsers}
+             activeDialogWith={activeDialogWith}
            />
            { activeDialogWith ? chattingSection : welcomeSection }
-           <Route path="/dashboard/settings" component={() => <div>Welcome yeba</div>}/>
+
            { imagesWereUploaded ? null : <Uploader
             onClose={() => this.setState({ uploaderVisible: false})}
             onDrop={this.onDrop}
@@ -303,6 +303,12 @@ class Dashboard extends Component {
               /> }
       </div>
     )
+    // <Switch>
+    //  <Route exact path={`${match.url}`} component={welcomeSection}/>
+    //  <Route path="/dashboard/:chatId" component={chattingSection}/>
+    //  <Route path="/dashboard/settings" component={() => <div>Welcome yeba</div>}/>
+    // </Switch>
+
 //     return (
 //       <div>
 //       <Link to={'/dashboard/chat'}>Settings</Link>

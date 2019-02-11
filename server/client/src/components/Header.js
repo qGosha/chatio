@@ -16,8 +16,7 @@ const styles = {
 }
 
 const PageHeader = (props) => {
-  const { auth, allUsers, logout, match } = props;
-  const user = auth.user;
+  const { logout, match } = props;
   return (
   <div style={styles.headerCont}>
       <Segment style={styles.header}>

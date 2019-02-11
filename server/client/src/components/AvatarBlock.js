@@ -1,5 +1,5 @@
 import React from "react";
-import { Segment, Image, Icon } from 'semantic-ui-react';
+import { Image, Icon } from 'semantic-ui-react';
 
 const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
 
@@ -24,13 +24,14 @@ const AvatarBlock = ({allUsers, auth, activeDialogWith}) => {
    if(!allUsers) return null;
     const user = auth.user;
     const peer = allUsers[activeDialogWith];
+    const online = allUsers && allUsers[user._id].online;
     const alone = (
       <div>
         <h2>
          {`Hello ${user.name}`}
         </h2>
         <Image alt='profile photo' src={user.photos.length ? user.photos[0].value : standartImage} size='tiny' bordered />
-        <span>My status: {allUsers && allUsers[user._id].online ? 'Online' : 'Offline'}</span>
+        <span style={{fontWeight: 'bold'}}>My status: <span style={{color: online ? 'green' : 'red'}}>{ online ? 'Online' : 'Offline'}</span></span>
      </div>
    );
    const chatWith = activeDialogWith && (

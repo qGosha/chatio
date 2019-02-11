@@ -12,7 +12,8 @@ import {
   NEW_MSG_NOTIFICATION,
   REMOVE_NOTIFICATIONS,
   MSG_FROM_UNKNOWN,
-  CREATE_NEW_CONVERSATION
+  CREATE_NEW_CONVERSATION,
+  ERROR
 } from '../actions/types';
 const initialState = {
    allUsers: null,
