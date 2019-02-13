@@ -19,6 +19,11 @@ const ChatSection = (props) => {
   const { currentMessages, activeDialogWith, newMsgNotifictions } = dashboard;
   const user = auth.user;
   const notReadMsg = currentMessages.some( msg => msg.recipient === user._id && !msg.read );
+  let dialog;
+  const assignRef = element => {
+    dialog = element;
+    handleRef(element);
+  }
   useEffect( () => {
     if (notReadMsg) {
       let timer = setTimeout(() => {
@@ -37,12 +42,15 @@ const ChatSection = (props) => {
       }, 1000);
       return () => clearTimeout(timer);
     }
+    if (dialog) {
+     dialog.scrollTop = dialog.scrollHeight;
+    }
   }, [activeDialogWith]);
   return (
   <div style={{gridArea: 'main'}}>
    <Fragment>
     <Icon name='times' style={styles.close} onClick={closeDialog}/>
-    <Ref innerRef={handleRef}>
+    <Ref innerRef={assignRef}>
      <Segment style={styles.dialog} onScroll={handleDialogScroll}>
        <Messages messages={currentMessages} dashboard={dashboard} auth={auth}/>
      </Segment>

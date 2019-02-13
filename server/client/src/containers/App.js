@@ -3,7 +3,6 @@ import { Router, Route, Switch } from 'react-router-dom';
 import { PrivateRoute, EnterRoute, ConfirmRoute } from '../helpers/routing';
 import Dashboard from './Dashboard';
 import Confirmation from './Confirmation';
-import NoMatch from '../components/noMatch';
 import Login from './Login';
 import Signup from './Signup';
 import Loadable from 'react-loading-overlay';
@@ -40,7 +39,7 @@ class App extends Component {
           <EnterRoute path='/login' auth={auth} component={Login}/>
           <Route exact path='/signup' auth={auth} component={Signup}/>
           <ConfirmRoute path='/confirmation' auth={auth} component={Confirmation}/>
-=         </Switch>
+         </Switch>
         </Router>
       </Loadable>
     )

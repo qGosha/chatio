@@ -16,14 +16,17 @@ const styles = {
 }
 
 const PageHeader = (props) => {
-  const { logout, match } = props;
+  const { logout, location } = props;
   return (
   <div style={styles.headerCont}>
       <Segment style={styles.header}>
         <Button
           size='tiny'
           color='blue'
-          onClick={() => history.push(match.url + '/settings')}
+          onClick={() => {
+            if (location.pathname === '/dashboard/settings') return;
+            history.push('/dashboard/settings')}
+          }
         >
           <Icon name='setting' /> Settings
         </Button>

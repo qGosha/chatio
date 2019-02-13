@@ -1,43 +1,41 @@
-import React, { Component, Fragment } from "react";
-import {connect} from 'react-redux';
-import * as actions from '../actions';
-import ModalWindow from '../components/modal';
-import io from 'socket.io-client';
-import SidePanel from '../components/SidePanel';
-import Uploader from '../components/uploadButton';
-import WelcomePage from '../components/WelcomePage';
-import PageHeader from '../components/Header';
-import ChatSection from '../components/ChatSection';
-import Footer from '../components/Footer';
-import Settings from './Settings';
-import AvatarBlock from '../components/AvatarBlock';
-import { Route, Switch } from 'react-router-dom';
+import React, {Component, Fragment} from "react";
+import {connect} from "react-redux";
+import * as actions from "../actions";
+import ModalWindow from "../components/modal";
+import io from "socket.io-client";
+import SidePanel from "../components/SidePanel";
+import Uploader from "../components/uploadButton";
+import WelcomePage from "../components/WelcomePage";
+import PageHeader from "../components/Header";
+import ChatSection from "../components/ChatSection";
+import Footer from "../components/Footer";
+import Settings from "./Settings";
+import AvatarBlock from "../components/AvatarBlock";
+import {Route, Switch} from "react-router-dom";
 
-const sound = require('../sounds/msg.mp3');
+const sound = require("../sounds/msg.mp3");
 
-const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
-
+const standartImage =
+  "https://react.semantic-ui.com/images/wireframe/square-image.png";
 
 const styles = {
   grid: {
-    display: 'grid',
-    gridTemplateAreas:
-    `'menu header header header header '
+    display: "grid",
+    gridTemplateAreas: `'menu header header header header '
      'menu avatar avatar avatar avatar '
      'menu main main main main '
      'menu footer footer footer footer '`,
-    gridTemplateColumns: '1fr 4fr 4fr 4fr',
-    gridGap: '10px',
-    width:'100vw',
-    height: '100vh',
+    gridTemplateColumns: "1fr 4fr 4fr 4fr",
+    gridGap: "10px",
+    width: "100vw",
+    height: "100vh"
   },
 
- sendButton: {
-   display: 'flex',
-   flexDirection: 'row'
- },
-
-}
+  sendButton: {
+    display: "flex",
+    flexDirection: "row"
+  }
+};
 
 class Dashboard extends Component {
   constructor(props) {
@@ -45,7 +43,7 @@ class Dashboard extends Component {
     this.state = {
       modalOpen: false,
       socket: null,
-      messageText: '',
+      messageText: "",
       pictures: [],
       uploaderVisible: false,
       imagesWereUploaded: false,
@@ -66,26 +64,27 @@ class Dashboard extends Component {
   logout = () => {
     this.state.socket.disconnect();
     this.props.logoutUser();
-  }
+  };
 
-  handleDialogScroll = async (e) => {
-    const { haveAllMessagesBeenFetched } = this.props.dashboard;
+  handleDialogScroll = async e => {
+    const {haveAllMessagesBeenFetched} = this.props.dashboard;
     if (this.uploadNewTrigger || haveAllMessagesBeenFetched) return;
     const target = e.target;
-    const height = ((target.scrollHeight - target.scrollTop) / target.scrollHeight) * 100;
+    const height =
+      (target.scrollHeight - target.scrollTop) / target.scrollHeight * 100;
     if (height > 50) {
       this.uploadNewTrigger = true;
-      const { activeDialogWith } = this.props.dashboard;
+      const {activeDialogWith} = this.props.dashboard;
       const skip = this.uploadTriggerCount + 20;
       this.uploadTriggerCount = skip;
-      console.log('alaaaarm');
+      console.log("alaaaarm");
       await this.props.uploadMessagesOnScroll(activeDialogWith, skip);
       this.uploadNewTrigger = false;
     }
-  }
+  };
 
-   handleOpenDialog = async (id) => {
-    const { activeDialogWith} = this.props.dashboard;
+  handleOpenDialog = async id => {
+    const {activeDialogWith} = this.props.dashboard;
     if (id === activeDialogWith) return;
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
@@ -93,245 +92,271 @@ class Dashboard extends Component {
     if (this.dialog) {
       this.dialog.scrollTop = this.dialog.scrollHeight;
     }
-  }
+  };
 
-  onDrop = (pictures) => {
-      this.setState({ pictures });
-    }
+  onDrop = pictures => {
+    this.setState({pictures});
+  };
 
- sendImages = () => {
-   const { pictures } = this.state;
-   const { sendImages, createNewConversation, dashboard } = this.props;
-   const { activeDialogWith, iHaveDialogWith } = dashboard;
+  sendImages = () => {
+    const {pictures} = this.state;
+    const {sendImages, createNewConversation, dashboard} = this.props;
+    const {activeDialogWith, iHaveDialogWith} = dashboard;
 
-   if (!pictures.length || !activeDialogWith) return;
-   let formData = new FormData();
-   pictures.forEach((file, i) => {
-      formData.append(i, file)
-    })
-    formData.append('activeDialogWith', activeDialogWith);
+    if (!pictures.length || !activeDialogWith) return;
+    let formData = new FormData();
+    pictures.forEach((file, i) => {
+      formData.append(i, file);
+    });
+    formData.append("activeDialogWith", activeDialogWith);
     sendImages(formData);
     if (!iHaveDialogWith.includes(activeDialogWith)) {
       createNewConversation(activeDialogWith);
     }
     this.setState({imagesWereUploaded: true, pictures: []});
- }
+  };
   sendMessage = () => {
-    const { messageText } = this.state;
-    const { createNewConversation, dashboard } = this.props;
-    const { activeDialogWith, iHaveDialogWith } = dashboard;
+    const {messageText} = this.state;
+    const {createNewConversation, dashboard} = this.props;
+    const {activeDialogWith, iHaveDialogWith} = dashboard;
     if (!messageText || !activeDialogWith) return;
     const newMessage = {
       message: {
         text: messageText
       },
-      recipient: activeDialogWith,
-    }
-    this.state.socket.emit('outboundMessage', newMessage);
+      recipient: activeDialogWith
+    };
+    this.state.socket.emit("outboundMessage", newMessage);
     if (!iHaveDialogWith.includes(activeDialogWith)) {
       createNewConversation(activeDialogWith);
     }
-    this.setState({messageText: ''})
-  }
+    this.setState({messageText: ""});
+  };
 
- handleTabVisibility = e => {
-   const isTabActive = !e.target[this.eventKey];
-   if (isTabActive) {
-     clearInterval(this.newMsgTabNotification);
-     document.title = this.normalTitle;
-   }
-   this.setState({isTabActive})
- }
+  handleTabVisibility = e => {
+    const isTabActive = !e.target[this.eventKey];
+    if (isTabActive) {
+      clearInterval(this.newMsgTabNotification);
+      document.title = this.normalTitle;
+    }
+    this.setState({isTabActive});
+  };
 
   newMsgNewTitle = () => {
     if (document.title === this.normalTitle) {
-      document.title = 'You have new message(s)!';
+      document.title = "You have new message(s)!";
     } else {
       document.title = this.normalTitle;
     }
-  }
+  };
 
   componentDidMount() {
     this.audio.load();
     this.normalTitle = document.title;
-    const socket = io('http://localhost:5000');
+    const socket = io("http://localhost:5000");
     this.setState({socket});
     const keys = {
-       hidden: "visibilitychange",
-       webkitHidden: "webkitvisibilitychange",
-       mozHidden: "mozvisibilitychange",
-       msHidden: "msvisibilitychange"
-     };
+      hidden: "visibilitychange",
+      webkitHidden: "webkitvisibilitychange",
+      mozHidden: "mozvisibilitychange",
+      msHidden: "msvisibilitychange"
+    };
 
     for (let stateKey in keys) {
-       if (stateKey in document) {
-           this.eventKey = stateKey
-           this.eventName = keys[stateKey]
-           break
-       }
-     };
+      if (stateKey in document) {
+        this.eventKey = stateKey;
+        this.eventName = keys[stateKey];
+        break;
+      }
+    }
 
-   document.addEventListener(this.eventName, this.handleTabVisibility);
+    document.addEventListener(this.eventName, this.handleTabVisibility);
 
-    socket.on('userChangedStatus', (message) => {
-       this.props.userChangedStatus(message);
-     });
-    socket.on('imageHasBeenUploaded', message => {
-     const dialog = this.dialog;
-     let scroll;
-      if (dialog) {
-        if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
-          scroll = true;
-        }
-      this.props.addImageUrl(message);
-      if(scroll) {
-        dialog.scrollTop = dialog.scrollHeight;
-       }
-      }
-   });
-    socket.on('inboundMessage', async message => {
-      const { dashboard, auth, newMessageForAnotherDialog, messageFromUnknown } = this.props;
-      const { activeDialogWith, iHaveDialogWith } = dashboard;
-      if(message.sender !== auth.user._id) {
-        try {
-          await this.audio.play();
-        } catch(e) {
-          throw new Error(e);
-        }
-      }
-      if (!this.state.isTabActive && message.sender !== auth.user._id) {
-        this.newMsgTabNotification = setInterval(this.newMsgNewTitle, 500);
-      }
-      if (message.recipient !== activeDialogWith && message.sender !== activeDialogWith) {
-        const id = iHaveDialogWith.find( msg => msg === message.sender );
-        if (!id) {
-          messageFromUnknown(message.sender);
-          return;
-        }
-        newMessageForAnotherDialog(id);
-        return
-      };
+    socket.on("userChangedStatus", message => {
+      this.props.userChangedStatus(message);
+    });
+    socket.on("imageHasBeenUploaded", message => {
       const dialog = this.dialog;
       let scroll;
       if (dialog) {
         if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
           scroll = true;
         }
-      await this.props.addMessage(message);
-
-      this.uploadTriggerCount++;
-      if(scroll) {
-        dialog.scrollTop = dialog.scrollHeight;
-       }
+        this.props.addImageUrl(message);
+        if (scroll) {
+          dialog.scrollTop = dialog.scrollHeight;
+        }
       }
     });
-   socket.on('msgHasBeenReadByPeer', async ids => {
-     const { dashboard, msgReadByPeer } = this.props;
-     const { currentMessages } = dashboard;
-     const updatedMsg = currentMessages.map( msg => {
-       if (ids.includes(msg._id)) msg.read = true;
-       return msg;
-     })
-     msgReadByPeer(updatedMsg);
-   })
-   socket.on('disconnect', (e) => console.log('disconnected', e));
-   this.props.getPeers();
+    socket.on("inboundMessage", async message => {
+      const {
+        dashboard,
+        auth,
+        newMessageForAnotherDialog,
+        messageFromUnknown
+      } = this.props;
+      const {activeDialogWith, iHaveDialogWith} = dashboard;
+      if (message.sender !== auth.user._id) {
+        try {
+          await this.audio.play();
+        } catch (e) {
+          throw new Error(e);
+        }
+      }
+      if (!this.state.isTabActive && message.sender !== auth.user._id) {
+        this.newMsgTabNotification = setInterval(this.newMsgNewTitle, 500);
+      }
+      if (
+        message.recipient !== activeDialogWith &&
+        message.sender !== activeDialogWith
+      ) {
+        const id = iHaveDialogWith.find(msg => msg === message.sender);
+        if (!id) {
+          messageFromUnknown(message.sender);
+          return;
+        }
+        newMessageForAnotherDialog(id);
+        return;
+      }
+      const dialog = this.dialog;
+      let scroll;
+      if (dialog) {
+        if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
+          scroll = true;
+        }
+        await this.props.addMessage(message);
+
+        this.uploadTriggerCount++;
+        if (scroll) {
+          dialog.scrollTop = dialog.scrollHeight;
+        }
+      }
+    });
+    socket.on("msgHasBeenReadByPeer", async ids => {
+      const {dashboard, msgReadByPeer} = this.props;
+      const {currentMessages} = dashboard;
+      const updatedMsg = currentMessages.map(msg => {
+        if (ids.includes(msg._id)) msg.read = true;
+        return msg;
+      });
+      msgReadByPeer(updatedMsg);
+    });
+    socket.on("disconnect", e => console.log("disconnected", e));
+    this.props.getPeers();
   }
 
   componentWillUnmount() {
-   document.removeEventListener(this.eventName, this.handleTabVisibility);
-   clearInterval(this.newMsgTabNotification);
+    document.removeEventListener(this.eventName, this.handleTabVisibility);
+    clearInterval(this.newMsgTabNotification);
   }
 
   render() {
-  const { auth, deleteUser, dashboard, removeNotifications, closeDialog, markMsgRead, match } = this.props;
-  const { activeDialogWith, allUsers } = dashboard;
-  const { imagesWereUploaded, uploaderVisible, messageText } = this.state;
-  const welcomeSection = <WelcomePage allUsers={allUsers} auth={auth} openDialog={this.handleOpenDialog}/>;
-  const chattingSection = (
+    const {
+      auth,
+      deleteUser,
+      dashboard,
+      removeNotifications,
+      closeDialog,
+      markMsgRead,
+      match,
+      location
+    } = this.props;
+    const {activeDialogWith, allUsers} = dashboard;
+    const {imagesWereUploaded, uploaderVisible, messageText} = this.state;
+    const welcomeSection = () => (
       <Fragment>
-        <ChatSection
-         dashboard={dashboard}
-         auth={auth}
-         handleDialogScroll={this.handleDialogScroll}
-         handleRef={this.handleRef}
-         closeDialog={closeDialog}
-         markMsgRead={markMsgRead}
-         removeNotifications={removeNotifications}
-         />
-        <Footer
-          onSubmit={(e) => { e.preventDefault(); this.sendMessage(); }}
-          messageText={messageText}
-          onChange={(e) => this.setState({messageText: e.target.value})}
-          handleSendClick={this.sendMessage}
-          handleImageSendClick={() => this.setState({ uploaderVisible: true, imagesWereUploaded: false })}
-          />
+        <AvatarBlock
+          auth={auth}
+          allUsers={allUsers}
+          activeDialogWith={activeDialogWith}
+        />
+        <WelcomePage
+          allUsers={allUsers}
+          auth={auth}
+          openDialog={this.handleOpenDialog}
+        />
       </Fragment>
-    )
-  
-    return(
+    );
+
+    const chattingSection = () => (
+      <Fragment>
+        <AvatarBlock
+          auth={auth}
+          allUsers={allUsers}
+          activeDialogWith={activeDialogWith}
+        />
+        <ChatSection
+          dashboard={dashboard}
+          auth={auth}
+          handleDialogScroll={this.handleDialogScroll}
+          handleRef={this.handleRef}
+          closeDialog={closeDialog}
+          markMsgRead={markMsgRead}
+          removeNotifications={removeNotifications}
+        />
+        <Footer
+          onSubmit={e => {
+            e.preventDefault();
+            this.sendMessage();
+          }}
+          messageText={messageText}
+          onChange={e => this.setState({messageText: e.target.value})}
+          handleSendClick={this.sendMessage}
+          handleImageSendClick={() =>
+            this.setState({uploaderVisible: true, imagesWereUploaded: false})
+          }
+        />
+      </Fragment>
+    );
+
+    return (
       <div style={styles.grid}>
         <ModalWindow
-         open={this.state.modalOpen}
-         onClose={() => this.setState({ modalOpen: false})}
-         headertext={'Delete Your Account'}
-         contenttext={'Are you sure you want to delete your account?'}
-         onNegative={() => this.setState({ modalOpen: false})}
-         onPositive={() => deleteUser()}
-         />
-          <SidePanel dashboard={dashboard} openDialog={(id) => this.handleOpenDialog(id)}/>
-          <PageHeader
-           auth={auth}
-           allUsers={allUsers}
-           logout={this.logout}
-           openModal={() => this.setState({ modalOpen: true })}
-           standartImage={standartImage}
-           match={match}
-           />
-           <AvatarBlock
-             auth={auth}
-             allUsers={allUsers}
-             activeDialogWith={activeDialogWith}
-           />
-           { activeDialogWith ? chattingSection : welcomeSection }
+          open={this.state.modalOpen}
+          onClose={() => this.setState({modalOpen: false})}
+          headertext={"Delete Your Account"}
+          contenttext={"Are you sure you want to delete your account?"}
+          onNegative={() => this.setState({modalOpen: false})}
+          onPositive={() => deleteUser()}
+        />
+        <SidePanel
+          dashboard={dashboard}
+          openDialog={id => this.handleOpenDialog(id)}
+        />
+        <PageHeader
+          auth={auth}
+          allUsers={allUsers}
+          logout={this.logout}
+          openModal={() => this.setState({modalOpen: true})}
+          standartImage={standartImage}
+          match={match}
+          location={location}
+        />
 
-           { imagesWereUploaded ? null : <Uploader
-            onClose={() => this.setState({ uploaderVisible: false})}
+        <Switch>
+          <Route exact path={`${match.url}`} render={welcomeSection} />
+          <Route path="/dashboard/chat" render={chattingSection} />
+          <Route
+            path="/dashboard/settings"
+            render={() => <div>Welcome yeba</div>}
+          />
+        </Switch>
+
+        {imagesWereUploaded ? null : (
+          <Uploader
+            onClose={() => this.setState({uploaderVisible: false})}
             onDrop={this.onDrop}
             visible={uploaderVisible}
             onUpload={this.sendImages}
-              /> }
+          />
+        )}
       </div>
-    )
-    // <Switch>
-    //  <Route exact path={`${match.url}`} component={welcomeSection}/>
-    //  <Route path="/dashboard/:chatId" component={chattingSection}/>
-    //  <Route path="/dashboard/settings" component={() => <div>Welcome yeba</div>}/>
-    // </Switch>
-
-//     return (
-//       <div>
-//       <Link to={'/dashboard/chat'}>Settings</Link>
-//       <Link to={'/dashboard/welcome'}>Settings</Link>
-// // the same way as before, not setting a path prop
-// // makes it render on every /dashboard/** request
-//   <Route component={() => <div>HeaDER</div>}/>
-//     <Switch>
-//    // longer path (with same root) than others first
-//      <Route path="/dashboard/chat" component={() => <div>Chat ebanyi</div>}/>
-//      <Route path="/dashboard/welcome" component={() => <div>Welcome yeba</div>}/>
-//    </Switch>
-//    </div>
-//     )
-
-
+    );
   }
-
-};
-
-function mapStateToProps({ auth, dashboard }) {
-  return {auth, dashboard};
 }
 
+function mapStateToProps({auth, dashboard}) {
+  return {auth, dashboard};
+}
 
 export default connect(mapStateToProps, actions)(Dashboard);
