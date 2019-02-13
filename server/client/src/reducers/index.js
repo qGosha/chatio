@@ -5,6 +5,6 @@ import { isLoading } from './loading';
 import { reducer as form} from 'redux-form';
 
 
-const rootReducer = combineReducers({ auth, form, isLoading,dashboard });
+const rootReducer = combineReducers({ auth, form, isLoading, dashboard });
 
 export default rootReducer;

@@ -96,8 +96,8 @@ export const openDialog = (id) => async dispatch => {
       },
       type: OPEN_DIALOG
     });
-    if(window.location.pathname !== '/dashboard/chat') {    
-      history.push('/dashboard/chat');
+    if(window.location.pathname !== '/dashboard') {
+      history.push('/dashboard');
     }
   }
 }
@@ -106,7 +106,6 @@ export const closeDialog = () => async dispatch => {
   dispatch({
     type: CLOSE_DIALOG
   });
-  history.push('/dashboard');
 }
 
 export const removeNotifications = id => async dispatch => {

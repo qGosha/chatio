@@ -334,11 +334,10 @@ class Dashboard extends Component {
         />
 
         <Switch>
-          <Route exact path={`${match.url}`} render={welcomeSection} />
-          <Route path="/dashboard/chat" render={chattingSection} />
+          <Route exact path={`${match.url}`} render={ activeDialogWith ? chattingSection : welcomeSection} />
           <Route
             path="/dashboard/settings"
-            render={() => <div>Welcome yeba</div>}
+            render={() => <Settings />}
           />
         </Switch>
 
