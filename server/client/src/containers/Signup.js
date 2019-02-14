@@ -40,7 +40,6 @@ class Signup extends Component {
  }
 
 submitForm = (values) => {
-  console.log(values);
   const { results } = this.state;
   const isCityPicked = results.some( i => i.title === values.city);
   if (!isCityPicked) {
