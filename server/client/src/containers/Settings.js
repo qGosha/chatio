@@ -3,8 +3,10 @@ import {connect} from "react-redux";
 import * as actions from "../actions";
 import { Segment, Form } from 'semantic-ui-react';
 import { InputComponent } from '../helpers/common';
-import { reduxForm, Field, getFormValues } from 'redux-form';
+import { reduxForm, Field } from 'redux-form';
 import { validate } from '../helpers/validation';
+import SearchCity from "../components/SearchCity";
+import SelectGender from "../components/SelectGender";
 
 const styles = {
   container: {
@@ -29,41 +31,62 @@ const styles = {
 }
 
 const Settings = props => {
-  const {auth, dashboard, match, error, submitting, handleSubmit, form, formValues} = props;
+  const {auth, dashboard, match, error, submitting, handleSubmit, form, formValues, change} = props;
   console.log(formValues);
   const { user } = auth;
-  const { name, email, gender, dateOfBirth } = user;
-  const [settings, setSetting] = useState({
-    Name: name,
-    Email: email,
-    Gender: gender,
-    'Date of birth': dateOfBirth
-  });
+  // const { name, email, gender, dateOfBirth, city } = user;
+  const aliaces = {
+    name: 'Name',
+    email: 'Email',
+    gender: 'Gender',
+    city: 'City',
+    dateOfBirth: 'Date of birth'
+  }
+ const [results, setResults] = useState([]);
+
   const [settingsStatus, settingsStatusChange] = useState({
-    Name: false,
-    Email: false,
-    Gender: false,
-    'Date of birth': false
+    name: false,
+    email: false,
+    gender: false,
+    city: false,
+    dateOfBirth: false
   });
   const fields = Object.keys(settingsStatus).map( (field, i) => {
-    if (!settings[field]) return null;
     const value = settingsStatus[field];
-    return (
-      <div key={i} style={styles.box}>
-        <div style={styles.title}>{`${field}:`}</div>
-         { value ?
-           <Field
+    let component = null;
+     if (field === 'city') {
+       component = (
+         <SearchCity
+         change={props.change}
+         setResults={setResults}
+         results={results}
+         />
+       );
+     } else if (field === 'gender') {
+       component = <SelectGender />;
+     } else {
+       component = (
+         <Field
             style={styles.field}
             name={field}
-            placeholder={`Type new ${field}`}
+            placeholder={`Type new ${aliaces[field]}`}
             component={InputComponent}
-           /> :
+           />
+       );
+     }
+    return (
+      <div key={i} style={styles.box}>
+        <div style={styles.title}>{`${aliaces[field]}:`}</div>
+         { value ? component :
            <div>
-            {settings[field]}
+            { user[field] ? user[field] : '' }
            </div>
              }
          <div><a onClick={ () => {
         if(value) {
+          if (settingsStatus.city) {
+            setResults([]);
+          }
           props.clearFields(form, false, field);
         }
          settingsStatusChange({...settingsStatus, [field]: !value})
@@ -90,23 +113,12 @@ const Settings = props => {
   )
 };
 
-const mapStateToProps = state => {
-  return {
-    formValues: getFormValues('settingsForm')(state),
-    auth: state.auth,
-    dashboard: state.dashboard
-  }
+
+function mapStateToProps({auth, dashboard}) {
+  return {auth, dashboard};
 }
 
-// function mapStateToProps({auth, dashboard}) {
-//   return {auth, dashboard};
-// }
-
 const ConnectedSettings = connect(mapStateToProps, actions)(Settings);
-
-// ConnectedSettings=connect( state => {
-//   values: getFormValues('settingsForm')(state)
-// } )(ConnectedSettings)
 
 export default reduxForm({
     form: 'settingsForm',

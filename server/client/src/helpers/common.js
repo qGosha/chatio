@@ -32,7 +32,7 @@ export const SearchComponent = ({input, results, handleSearchChange, handleSelec
            onResultSelect={(e, {result}) => handleSelectResult('city', result.title)}
            onFocus={(e) => {
              //trick to disable autocomplete
-             e.target.autocomplete = 'custom'
+             e.target.autocomplete = 'custom';         
            }}
            results={results}
            {...custom}/>
