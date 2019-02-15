@@ -1,5 +1,27 @@
 import React, { Fragment } from "react";
 import { Form, Label, Input, Dropdown, Search } from 'semantic-ui-react'
+import { DateInput } from 'semantic-ui-calendar-react';
+
+export const DatePickComponent = ({input, change, label, meta: { touched, error, warning }, ...custom}) => {
+  const handleChange = (event, {name, value}) => {
+   input.onChange(value);
+ };
+  return (
+    <Form.Field
+    error={touched && !!error}
+    style={{ textAlign:'left' }}>
+      <DateInput
+          {...input}
+          onChange={handleChange}
+          placeholder="Date"
+          iconPosition="left"
+          closable={true}
+          startMode='year'
+          {...custom}
+        />
+     </Form.Field>
+  )
+}
 
 
 export const InputComponent = ({input, label, meta: { touched, error, warning }, ...custom}) => (
@@ -32,7 +54,7 @@ export const SearchComponent = ({input, results, handleSearchChange, handleSelec
            onResultSelect={(e, {result}) => handleSelectResult('city', result.title)}
            onFocus={(e) => {
              //trick to disable autocomplete
-             e.target.autocomplete = 'custom';         
+             e.target.autocomplete = 'custom';
            }}
            results={results}
            {...custom}/>
@@ -52,7 +74,7 @@ export const SelectComponent = ({input, label, meta: { touched, error, warning, 
         error={touched && !active && !!error }
         style={{ textAlign:'left' }}>
           <Dropdown
-           style={{ marginBottom: '0px', minWidth: '0' }}
+           style={{ marginBottom: '0px'}}
            {...input}
            onChange={(param,data) => input.onChange(data.value)}
            {...custom}/>

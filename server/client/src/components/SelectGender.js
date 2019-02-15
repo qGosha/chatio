@@ -14,8 +14,8 @@ const SelectGender = props => {
       options={genderOptions}
       selection
       placeholder="Select your gender"
-      fluid
       component={SelectComponent}
+      {...props}
     />
   )
 }

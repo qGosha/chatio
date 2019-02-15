@@ -1,5 +1,5 @@
 import React from "react";
-import {InputComponent, SelectComponent} from "../helpers/common";
+import {InputComponent, SelectComponent, DatePickComponent} from "../helpers/common";
 import {Form, Grid, Header, Message, Segment, Icon} from "semantic-ui-react";
 import {Field} from "redux-form";
 import {Link} from "react-router-dom";
@@ -61,32 +61,10 @@ const SignUpGrid = ({
               <span style={label}>Birthday</span>
               <Form.Group widths="equal" style={{flexWrap: "nowrap"}}>
                 <Field
-                  fluid
-                  search
-                  name="birthDay"
-                  options={dayOptions}
-                  selection
-                  placeholder="Day"
-                  component={SelectComponent}
-                />
-                <Field
-                  fluid
-                  search
-                  name="birthMonth"
-                  options={monthOptions}
-                  selection
-                  placeholder="Month"
-                  component={SelectComponent}
-                />
-                <Field
-                  fluid
-                  search
-                  name="birthYear"
-                  options={yearOptions}
-                  selection
-                  placeholder="Year"
-                  component={SelectComponent}
-                />
+                     name={'dateOfBirth'}
+                     placeholder={`Type new date`}
+                     component={DatePickComponent}
+                    />
               </Form.Group>
               <span style={label}>Your city</span>
               <SearchCity

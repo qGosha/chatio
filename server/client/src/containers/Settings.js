@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {connect} from "react-redux";
 import * as actions from "../actions";
 import { Segment, Form } from 'semantic-ui-react';
-import { InputComponent } from '../helpers/common';
+import { InputComponent, DatePickComponent } from '../helpers/common';
 import { reduxForm, Field } from 'redux-form';
 import { validate } from '../helpers/validation';
 import SearchCity from "../components/SearchCity";
@@ -64,6 +64,12 @@ const Settings = props => {
        );
      } else if (field === 'gender') {
        component = <SelectGender />;
+     } else if (field === 'dateOfBirth') {
+       component = (<Field
+              name={'dateOfBirth'}
+              placeholder={`Type new date`}
+              component={DatePickComponent}
+             />)
      } else {
        component = (
          <Field

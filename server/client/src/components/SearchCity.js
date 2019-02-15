@@ -4,8 +4,7 @@ import axios from 'axios';
 import { SearchComponent } from '../helpers/common';
 import { Field } from 'redux-form';
 
-const SearchCity = props => {
-  const { change, setResults, results } = props;
+const SearchCity = ({change, setResults, results, ...other}) => {
   const searchCity = async value => {
      const res = await axios.post('/api/search/city', { value });
      const { data } = res;
@@ -32,13 +31,14 @@ const SearchCity = props => {
    }
   return (
     <Field
-     handleSelectResult={props.change}
+     handleSelectResult={change}
      handleSearchChange={handleSearchChange}
      fluid
      name='city'
      results={results}
      placeholder='Type your city name'
      component={SearchComponent}
+     {...other}
     />
   )
 }
