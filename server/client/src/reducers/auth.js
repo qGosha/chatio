@@ -1,4 +1,4 @@
-import { FETCH_USER, LOGOUT_USER, ERROR, LOGIN_USER, CONFIRM_USER, DELETE_USER } from '../actions/types';
+import { FETCH_USER, LOGOUT_USER, ERROR, LOGIN_USER, CONFIRM_USER, DELETE_USER, CHANGE_AVATAR } from '../actions/types';
 
 export function auth(state = null, action) {
  switch (action.type) {
@@ -14,6 +14,10 @@ export function auth(state = null, action) {
    return { user: action.payload, isAuthenticated: true, error: false };
  case ERROR:
   return { user: null, isAuthenticated: false, fetchError: action.payload };
+ case CHANGE_AVATAR:
+  const photos = state.user.photos;
+  photos.unshift(action.payload)
+  return { ...state, user: { ...state.user, photos } };
  default: return state;
  }
 }

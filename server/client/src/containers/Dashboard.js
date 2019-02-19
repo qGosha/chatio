@@ -14,9 +14,7 @@ import AvatarBlock from "../components/AvatarBlock";
 import {Route, Switch} from "react-router-dom";
 
 const sound = require("../sounds/msg.mp3");
-
-const standartImage =
-  "https://react.semantic-ui.com/images/wireframe/square-image.png";
+const standartImage = require("../img/square-image.png");
 
 const styles = {
   grid: {
@@ -293,6 +291,7 @@ class Dashboard extends Component {
           closeDialog={closeDialog}
           markMsgRead={markMsgRead}
           removeNotifications={removeNotifications}
+          standartImage={standartImage}
         />
         <Footer
           onSubmit={e => {
@@ -337,7 +336,7 @@ class Dashboard extends Component {
           <Route exact path={`${match.url}`} render={ activeDialogWith ? chattingSection : welcomeSection} />
           <Route
             path="/dashboard/settings"
-            render={() => <Settings />}
+            render={() => <Settings standartImage={standartImage}/>}
           />
         </Switch>
 

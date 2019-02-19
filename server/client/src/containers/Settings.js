@@ -1,16 +1,17 @@
 import React, {useState} from "react";
 import {connect} from "react-redux";
 import * as actions from "../actions";
-import {Segment, Form, Grid} from "semantic-ui-react";
+import {Segment, Form, Grid, Image, Tab} from "semantic-ui-react";
 import {InputComponent, DatePickComponent} from "../helpers/common";
 import {reduxForm, Field} from "redux-form";
 import {validate} from "../helpers/validation";
 import SearchCity from "../components/SearchCity";
 import SelectGender from "../components/SelectGender";
+import FileButton from "../components/FileButton";
 
 const styles = {
   container: {
-    gridColumn: "2 / 4",
+    gridColumn: "2 / 5",
     // display: "grid"
     // gridTemplateColumns: 'auto auto auto'
   },
@@ -44,10 +45,12 @@ const Settings = props => {
     handleSubmit,
     form,
     formValues,
-    change
+    change,
+    standartImage
   } = props;
   console.log(formValues);
   const {user} = auth;
+  const myAvatar = user.photos.length ? user.photos[0] : standartImage;
   // const { name, email, gender, dateOfBirth, city } = user;
   const aliaces = {
     name: "Name",
@@ -100,13 +103,13 @@ const Settings = props => {
     }
     return (
     <Grid.Row key={i} style={styles.row}>
-      <Grid.Column width={3} style={{textAlign:'left'}}>
+      <Grid.Column width={2} style={{textAlign:'left'}}>
         <div style={styles.title}>{`${aliaces[field]}:`}</div>
       </Grid.Column>
-      <Grid.Column width={10}>
+      <Grid.Column width={6}>
         {value ? component : <div>{user[field] ? user[field] : ""}</div>}
       </Grid.Column>
-      <Grid.Column width={3} style={{textAlign:'left'}}>
+      <Grid.Column width={2} style={{textAlign:'left'}}>
         <div>
           <a
             onClick={() => {
@@ -126,28 +129,45 @@ const Settings = props => {
     </Grid.Row>
     );
   });
-  return (
-      <Form
-        size="large"
-        onSubmit={handleSubmit(values => console.log(values))}
-        error={!!error}
-        style={styles.container}
-      >
-      <Grid
-       textAlign="center"
-       stackable>
+  const generalPane = (
+    <Form
+      size="large"
+      onSubmit={handleSubmit(values => console.log(values))}
+      error={!!error}
+    >
+    <Grid
+     textAlign="left"
+     stackable>
         {fields}
-        </Grid>
-        <Form.Button
-          color="blue"
-          size="large"
-          loading={submitting}
-          disabled={submitting}
-          style={styles.saveButton}
-        >
-          Save
-        </Form.Button>
-      </Form>
+      </Grid>
+      <Form.Button
+        color="blue"
+        size="large"
+        loading={submitting}
+        disabled={submitting}
+        style={styles.saveButton}
+      >
+        Save
+      </Form.Button>
+    </Form>
+  );
+  const avatarPane = (
+    <Grid
+     stackable>
+      <Grid.Column>
+       <Segment>
+        <Image rounded size='small' verticalAlign='top' src={myAvatar} />
+        <FileButton onSelect={props.changeAvatar}/>
+       </Segment>
+      </Grid.Column>
+    </Grid>
+  )
+  const panes = [
+  { menuItem: 'General', render: () => <Tab.Pane>{generalPane}</Tab.Pane> },
+  { menuItem: 'Avatar', render: () => <Tab.Pane>{avatarPane}</Tab.Pane> }
+]
+  return (
+    <Tab panes={panes} style={styles.container}/>
   );
 };
 

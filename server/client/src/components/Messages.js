@@ -3,7 +3,7 @@ import { Image, Divider } from 'semantic-ui-react';
 
 const moment = require('moment');
 
-const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
+// const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
 
 const styles = {
   messageContainer: {
@@ -31,16 +31,16 @@ const styles = {
   }
 }
 
-const Messages = ({messages, dashboard, auth}) => {
+const Messages = ({messages, dashboard, auth, standartImage}) => {
   if(!dashboard || !auth || !messages.length) return null;
   const sortedMessages = messages.sort( (a, b) =>  {
     return new Date(a.timestamp) - new Date(b.timestamp)
   })
   const { activeDialogWith, allUsers } = dashboard;
   const { user } = auth;
-  const myAvatar = user.photos.length ? user.photos[0].value : standartImage;
+  const myAvatar = user.photos.length ? user.photos[0] : standartImage;
   const peer = allUsers[activeDialogWith];
-  const peerAvatar = (peer && peer.photos.length) ? peer.photos[0].value : standartImage;
+  const peerAvatar = (peer && peer.photos.length) ? peer.photos[0] : standartImage;
   let shouldUseAvatar = true;
   let lastMessageFrom = sortedMessages[0].sender;
   let currentDate = 0;
@@ -59,7 +59,7 @@ const Messages = ({messages, dashboard, auth}) => {
     const dynamicTexStyle = {
       marginLeft: shouldUseAvatar ? '8px' : '48px',
     }
-  
+
     const dynamicImageStyle = {
       width: '300px',
       height: '300px',

@@ -36,7 +36,7 @@ passport.use(new FacebookStrategy({
       'facebook.facebookId': profile.id,
       'facebook.facebookEmail': profile.emails && profile.emails.length ? profile.emails[0].value : '',
        name: profile.name && profile.name.givenName,
-       photos: profile.photos,
+       photos: profile.photos.length && profile.photos[0].value,
        gender: profile.gender,
        isConfirmed: true
     }).save();
@@ -61,7 +61,7 @@ passport.use(new GoogleStrategy({
     'google.googleId': profile.id,
     'google.googleEmail': profile.emails && profile.emails.length ? profile.emails[0].value : '',
     name: profile.name && profile.name.givenName,
-    photos: profile.photos,
+    photos: profile.photos.length && profile.photos[0].value,
     isConfirmed: true
    }).save();
    done(null, newUser);

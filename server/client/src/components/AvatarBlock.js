@@ -30,18 +30,18 @@ const AvatarBlock = ({allUsers, auth, activeDialogWith}) => {
         <h2>
          {`Hello ${user.name}`}
         </h2>
-        <Image alt='profile photo' src={user.photos.length ? user.photos[0].value : standartImage} size='tiny' bordered />
+        <Image alt='profile photo' src={user.photos.length ? user.photos[0] : standartImage} size='tiny' bordered />
         <span style={{fontWeight: 'bold'}}>My status: <span style={{color: online ? 'green' : 'red'}}>{ online ? 'Online' : 'Offline'}</span></span>
      </div>
    );
    const chatWith = activeDialogWith && (
        <div style={styles.chatImg}>
         <div>
-         <Image alt='profile photo' src={user.photos.length ? user.photos[0].value : standartImage} size='mini' bordered />
+         <Image alt='profile photo' src={user.photos.length ? user.photos[0] : standartImage} size='mini' bordered />
         </div>
         <Icon name="angle double right" style={styles.icon}/>
         <div>
-         <Image alt='profile photo' src={peer.photos.length ? peer.photos[0].value : standartImage} size='mini' bordered />
+         <Image alt='profile photo' src={peer.photos.length ? peer.photos[0] : standartImage} size='mini' bordered />
         </div>
        </div>
    )
