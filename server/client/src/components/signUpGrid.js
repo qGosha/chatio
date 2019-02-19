@@ -1,5 +1,5 @@
 import React from "react";
-import {InputComponent, SelectComponent, DatePickComponent} from "../helpers/common";
+import {InputComponent, DatePickComponent} from "../helpers/common";
 import {Form, Grid, Header, Message, Segment, Icon} from "semantic-ui-react";
 import {Field} from "redux-form";
 import {Link} from "react-router-dom";
@@ -9,11 +9,6 @@ import SelectGender from "./SelectGender";
 
 const SignUpGrid = ({
   submitForm,
-  monthOptions,
-  yearOptions,
-  dayOptions,
-  genderOptions,
-  handleSearchChange,
   results,
   props,
   setResults

@@ -1,4 +1,5 @@
-export const validate = (values, props) => {
+const moment = require('moment');
+export const validate = (values) => {
   const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const errors = {}
   if (!values.email) {
@@ -16,15 +17,15 @@ export const validate = (values, props) => {
   } else if (values.password !== values.repPassword) {
      errors.repPassword = 'Passwords don\'t match'
   }
-  if (!values.birthDay) {
-   errors.birthDay = 'Select day'
-  }
-  if (!values.birthMonth) {
-   errors.birthMonth = 'Select month'
-  }
-  if (!values.birthYear) {
-   errors.birthYear = 'Select year'
-  }
+  if (!values.dateOfBirth) {
+   errors.dateOfBirth = 'Select your date of birth'
+ } else if (!moment(values.dateOfBirth, 'MM-DD-YYYY', true).isValid()) {
+   errors.dateOfBirth = 'Incorrect date'
+ } else if (new Date(values.dateOfBirth).getFullYear() < 1900) {
+   errors.dateOfBirth = 'Incorrect date'
+ } else if (moment(values.dateOfBirth).isAfter(new Date())) {
+   errors.dateOfBirth = 'The date is in the future'
+ }
   if (!values.gender) {
    errors.gender = 'Select your gender'
   }
@@ -42,14 +43,3 @@ export const validate = (values, props) => {
  }
   return errors
 };
-
-export const pinValidate = (values, props) => {
-  const errors = {};
-  if (!values.pin) {
-    errors.pin = 'Required'
-  } else if (values.pin.length < 4) {
-     errors.pin = 'Pin must be 4 characters long'
-  }
-  return errors;
-
-}

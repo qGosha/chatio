@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const mail = require('../helpers/mail');
 const nodemailer = require('nodemailer');
 const _ = require('lodash');
+const moment = require('moment');
 
 const sendTokenEmail = async (req, user) => {
   const token = await new Token({
@@ -37,7 +38,7 @@ module.exports = (app) => {
 app.post('/api/signup', async (req, res) => {
   if(req.user) return res.redirect('/dashboard');
 
-  const userData = _.pick(req.body, ['name', 'gender', 'birthDay', 'birthMonth', 'birthYear', 'city', 'email', 'password']);
+  const userData = _.pick(req.body, ['name', 'gender', 'dateOfBirth', 'city', 'email', 'password']);
   const isDataComplete = Object.keys(userData).every( i => userData[i]);
   if(!isDataComplete) {
     const mes = {
@@ -48,7 +49,22 @@ app.post('/api/signup', async (req, res) => {
   }
   try {
     await User.uniqEmailCheck(userData.email);
-    const dateOfBirth = new Date(`${userData.birthDay}-${userData.birthMonth}-${userData.birthYear}`).toISOString();
+    const dateOfBirth = new Date(userData.dateOfBirth).toISOString();
+    let dateError;
+    if (!moment(dateOfBirth, 'MM-DD-YYYY', true).isValid()) {
+      dateError = 'Incorrect date'
+    } else if (new Date(dateOfBirth).getFullYear() < 1900) {
+      dateError = 'Incorrect date'
+    } else if (moment(dateOfBirth).isAfter(new Date())) {
+      dateError = 'The date is in the future'
+    }
+    if (dateError) {
+      const mes = {
+        success: false,
+        message: dateError
+      }
+      res.status(400).send(mes);
+    }
     const user = await new User({
       name: userData.name,
       gender: userData.gender,
