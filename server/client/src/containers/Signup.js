@@ -17,48 +17,6 @@ const Signup = props => {
     return props.signUpUser(values);
   };
 
-    // let dayOptions = [];
-    // for (let i = 1; i <= 31; i++) {
-    //   const day = {
-    //     key: i,
-    //     text: i,
-    //     value: i
-    //   };
-    //   dayOptions.push(day);
-    // }
-    // let yearOptions = [];
-    // for (let i = 2000; i >= 1915; i--) {
-    //   const day = {
-    //     key: i,
-    //     text: i,
-    //     value: i
-    //   };
-    //   yearOptions.push(day);
-    // }
-    // const months = [
-    //   "January",
-    //   "February",
-    //   "March",
-    //   "April",
-    //   "May",
-    //   "June",
-    //   "July",
-    //   "August",
-    //   "September",
-    //   "October",
-    //   "November",
-    //   "December"
-    // ];
-    // let monthOptions = [];
-    // for (let i = 0; i <= months.length - 1; i++) {
-    //   const day = {
-    //     key: months[i],
-    //     text: months[i],
-    //     value: months[i]
-    //   };
-    //   monthOptions.push(day);
-    // }
-
     return (
       <SignUpGrid
         props={props}

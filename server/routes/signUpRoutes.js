@@ -41,30 +41,23 @@ app.post('/api/signup', async (req, res) => {
   const userData = _.pick(req.body, ['name', 'gender', 'dateOfBirth', 'city', 'email', 'password']);
   const isDataComplete = Object.keys(userData).every( i => userData[i]);
   if(!isDataComplete) {
-    const mes = {
-      success: false,
-      message: 'Please complete the form'
-    }
-    res.status(400).send(mes);
+    throw('Please complete the form');
   }
   try {
     await User.uniqEmailCheck(userData.email);
-    const dateOfBirth = new Date(userData.dateOfBirth).toISOString();
+    const date = userData.dateOfBirth;
     let dateError;
-    if (!moment(dateOfBirth, 'MM-DD-YYYY', true).isValid()) {
-      dateError = 'Incorrect date'
-    } else if (new Date(dateOfBirth).getFullYear() < 1900) {
-      dateError = 'Incorrect date'
-    } else if (moment(dateOfBirth).isAfter(new Date())) {
+    if (!moment(date, 'MM-DD-YYYY', true).isValid()) {
+      dateError = 'Incorrect date';
+    } else if (new Date(date).getFullYear() < 1900) {
+      dateError = 'The date is too far in the past'
+    } else if (moment(date).isAfter(new Date())) {
       dateError = 'The date is in the future'
     }
     if (dateError) {
-      const mes = {
-        success: false,
-        message: dateError
-      }
-      res.status(400).send(mes);
+     throw(dateError);
     }
+    const dateOfBirth = new Date(date).toISOString();
     const user = await new User({
       name: userData.name,
       gender: userData.gender,

@@ -5,13 +5,7 @@ const User = mongoose.model('users');
 const Message = mongoose.model('messages');
 const Conversation = mongoose.model('conversations');
 const { ObjectId } = require('mongodb');
-const cloudinary = require('cloudinary');
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUD_KEY,
-  api_secret: process.env.CLOUD_SECRET
-})
+const cloudinary = require('../helpers/settings')
 
 module.exports = (app, io) => {
   app.post('/api/search/city', async (req, res) => {
@@ -26,7 +20,7 @@ module.exports = (app, io) => {
    } catch (error) {
      res.send({
        success: false,
-       error
+       error: 'This place can\'t be found'
      })
    }
   });

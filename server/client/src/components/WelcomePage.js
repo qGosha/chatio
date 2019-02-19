@@ -48,13 +48,13 @@ const WelcomePage = ({allUsers, auth, openDialog}) => {
     const me = auth.user._id;
     const users = Object.values(allUsers).filter( i => i._id !== me);
     const avatars = users && users.map( user => {
-      const photos = user.photos[0];
+      const photo = user.photos[0];
       return (
         <div key={user._id} style={styles.img_block} onClick={
           () => openDialog(user._id)
         }>
          <div style={styles.cont}>
-          <Image src={photos ? photos.value : standartImage} style={styles.img} avatar />
+          <Image src={photo ? photo : standartImage} style={styles.img} avatar />
           <div style={{ ...styles.indicator, backgroundColor: user.online ? 'green' : 'red' }}></div>
          </div>
           <span>{user.name}</span>

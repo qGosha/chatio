@@ -33,7 +33,7 @@ const SidePanel = ({dashboard, openDialog}) => {
     const avatars = iHaveDialogWith && iHaveDialogWith.map( friend => {
       const user = allUsers[friend];
       if (!user) return null;
-      const photos = user.photos[0];
+      const photo = user.photos[0];
       const notifications = newMsgNotifictions[friend];
       const withNotificationStyles = {
         border: notifications ? '3px solid red' : 'none'
@@ -41,7 +41,7 @@ const SidePanel = ({dashboard, openDialog}) => {
       return (
         <div key={user._id} style={styles.img_block} onClick={() => openDialog(user._id)}>
           <div style={{ position: 'relative' }}>
-            <Image src={photos ? photos.value : standartImage} style={{...styles.img, ...withNotificationStyles}} avatar />
+            <Image src={photo ? photo : standartImage} style={{...styles.img, ...withNotificationStyles}} avatar />
             { notifications ? <Label color='red' floating circular size='tiny'>{notifications}</Label> : null }
             <div style={{ ...styles.indicator, backgroundColor: user.online ? 'green' : 'red' }}></div>
           </div>

@@ -18,7 +18,9 @@ const FileButton = props => {
                 <Button
                     {...props}
                     as="label"
-                    htmlFor={id} />
+                    htmlFor={id}>
+                    Change
+                </Button>
                 <input
                     hidden
                     id={id}

@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import * as actions from "../actions";
 import {Segment, Form, Grid, Image, Tab} from "semantic-ui-react";
 import {InputComponent, DatePickComponent} from "../helpers/common";
-import {reduxForm, Field} from "redux-form";
+import {reduxForm, Field, SubmissionError} from "redux-form";
 import {validate} from "../helpers/validation";
 import SearchCity from "../components/SearchCity";
 import SelectGender from "../components/SelectGender";
@@ -14,12 +14,6 @@ const styles = {
     gridColumn: "2 / 5",
     // display: "grid"
     // gridTemplateColumns: 'auto auto auto'
-  },
-  box: {
-    // display: "flex",
-    // justifyContent: "space-between",
-    // borderBottom: "1px solid #ecdcdc",
-    // padding: "10px"
   },
   title: {
     // marginRight: '5em'
@@ -38,7 +32,7 @@ const styles = {
 const Settings = props => {
   const {
     auth,
-    dashboard,
+    settings,
     match,
     error,
     submitting,
@@ -50,6 +44,7 @@ const Settings = props => {
   } = props;
   console.log(formValues);
   const {user} = auth;
+  const {isAvatarUploading, isSettingsUploading} = settings;
   const myAvatar = user.photos.length ? user.photos[0] : standartImage;
   // const { name, email, gender, dateOfBirth, city } = user;
   const aliaces = {
@@ -68,6 +63,17 @@ const Settings = props => {
     city: false,
     dateOfBirth: false
   });
+
+  const submitForm = values => {
+    if (values.hasOwnProperty('city')) {
+      const isCityPicked = results.some(i => i.title === values.city);
+      if (!isCityPicked) {
+        throw new SubmissionError({city: "Select your city"});
+      }
+    }
+    return props.changeSettings(values);
+  };
+
   const fields = Object.keys(settingsStatus).map((field, i) => {
     const value = settingsStatus[field];
     let component = null;
@@ -132,7 +138,7 @@ const Settings = props => {
   const generalPane = (
     <Form
       size="large"
-      onSubmit={handleSubmit(values => console.log(values))}
+      onSubmit={handleSubmit(submitForm)}
       error={!!error}
     >
     <Grid
@@ -157,7 +163,13 @@ const Settings = props => {
       <Grid.Column>
        <Segment>
         <Image rounded size='small' verticalAlign='top' src={myAvatar} />
-        <FileButton onSelect={props.changeAvatar}/>
+        <FileButton
+          onSelect={props.changeAvatar}
+          primary
+          style={{marginTop: '1em'}}
+          disabled={isAvatarUploading}
+          loading={isAvatarUploading}
+          />
        </Segment>
       </Grid.Column>
     </Grid>
@@ -171,8 +183,8 @@ const Settings = props => {
   );
 };
 
-function mapStateToProps({auth, dashboard}) {
-  return {auth, dashboard};
+function mapStateToProps({auth, settings}) {
+  return {auth, settings};
 }
 
 const ConnectedSettings = connect(mapStateToProps, actions)(Settings);

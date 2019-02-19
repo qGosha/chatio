@@ -14,9 +14,8 @@ const styles = {
     overflowX: 'hidden'
   },
   avatar: {
-    height: '40px',
-    weight: '40px',
-    borderRadius: '100%'
+    height: '3em',
+    width: '3em',
   },
   text: {
     wordBreak: 'break',
@@ -76,7 +75,7 @@ const Messages = ({messages, dashboard, auth, standartImage}) => {
       <Fragment key={item._id}>
         { shouldShowDivider ? <Divider horizontal><span style={styles.timestamp}>{currentDate}</span></Divider> : null }
         <div style={{...styles.messageContainer, backgroundColor: item.read ? '#fff' : 'beige'}}>
-         { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar}/> : null }
+         { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar} avatar/> : null }
          <div style={{...styles.text, ...dynamicTexStyle}}>
            { content }
            <span style={styles.timestamp}>{moment(item.timestamp).format('HH:mm')}</span>

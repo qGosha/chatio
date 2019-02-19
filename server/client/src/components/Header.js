@@ -23,6 +23,18 @@ const PageHeader = (props) => {
         <Button
           size='tiny'
           color='blue'
+          active={location.pathname === '/dashboard'}
+          onClick={() => {
+            if (location.pathname === '/dashboard') return;
+            history.push('/dashboard')}
+          }
+        >
+          <Icon name='dashboard' /> Dashboard
+        </Button>
+        <Button
+          size='tiny'
+          active={location.pathname === '/dashboard/settings'}
+          color='blue'
           onClick={() => {
             if (location.pathname === '/dashboard/settings') return;
             history.push('/dashboard/settings')}
