@@ -3,8 +3,6 @@ import { Image, Divider } from 'semantic-ui-react';
 
 const moment = require('moment');
 
-// const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-image.png';
-
 const styles = {
   messageContainer: {
     display: 'flex',

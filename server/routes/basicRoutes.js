@@ -1,4 +1,4 @@
-const loggedIn = require('../helpers/middleware');
+const {loggedIn} = require('../helpers/middleware');
 const axios = require('axios');
 const mongoose = require('mongoose');
 const User = mongoose.model('users');

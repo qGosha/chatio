@@ -1,13 +1,14 @@
 import React, {useState} from "react";
 import {connect} from "react-redux";
 import * as actions from "../actions";
-import {Segment, Form, Grid, Image, Tab} from "semantic-ui-react";
+import {Segment, Form, Grid, Image, Tab, Message, Icon} from "semantic-ui-react";
 import {InputComponent, DatePickComponent} from "../helpers/common";
 import {reduxForm, Field, SubmissionError} from "redux-form";
 import {validate} from "../helpers/validation";
 import SearchCity from "../components/SearchCity";
 import SelectGender from "../components/SelectGender";
 import FileButton from "../components/FileButton";
+const moment = require('moment');
 
 const styles = {
   container: {
@@ -33,20 +34,20 @@ const Settings = props => {
   const {
     auth,
     settings,
-    match,
     error,
     submitting,
     handleSubmit,
     form,
-    formValues,
-    change,
     standartImage
   } = props;
-  console.log(formValues);
-  const {user} = auth;
-  const {isAvatarUploading, isSettingsUploading} = settings;
+
+  const { user } = auth;
+  if (user.dateOfBirth) {
+    user.dateOfBirth = moment(user.dateOfBirth).format('YYYY-MM-DD');
+  }
+  const { isAvatarUploading } = settings;
   const myAvatar = user.photos.length ? user.photos[0] : standartImage;
-  // const { name, email, gender, dateOfBirth, city } = user;
+
   const aliaces = {
     name: "Name",
     email: "Email",
@@ -55,22 +56,24 @@ const Settings = props => {
     dateOfBirth: "Date of birth"
   };
   const [results, setResults] = useState([]);
-
-  const [settingsStatus, settingsStatusChange] = useState({
+  const defualtSettingsPositions = {
     name: false,
     email: false,
     gender: false,
     city: false,
     dateOfBirth: false
-  });
+  }
+  const [settingsStatus, settingsStatusChange] = useState(defualtSettingsPositions);
 
   const submitForm = values => {
+    if (!Object.keys(values).length) return;
     if (values.hasOwnProperty('city')) {
       const isCityPicked = results.some(i => i.title === values.city);
       if (!isCityPicked) {
         throw new SubmissionError({city: "Select your city"});
       }
     }
+    settingsStatusChange(defualtSettingsPositions)
     return props.changeSettings(values);
   };
 
@@ -137,6 +140,7 @@ const Settings = props => {
   });
   const generalPane = (
     <Form
+      loading={submitting}
       size="large"
       onSubmit={handleSubmit(submitForm)}
       error={!!error}
@@ -155,6 +159,12 @@ const Settings = props => {
       >
         Save
       </Form.Button>
+      {error && (
+        <Message negative style={{textAlign: "left"}}>
+          <Icon name="times circle" color="red" />
+          <span>{error.message}</span>
+        </Message>
+      )}
     </Form>
   );
   const avatarPane = (

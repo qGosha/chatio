@@ -4,8 +4,8 @@ const Token = mongoose.model('verifTokens');
 const crypto = require('crypto');
 const mail = require('../helpers/mail');
 const nodemailer = require('nodemailer');
-const _ = require('lodash');
-const moment = require('moment');
+const pick = require('lodash.pick');
+const { userInputCheck } = require('../helpers/middleware');
 
 const sendTokenEmail = async (req, user) => {
   const token = await new Token({
@@ -35,33 +35,14 @@ const sendTokenEmail = async (req, user) => {
 
 module.exports = (app) => {
 
-app.post('/api/signup', async (req, res) => {
+app.post('/api/signup', userInputCheck, async (req, res) => {
   if(req.user) return res.redirect('/dashboard');
-
-  const userData = _.pick(req.body, ['name', 'gender', 'dateOfBirth', 'city', 'email', 'password']);
-  const isDataComplete = Object.keys(userData).every( i => userData[i]);
-  if(!isDataComplete) {
-    throw('Please complete the form');
-  }
+  const { userData } = res.locals;
   try {
-    await User.uniqEmailCheck(userData.email);
-    const date = userData.dateOfBirth;
-    let dateError;
-    if (!moment(date, 'MM-DD-YYYY', true).isValid()) {
-      dateError = 'Incorrect date';
-    } else if (new Date(date).getFullYear() < 1900) {
-      dateError = 'The date is too far in the past'
-    } else if (moment(date).isAfter(new Date())) {
-      dateError = 'The date is in the future'
-    }
-    if (dateError) {
-     throw(dateError);
-    }
-    const dateOfBirth = new Date(date).toISOString();
     const user = await new User({
       name: userData.name,
       gender: userData.gender,
-      dateOfBirth,
+      dateOfBirth: userData.dateOfBirth,
       city: userData.city,
       email: userData.email,
       password: userData.password
@@ -79,7 +60,7 @@ app.post('/api/signup', async (req, res) => {
   } catch (error) {
     return res.send({
       success: false,
-      message: error
+      message: error.message
     });
   }
 });
@@ -100,7 +81,7 @@ app.get('/api/resendToken', async (req, res) => {
      success: true
    })
   } catch (error) {
-    return res.status(404).send(error);
+    return res.status(404).send(error.message);
   }
 })
 
@@ -131,7 +112,7 @@ app.get('/api/confirmation/:token', async (req, res) => {
 
 
 app.post('/api/confirmation', async (req, res) => {
-  const userData = _.pick(req.body, ['pin']);
+  const userData = pick(req.body, ['pin']);
   const pin = userData.pin;
   if(!pin) {
     return res.status(404).send({
@@ -174,7 +155,7 @@ app.post('/api/confirmation', async (req, res) => {
   } catch (error) {
     return res.send({
       success: false,
-      message: error
+      message: error.message
     });
   }
 })

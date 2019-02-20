@@ -1,16 +1,16 @@
-const loggedIn = require('../helpers/middleware');
+const { loggedIn, userInputCheck } = require('../helpers/middleware');
 const mongoose = require('mongoose');
 const User = mongoose.model('users');
 const { ObjectId } = require('mongodb');
 const cloudinary = require('../helpers/settings');
-const _ = require('lodash');
+
 module.exports = (app) => {
 
  app.post('/api/profile/changeAvatar', loggedIn, async (req, res) => {
    const id = ObjectId(req.user._id);
    const val = Object.values(req.files)[0];
    if (!val) {
-     throw('No file provided');
+     throw new Error('No file provided');
    }
    try {
      const result = await cloudinary.v2.uploader.upload(val.path, {
@@ -27,23 +27,25 @@ module.exports = (app) => {
   } catch (error) {
     res.send({
       success: false,
-      message: error
+      message: error.message
     });
   }
 
 });
 
-  app.post('/api/profile/changeSettings', loggedIn, async (req, res) => {
+  app.post('/api/profile/changeSettings', loggedIn, userInputCheck, async (req, res) => {
     const id = ObjectId(req.user._id);
-    const { values } = req.body;
-    const newSettings = _.pick(values, ['name', 'gender', 'dateOfBirth', 'city', 'email', 'password']);
+    const { userData } = res.locals;
     try {
-      // await User.findOneAndUpdate({ _id: id }, {  })
-      res.send(newSettings);
+      const newUser = await User.findOneAndUpdate({ _id: id }, { $set: { ...userData } }, { new: true, fields: { password: 0 } });
+      res.send({
+        success: true,
+        message: newUser
+      });
     } catch (error) {
       res.send({
         success: false,
-        message: error
+        message: error.message
       })
     }
   });
@@ -59,7 +61,7 @@ module.exports = (app) => {
   } catch (error) {
     res.send({
       success: false,
-      message: error
+      message: error.message
     })
   }
 

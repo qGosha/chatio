@@ -66,7 +66,7 @@ userSchema.statics.uniqEmailCheck = function (email) {
 
   return User.findOne({email}).then((user) => {
     if (user) {
-      return Promise.reject('User with this email already exists');
+      throw new Error('User with this email already exists');
     } else {
       return Promise.resolve();
     }
@@ -78,7 +78,7 @@ userSchema.statics.findByCredentials = function (email, password) {
 
   return User.findOne({email}).then((user) => {
     if (!user) {
-      return Promise.reject('No user with this credentials');
+      throw new Error('No user with this credentials');
     }
 
     return new Promise((resolve, reject) => {
@@ -87,7 +87,7 @@ userSchema.statics.findByCredentials = function (email, password) {
         if (res) {
           resolve(user);
         } else {
-          reject('Password is wrong');
+          reject({message: 'Password is wrong'});
         }
       });
     });

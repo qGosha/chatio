@@ -78,6 +78,6 @@ passport.use(new LocalStrategy({
    const user = await User.findByCredentials(email, password);
    done(null, user)
   } catch(err) {
-    done(null, false, { message: err })
+    done(null, false, { message: err.message })
   }
 }));

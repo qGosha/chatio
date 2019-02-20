@@ -29,7 +29,7 @@ tokenSchema.statics.findByToken = function (token) {
 
  return Token.findOne({token}).then((token) => {
    if (!token) {
-     return Promise.reject('Token is not valid');
+     throw new Error('Token is not valid');
    } else {
      return Promise.resolve(token);
    }
@@ -41,7 +41,7 @@ tokenSchema.statics.findByPin = function (pin) {
 
  return Token.findOne({pin}).then((pin) => {
    if (!pin) {
-     return Promise.reject('Pin is not valid');
+     throw new Error('Pin is not valid');
    } else {
      return Promise.resolve(pin);
    }
