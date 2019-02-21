@@ -38,7 +38,16 @@ module.exports = (app) => {
   app.post('/api/profile/changeSettings', loggedIn, userInputCheck, async (req, res) => {
     const id = ObjectId(req.user._id);
     const { userData } = res.locals;
+    Object.keys(userData).forEach( key => {
+      if(!userData[key]) {
+        throw new Error('All fields need to be filled')
+      }
+    });
     const doChangeEmail = userData.hasOwnProperty('email');
+    const { oldPassword, password } = userData;
+    if (oldPassword && password) {
+      
+    }
     try {
       if (doChangeEmail) {
         const user = await User.findById(id);

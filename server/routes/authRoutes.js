@@ -28,7 +28,8 @@ module.exports = (app) => {
           return next(loginErr);
         }
         user.password = undefined;
-        const editedUser = omit(user, ['password']);
+        user.__v = undefined;
+        const editedUser = omit(user, ['password'], ['__v']);
         return res.send({ success : true, message : editedUser });
       });
     })(req, res, next);
@@ -49,8 +50,7 @@ module.exports = (app) => {
 
 
   app.get('/api/current_user', loggedIn, (req, res) => {
-    const user = omit(req.user, ['password']);
-    res.send(user);
+    res.send(req.user);
   });
 
 }

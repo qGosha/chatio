@@ -38,6 +38,10 @@ const userSchema = new Schema({
      type: Boolean,
      default: false
    },
+   isOauth: {
+     type: Boolean,
+     default: false
+   },
 
 });
 

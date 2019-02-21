@@ -9,7 +9,7 @@ import SearchCity from "../components/SearchCity";
 import SelectGender from "../components/SelectGender";
 import FileButton from "../components/FileButton";
 const moment = require('moment');
-
+const omit = require('lodash.omit');
 const styles = {
   container: {
     gridColumn: "2 / 5",
@@ -55,25 +55,36 @@ const Settings = props => {
     city: "City",
     dateOfBirth: "Date of birth"
   };
+  const passwordAliaces = {
+    oldPassword: 'Old password',
+    password: 'New password',
+    repPassword: 'Repeat new password'
+  };
   const [results, setResults] = useState([]);
   const defualtSettingsPositions = {
     name: false,
     email: false,
     gender: false,
     city: false,
-    dateOfBirth: false
+    dateOfBirth: false,
   }
+  const [passwordField, passwordFieldStatus] = useState(false);
   const [settingsStatus, settingsStatusChange] = useState(defualtSettingsPositions);
 
   const submitForm = values => {
-    if (!Object.keys(values).length) return;
+    const valArr = Object.keys(values);
+    if (!valArr.length) return;
     if (values.hasOwnProperty('city')) {
       const isCityPicked = results.some(i => i.title === values.city);
       if (!isCityPicked) {
         throw new SubmissionError({city: "Select your city"});
       }
     }
-    settingsStatusChange(defualtSettingsPositions)
+    if (values.hasOwnProperty('repPassword')) {
+      values = omit(values, ['repPassword']);
+    }
+    settingsStatusChange(defualtSettingsPositions);
+    props.clearFields(form, false, ...valArr);
     return props.changeSettings(values);
   };
 
@@ -101,6 +112,9 @@ const Settings = props => {
         />
       );
     } else {
+      if (field === "email" && user.isOauth) {
+        return;
+      }
       component = (
         <Field
           style={styles.field}
@@ -138,6 +152,7 @@ const Settings = props => {
     </Grid.Row>
     );
   });
+
   const generalPane = (
     <Form
       loading={submitting}
@@ -149,6 +164,49 @@ const Settings = props => {
      textAlign="left"
      stackable>
         {fields}
+
+        <Grid.Row style={styles.row}>
+          <Grid.Column width={2} style={{textAlign:'left'}}>
+            <div style={styles.title}>Password:</div>
+          </Grid.Column>
+
+          <Grid.Column width={6}>
+           { passwordField.password ?
+             Object.keys(passwordAliaces).map( (field, i) => {
+               return (
+                 <Grid.Row key={i}>
+                   <Grid.Column width={6}>
+                   <Field
+                     style={{...styles.field, marginBottom: '5px'}}
+                     name={field}
+                     type="password"
+                     placeholder={`${passwordAliaces[field]}`}
+                     component={InputComponent}
+                   />
+                   </Grid.Column>
+                 </Grid.Row>
+               )
+
+             }) : '******'
+           }
+          </Grid.Column>
+
+          <Grid.Column width={2} style={{textAlign:'left'}}>
+            <div>
+              <a
+                onClick={() => {
+                    props.clearFields(form, false, 'oldPassword', 'password', 'repPassword');
+                    passwordFieldStatus({password: !passwordField.password});
+                }}
+              >
+                {passwordField.password? "Cancel" : "Change"}
+              </a>
+            </div>
+        </Grid.Column>
+        </Grid.Row>
+
+
+
       </Grid>
       <Form.Button
         color="blue"

@@ -10,15 +10,16 @@ passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-passport.deserializeUser((id, done) => {
-  User.findById(id, (err, user) => {
-    if(err) {
-      console.error('There was an error accessing the records of' +
-      ' user with id: ' + id);
-      return console.log(err.message);
+passport.deserializeUser(async (id, done) => {
+  try {
+    let user = await User.findOne({_id: id}, { password: 0, __v: 0});
+    if (!user) {
+      return done(new Error('user not found'));
     }
-    done(err, user);
-  })
+    done(null, user);
+  } catch (e) {
+    done(e.message);
+  }
 });
 
 passport.use(new FacebookStrategy({
@@ -38,7 +39,8 @@ passport.use(new FacebookStrategy({
        name: profile.name && profile.name.givenName,
        photos: profile.photos.length && profile.photos[0].value,
        gender: profile.gender,
-       isConfirmed: true
+       isConfirmed: true,
+       isOauth: true
     }).save();
     done(null, newUser);
     } catch(err) {
@@ -62,7 +64,8 @@ passport.use(new GoogleStrategy({
     'google.googleEmail': profile.emails && profile.emails.length ? profile.emails[0].value : '',
     name: profile.name && profile.name.givenName,
     photos: profile.photos.length && profile.photos[0].value,
-    isConfirmed: true
+    isConfirmed: true,
+    isOauth: true
    }).save();
    done(null, newUser);
  } catch(err) {

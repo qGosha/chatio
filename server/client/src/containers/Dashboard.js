@@ -246,6 +246,7 @@ class Dashboard extends Component {
   componentWillUnmount() {
     document.removeEventListener(this.eventName, this.handleTabVisibility);
     clearInterval(this.newMsgTabNotification);
+    this.props.dashboard.socket.disconnect();
   }
 
   render() {
