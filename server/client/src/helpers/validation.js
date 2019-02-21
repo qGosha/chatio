@@ -31,10 +31,12 @@ export const validate = (values) => {
   }
   if (!values.name) {
    errors.name = 'Enter your name'
- } else if ( !(/^[A-Za-z]+$/g).test(values.name) ) {
-   errors.name = 'Name field cannot contain numbers or symbols'
+ } else if ( !(/^[A-Za-z0-9]+$/g).test(values.name) ) {
+   errors.name = 'Name field cannot contain symbols'
  } else if ( values.name.length === 1 ) {
    errors.name = 'Name is too short'
+ } else if ( values.name.length > 10 ) {
+   errors.name = 'Name is too long'
  }
  if (!values.pin) {
    errors.pin = 'Required'

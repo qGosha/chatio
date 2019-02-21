@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = mongoose.model('users');
 const { ObjectId } = require('mongodb');
 const cloudinary = require('../helpers/settings');
+const { sendTokenEmail } = require('../helpers/help_functions');
 
 module.exports = (app) => {
 
@@ -36,8 +37,17 @@ module.exports = (app) => {
   app.post('/api/profile/changeSettings', loggedIn, userInputCheck, async (req, res) => {
     const id = ObjectId(req.user._id);
     const { userData } = res.locals;
+    const doChangeEmail = userData.hasOwnProperty('email');
     try {
-      const newUser = await User.findOneAndUpdate({ _id: id }, { $set: { ...userData } }, { new: true, fields: { password: 0 } });
+      const newUser = await User.findOneAndUpdate(
+        { _id: id },
+        { $set: { ...userData, isConfirmed: doChangeEmail ? false : true } },
+        { new: true, fields: { password: 0 } }
+      );
+      if (doChangeEmail) {
+        await sendTokenEmail(req, newUser);
+
+      }
       res.send({
         success: true,
         message: newUser

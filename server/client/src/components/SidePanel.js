@@ -24,6 +24,9 @@ const styles = {
     borderRadius: '100%',
     bottom: '50%',
     left: '0'
+  },
+  username: {
+    wordBreak: 'break-all'
   }
 }
 
@@ -45,7 +48,7 @@ const SidePanel = ({dashboard, openDialog}) => {
             { notifications ? <Label color='red' floating circular size='tiny'>{notifications}</Label> : null }
             <div style={{ ...styles.indicator, backgroundColor: user.online ? 'green' : 'red' }}></div>
           </div>
-          <span>{user.name}</span>
+          <span style={styles.username}>{user.name}</span>
         </div>
       )
     })

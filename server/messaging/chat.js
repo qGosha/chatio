@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Message = mongoose.model('messages');
 const Conversation = mongoose.model('conversations');
-const changeUserStatus = require('../helpers/help_functions');
+const { changeUserStatus } = require('../helpers/help_functions');
 
 
 module.exports = io => {
