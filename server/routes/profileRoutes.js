@@ -1,6 +1,7 @@
 const { loggedIn, userInputCheck } = require('../helpers/middleware');
 const mongoose = require('mongoose');
 const User = mongoose.model('users');
+const Token = mongoose.model('verifTokens');
 const { ObjectId } = require('mongodb');
 const cloudinary = require('../helpers/settings');
 const { sendTokenEmail } = require('../helpers/help_functions');
@@ -39,6 +40,12 @@ module.exports = (app) => {
     const { userData } = res.locals;
     const doChangeEmail = userData.hasOwnProperty('email');
     try {
+      if (doChangeEmail) {
+        const user = await User.findById(id);
+        if (!user.password) {
+          throw new Error('Email was used for Oauth authentication. Cannot change')
+        }
+      }
       const newUser = await User.findOneAndUpdate(
         { _id: id },
         { $set: { ...userData, isConfirmed: doChangeEmail ? false : true } },
@@ -54,6 +61,28 @@ module.exports = (app) => {
       });
     } catch (error) {
       res.send({
+        success: false,
+        message: error.message
+      })
+    }
+  });
+  app.post('/api/profile/changeEmail', loggedIn, userInputCheck, async (req, res) => {
+    const id = ObjectId(req.user._id);
+    const { userData } = res.locals;
+    try {
+      const newUser = await User.findOneAndUpdate(
+        { _id: id },
+        { $set: { ...userData } },
+        { new: true, fields: { password: 0 } }
+      );
+      await Token.findOneAndRemove({_userId: id})
+      await sendTokenEmail(req, newUser);
+      res.send({
+        success: true,
+        message: newUser
+      })
+    } catch (error) {
+       res.send({
         success: false,
         message: error.message
       })

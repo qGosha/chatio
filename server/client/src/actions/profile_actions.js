@@ -5,6 +5,7 @@ import {
   ERROR,
   CHANGE_AVATAR_START,
   CHANGE_SETTINGS,
+  CHANGE_EMAIL_ON_CONFIRMATION
 } from "./types";
 import history from "../helpers/history";
 import {SubmissionError} from "redux-form";
@@ -16,6 +17,21 @@ export const deleteUser = () => async dispatch => {
     history.push("/");
   }
 };
+
+export const changeEmail = value => async dispatch => {
+  try {
+    const res = await axios.post("/api/profile/changeEmail", { ...value });
+    if (!res.data.success) {
+      throw new Error(res.data.message);
+    }
+    dispatch({
+      type: CHANGE_EMAIL_ON_CONFIRMATION,
+      payload: res.data.message
+    });
+  } catch (e) {
+    throw new SubmissionError({_error: e});
+  }
+}
 
 export const changeAvatar = data => async dispatch => {
   dispatch({

@@ -13,7 +13,8 @@ import {
   REMOVE_NOTIFICATIONS,
   MSG_FROM_UNKNOWN,
   CREATE_NEW_CONVERSATION,
-  ERROR
+  ERROR,
+  SET_SOCKET
 } from './types';
 import history from '../helpers/history';
 
@@ -204,4 +205,10 @@ export const sendImages = (data) => async dispatch => {
      type: ERROR
    });
  }
+};
+export const setSocket = socket => async dispatch => {
+  dispatch({
+    payload: socket,
+    type: SET_SOCKET
+  })
 }

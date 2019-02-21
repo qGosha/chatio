@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Segment, Button, Icon } from 'semantic-ui-react';
 import history from '../helpers/history';
 
@@ -16,11 +16,13 @@ const styles = {
 }
 
 const PageHeader = (props) => {
-  const { logout, location } = props;
+  const { logout, location, extraStyle, auth } = props;
   return (
-  <div style={styles.headerCont}>
+  <div style={{ ...styles.headerCont, ...extraStyle }}>
       <Segment style={styles.header}>
-        <Button
+        { auth.user.isConfirmed ?
+        <Fragment>
+          <Button
           size='tiny'
           color='blue'
           active={location.pathname === '/dashboard'}
@@ -42,6 +44,8 @@ const PageHeader = (props) => {
         >
           <Icon name='setting' /> Settings
         </Button>
+       </Fragment> :
+       null }
         <Button
           size='tiny'
           color='grey'

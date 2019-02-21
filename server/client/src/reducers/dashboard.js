@@ -13,9 +13,12 @@ import {
   REMOVE_NOTIFICATIONS,
   MSG_FROM_UNKNOWN,
   CREATE_NEW_CONVERSATION,
-  ERROR
+  ERROR,
+  SET_SOCKET
 } from '../actions/types';
+
 const initialState = {
+   socket: null,
    allUsers: null,
    iHaveDialogWith: null,
    activeDialogWith: null,
@@ -35,7 +38,9 @@ export function dashboard(state = initialState, action) {
     newMsgNotifictions
   };
  case USER_CHANGESTATUS:
-  return { ...state, allUsers:  payload };
+  return { ...state, allUsers: payload };
+ case SET_SOCKET:
+  return { ...state, socket: payload };
  case OPEN_DIALOG:
   return {
     ...state,

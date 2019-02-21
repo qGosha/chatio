@@ -40,7 +40,6 @@ class Dashboard extends Component {
     super(props);
     this.state = {
       modalOpen: false,
-      socket: null,
       messageText: "",
       pictures: [],
       uploaderVisible: false,
@@ -60,7 +59,7 @@ class Dashboard extends Component {
   }
 
   logout = () => {
-    this.state.socket.disconnect();
+    this.props.dashboard.socket.disconnect();
     this.props.logoutUser();
   };
 
@@ -117,6 +116,7 @@ class Dashboard extends Component {
     const {messageText} = this.state;
     const {createNewConversation, dashboard} = this.props;
     const {activeDialogWith, iHaveDialogWith} = dashboard;
+    const { socket } = dashboard;
     if (!messageText || !activeDialogWith) return;
     const newMessage = {
       message: {
@@ -124,7 +124,7 @@ class Dashboard extends Component {
       },
       recipient: activeDialogWith
     };
-    this.state.socket.emit("outboundMessage", newMessage);
+    socket.emit("outboundMessage", newMessage);
     if (!iHaveDialogWith.includes(activeDialogWith)) {
       createNewConversation(activeDialogWith);
     }
@@ -152,7 +152,7 @@ class Dashboard extends Component {
     this.audio.load();
     this.normalTitle = document.title;
     const socket = io("http://localhost:5000");
-    this.setState({socket});
+    this.props.setSocket(socket);
     const keys = {
       hidden: "visibilitychange",
       webkitHidden: "webkitvisibilitychange",
@@ -324,11 +324,8 @@ class Dashboard extends Component {
         />
         <PageHeader
           auth={auth}
-          allUsers={allUsers}
           logout={this.logout}
           openModal={() => this.setState({modalOpen: true})}
-          standartImage={standartImage}
-          match={match}
           location={location}
         />
 
