@@ -1,7 +1,8 @@
-import React, {useState} from "react";
+import React, {useState, Fragment} from "react";
 import {connect} from "react-redux";
 import * as actions from "../actions";
-import {Segment, Form, Grid, Image, Tab, Message, Icon} from "semantic-ui-react";
+import ModalWindow from "../components/modal";
+import {Segment, Form, Grid, Image, Tab, Message, Icon, Button, Checkbox} from "semantic-ui-react";
 import {InputComponent, DatePickComponent} from "../helpers/common";
 import {reduxForm, Field, SubmissionError} from "redux-form";
 import {validate} from "../helpers/validation";
@@ -14,14 +15,6 @@ const omit = require('lodash.omit');
 const styles = {
   container: {
     gridColumn: "2 / 5",
-    // display: "grid"
-    // gridTemplateColumns: 'auto auto auto'
-  },
-  title: {
-    // marginRight: '5em'
-  },
-  field: {
-    // marginTop: '15px'
   },
   saveButton: {
     marginTop: '30px'
@@ -39,7 +32,8 @@ const Settings = props => {
     submitting,
     handleSubmit,
     form,
-    standartImage
+    standartImage,
+    deleteUser
   } = props;
 
   const { user } = auth;
@@ -56,7 +50,7 @@ const Settings = props => {
     city: "City",
     dateOfBirth: "Date of birth"
   };
-
+  const [modalOpen, modalStatusChange] = useState(false);
   const [results, setResults] = useState([]);
   const defualtSettingsPositions = {
     name: false,
@@ -95,18 +89,16 @@ const Settings = props => {
           change={props.change}
           setResults={setResults}
           results={results}
-          style={styles.field}
         />
       );
     } else if (field === "gender") {
-      component = <SelectGender style={styles.field}/>;
+      component = <SelectGender/>;
     } else if (field === "dateOfBirth") {
       component = (
         <Field
           name={"dateOfBirth"}
           placeholder={`Type new date`}
           component={DatePickComponent}
-          style={styles.field}
         />
       );
     } else {
@@ -115,7 +107,6 @@ const Settings = props => {
       }
       component = (
         <Field
-          style={styles.field}
           name={field}
           placeholder={`Type new ${aliaces[field]}`}
           component={InputComponent}
@@ -169,16 +160,49 @@ const Settings = props => {
          clearFields={props.clearFields}
          form={form}
          />
+         <Grid.Row style={{justifyContent: 'flex-end'}}>
+           <Grid.Column width={5} style={{textAlign:'right'}}>
+            <Button
+             negative
+             onClick={() => modalStatusChange(true)}
+             type='reset'>
+             <Icon name='trash alternate' />
+             Delete account
+            </Button>
+           </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column width={5} style={{textAlign:'left'}}>
+              <Field
+                name={"mute"}
+                defaultValue={user.mute}
+                component={ ({ defaultValue, input: { value, onChange, ...input }, meta: { touched, error } }) => {
+                  return (
+                    <Form.Field>
+                     <Checkbox
+                       {...input}
+                       defaultValue={defaultValue}
+                       type="checkbox"
+                       onChange={(e, data) => onChange(data.checked)}
+                       defaultChecked={!!value }
+                       toggle/>
+                    </Form.Field>
+                  )
+                }}
+              />
+            </Grid.Column>
+         </Grid.Row>
       </Grid>
-      <Form.Button
-        color="blue"
+      <Button
+        type='submit'
+        primary
         size="large"
         loading={submitting}
         disabled={submitting}
         style={styles.saveButton}
       >
         Save
-      </Form.Button>
+      </Button>
       {error && (
         <Message negative style={{textAlign: "left"}}>
           <Icon name="times circle" color="red" />
@@ -215,12 +239,22 @@ const Settings = props => {
   { menuItem: 'Avatar', render: () => <Tab.Pane>{avatarPane}</Tab.Pane> }
 ]
   return (
-    <Tab panes={panes} style={styles.container}/>
+    <Fragment>
+      <ModalWindow
+        open={modalOpen}
+        onClose={() => modalStatusChange(false)}
+        headertext={"Delete Your Account"}
+        contenttext={"Are you sure you want to delete your account?"}
+        onNegative={() => modalStatusChange(false)}
+        onPositive={() => deleteUser()}
+      />
+      <Tab panes={panes} style={styles.container}/>
+    </Fragment>
   );
 };
 
 function mapStateToProps({auth, settings}) {
-  return {auth, settings};
+  return {auth, settings, initialValues: auth.user.mute};
 }
 
 const ConnectedSettings = connect(mapStateToProps, actions)(Settings);

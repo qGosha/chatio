@@ -47,7 +47,7 @@ const AvatarBlock = ({allUsers, auth, activeDialogWith}) => {
         <div style={{
           width: '2em',
           height: '2em',
-          background: `url(${peer.photos.length ? peer.photos[0] : standartImage}) no-repeat center`,
+          background: `url(${(peer && peer.photos.length) ? peer.photos[0] : standartImage}) no-repeat center`,
           backgroundSize: 'cover'
         }}>
         </div>
@@ -55,7 +55,7 @@ const AvatarBlock = ({allUsers, auth, activeDialogWith}) => {
    )
     return (
      <div style={styles.container}>
-     { peer ? chatWith : alone }
+     { activeDialogWith ? chatWith : alone }
    </div>
     )
 }

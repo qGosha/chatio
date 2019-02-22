@@ -8,7 +8,7 @@ import {
 
 const initialState = {
   isAvatarUploading: false,
-  showSuccessUpdate: false
+  showSuccessUpdate: false,
 };
 
 export function settings(state = initialState, action) {

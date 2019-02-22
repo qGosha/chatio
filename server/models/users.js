@@ -43,6 +43,10 @@ const userSchema = new Schema({
      default: false
    },
 
+   mute: {
+     type: Boolean,
+     default: false
+   }
 });
 
 userSchema.pre('save', function(next) {

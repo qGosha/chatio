@@ -73,7 +73,7 @@ module.exports = (app) => {
       const newUser = await User.findOneAndUpdate(
         { _id: id },
         { $set: { ...userData } },
-        { new: true, fields: { password: 0 } }
+        { new: true, fields: { password: 0, __v: 0 } }
       );
       await Token.findOneAndRemove({_userId: id})
       await sendTokenEmail(req, newUser);
@@ -88,6 +88,16 @@ module.exports = (app) => {
       })
     }
   });
+
+  // app.get('/api/profile/muteNotifications', loggedIn, async (req, res) => {
+  //   try {
+  //     const newUser =await User.findOneAndUpdate(
+  //       { _id: req.user._id },
+  //       { $set: { mute: true } },
+  //       { new: true, fields: { password: 0, __v: 0 } }
+  //   );
+  //   }
+  // });
 
   app.get('/api/profile/deleteProfile', loggedIn, async (req, res) => {
   try {
@@ -104,5 +114,5 @@ module.exports = (app) => {
     })
   }
 
-  })
+});
 }

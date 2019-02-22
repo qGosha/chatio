@@ -5,7 +5,7 @@ const standartImage = 'https://react.semantic-ui.com/images/wireframe/square-ima
 
 const styles = {
   container: {
-    width: '75px',
+    width: '80px',
     height: '100%',
   },
   img_block: {
@@ -35,20 +35,20 @@ const SidePanel = ({dashboard, openDialog}) => {
     if (!allUsers) return null;
     const avatars = iHaveDialogWith && iHaveDialogWith.map( friend => {
       const user = allUsers[friend];
-      if (!user) return null;
-      const photo = user.photos[0];
+      // if (!user) return null;
+      const photo = user && user.photos[0];
       const notifications = newMsgNotifictions[friend];
       const withNotificationStyles = {
         border: notifications ? '3px solid red' : 'none'
       }
       return (
-        <div key={user._id} style={styles.img_block} onClick={() => openDialog(user._id)}>
+        <div key={ user ? user._id : friend } style={styles.img_block} onClick={() => openDialog(user ? user._id : friend)}>
           <div style={{ position: 'relative' }}>
             <Image src={photo ? photo : standartImage} style={{...styles.img, ...withNotificationStyles}} avatar />
             { notifications ? <Label color='red' floating circular size='tiny'>{notifications}</Label> : null }
-            <div style={{ ...styles.indicator, backgroundColor: user.online ? 'green' : 'red' }}></div>
+            { user ? <div style={{ ...styles.indicator, backgroundColor: user.online ? 'green' : 'red' }}></div> : null }
           </div>
-          <span style={styles.username}>{user.name}</span>
+          <span style={styles.username}>{user ? user.name : 'Deleted'}</span>
         </div>
       )
     })

@@ -1,7 +1,6 @@
 import React, {Component, Fragment} from "react";
 import {connect} from "react-redux";
 import * as actions from "../actions";
-import ModalWindow from "../components/modal";
 import io from "socket.io-client";
 import SidePanel from "../components/SidePanel";
 import Uploader from "../components/uploadButton";
@@ -39,7 +38,6 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      modalOpen: false,
       messageText: "",
       pictures: [],
       uploaderVisible: false,
@@ -311,14 +309,6 @@ class Dashboard extends Component {
 
     return (
       <div style={styles.grid}>
-        <ModalWindow
-          open={this.state.modalOpen}
-          onClose={() => this.setState({modalOpen: false})}
-          headertext={"Delete Your Account"}
-          contenttext={"Are you sure you want to delete your account?"}
-          onNegative={() => this.setState({modalOpen: false})}
-          onPositive={() => deleteUser()}
-        />
         <SidePanel
           dashboard={dashboard}
           openDialog={id => this.handleOpenDialog(id)}
@@ -326,7 +316,6 @@ class Dashboard extends Component {
         <PageHeader
           auth={auth}
           logout={this.logout}
-          openModal={() => this.setState({modalOpen: true})}
           location={location}
         />
 
