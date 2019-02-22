@@ -84,6 +84,7 @@ const Settings = props => {
       values = omit(values, ['repPassword']);
     }
     settingsStatusChange(defualtSettingsPositions);
+    passwordFieldStatus({password: false});
     props.clearFields(form, false, ...valArr);
     return props.changeSettings(values);
   };

@@ -17,6 +17,9 @@ export const validate = (values) => {
   } else if (values.password !== values.repPassword) {
      errors.repPassword = 'Passwords don\'t match'
   }
+  if (!values.oldPassword) {
+    errors.oldPassword = 'Required'
+  }
   if (!values.dateOfBirth) {
    errors.dateOfBirth = 'Select your date of birth'
  } else if (!moment(values.dateOfBirth, 'MM-DD-YYYY', true).isValid()) {

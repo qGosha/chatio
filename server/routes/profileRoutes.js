@@ -5,6 +5,7 @@ const Token = mongoose.model('verifTokens');
 const { ObjectId } = require('mongodb');
 const cloudinary = require('../helpers/settings');
 const { sendTokenEmail } = require('../helpers/help_functions');
+const omit = require('lodash.omit');
 
 module.exports = (app) => {
 
@@ -21,7 +22,7 @@ module.exports = (app) => {
      "height": 640,
      "crop": 'fit'
    });
-   await User.findOneAndUpdate({ _id: ObjectId(id) }, { $push: { photos: { $each: [result.secure_url], $position: 0 } } } );
+   await User.findOneAndUpdate({ _id: id }, { $push: { photos: { $each: [result.secure_url], $position: 0 } } } );
    res.send({
      success: true,
      message: result.secure_url
@@ -38,31 +39,21 @@ module.exports = (app) => {
   app.post('/api/profile/changeSettings', loggedIn, userInputCheck, async (req, res) => {
     const id = ObjectId(req.user._id);
     const { userData } = res.locals;
-    Object.keys(userData).forEach( key => {
-      if(!userData[key]) {
-        throw new Error('All fields need to be filled')
-      }
-    });
-    const doChangeEmail = userData.hasOwnProperty('email');
-    const { oldPassword, password } = userData;
-    if (oldPassword && password) {
-      
-    }
+    const { email } = userData;
     try {
-      if (doChangeEmail) {
+      if (email) {
         const user = await User.findById(id);
-        if (!user.password) {
+        if (user.isOauth) {
           throw new Error('Email was used for Oauth authentication. Cannot change')
         }
       }
       const newUser = await User.findOneAndUpdate(
         { _id: id },
-        { $set: { ...userData, isConfirmed: doChangeEmail ? false : true } },
+        { $set: { ...userData, isConfirmed: email ? false : true } },
         { new: true, fields: { password: 0 } }
       );
-      if (doChangeEmail) {
+      if (email) {
         await sendTokenEmail(req, newUser);
-
       }
       res.send({
         success: true,

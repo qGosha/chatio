@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('users');
 const pick = require('lodash.pick');
+const omit = require('lodash.omit');
 const moment = require('moment');
+const { ObjectId } = require('mongodb');
+const bcrypt = require('bcryptjs');
 
 const loggedIn = (req, res, next) => {
     if (req.user) {
@@ -12,7 +15,7 @@ const loggedIn = (req, res, next) => {
 }
 
 const userInputCheck = async (req, res, next) => {
-  const userData = pick(req.body, ['name', 'gender', 'dateOfBirth', 'city', 'email', 'password']);
+  let userData = pick(req.body, ['name', 'gender', 'dateOfBirth', 'city', 'email', 'password', 'oldPassword']);
   const isDataComplete = Object.keys(userData).every( i => userData[i]);
   if(!isDataComplete) {
     throw new Error('Please complete the form');
@@ -20,6 +23,17 @@ const userInputCheck = async (req, res, next) => {
   try {
     if (userData.hasOwnProperty('email')) {
       await User.uniqEmailCheck(userData.email);
+    }
+    if (userData.hasOwnProperty('oldPassword')) {
+      const user = await User.findById(req.user._id);
+      const match = await bcrypt.compare(userData.oldPassword, user.password);
+      if (match) {
+        user.password = userData.password;
+        await user.save();
+        userData = omit(userData, ['oldPassword'], ['password']);
+      } else {
+        throw new Error('Current password is wrong');
+      }
     }
     if (userData.hasOwnProperty('dateOfBirth')) {
       const date = userData.dateOfBirth;
@@ -35,7 +49,7 @@ const userInputCheck = async (req, res, next) => {
        throw new Error(dateError);
       }
       userData.dateOfBirth = new Date(date).toISOString();
-    }  
+    }
     res.locals.userData = userData;
     next();
 } catch (error) {
