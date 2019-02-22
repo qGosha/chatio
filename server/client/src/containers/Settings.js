@@ -8,6 +8,7 @@ import {validate} from "../helpers/validation";
 import SearchCity from "../components/SearchCity";
 import SelectGender from "../components/SelectGender";
 import FileButton from "../components/FileButton";
+import PasswordChangeField from "../components/PasswordChangeField";
 const moment = require('moment');
 const omit = require('lodash.omit');
 const styles = {
@@ -45,7 +46,7 @@ const Settings = props => {
   if (user.dateOfBirth) {
     user.dateOfBirth = moment(user.dateOfBirth).format('YYYY-MM-DD');
   }
-  const { isAvatarUploading } = settings;
+  const { isAvatarUploading, showSuccessUpdate } = settings;
   const myAvatar = user.photos.length ? user.photos[0] : standartImage;
 
   const aliaces = {
@@ -55,11 +56,7 @@ const Settings = props => {
     city: "City",
     dateOfBirth: "Date of birth"
   };
-  const passwordAliaces = {
-    oldPassword: 'Old password',
-    password: 'New password',
-    repPassword: 'Repeat new password'
-  };
+
   const [results, setResults] = useState([]);
   const defualtSettingsPositions = {
     name: false,
@@ -165,49 +162,13 @@ const Settings = props => {
      textAlign="left"
      stackable>
         {fields}
-
-        <Grid.Row style={styles.row}>
-          <Grid.Column width={2} style={{textAlign:'left'}}>
-            <div style={styles.title}>Password:</div>
-          </Grid.Column>
-
-          <Grid.Column width={6}>
-           { passwordField.password ?
-             Object.keys(passwordAliaces).map( (field, i) => {
-               return (
-                 <Grid.Row key={i}>
-                   <Grid.Column width={6}>
-                   <Field
-                     style={{...styles.field, marginBottom: '5px'}}
-                     name={field}
-                     type="password"
-                     placeholder={`${passwordAliaces[field]}`}
-                     component={InputComponent}
-                   />
-                   </Grid.Column>
-                 </Grid.Row>
-               )
-
-             }) : '******'
-           }
-          </Grid.Column>
-
-          <Grid.Column width={2} style={{textAlign:'left'}}>
-            <div>
-              <a
-                onClick={() => {
-                    props.clearFields(form, false, 'oldPassword', 'password', 'repPassword');
-                    passwordFieldStatus({password: !passwordField.password});
-                }}
-              >
-                {passwordField.password? "Cancel" : "Change"}
-              </a>
-            </div>
-        </Grid.Column>
-        </Grid.Row>
-
-
-
+       <PasswordChangeField
+         passwordField={passwordField}
+         passwordFieldStatus={passwordFieldStatus}
+         styles={styles}
+         clearFields={props.clearFields}
+         form={form}
+         />
       </Grid>
       <Form.Button
         color="blue"
@@ -222,6 +183,12 @@ const Settings = props => {
         <Message negative style={{textAlign: "left"}}>
           <Icon name="times circle" color="red" />
           <span>{error.message}</span>
+        </Message>
+      )}
+      {showSuccessUpdate && (
+        <Message positive style={{textAlign: "left"}}>
+          <Icon name="check circle" color="green" />
+          <span>Settings were successfully updated</span>
         </Message>
       )}
     </Form>

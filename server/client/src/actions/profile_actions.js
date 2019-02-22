@@ -5,7 +5,8 @@ import {
   ERROR,
   CHANGE_AVATAR_START,
   CHANGE_SETTINGS,
-  CHANGE_EMAIL_ON_CONFIRMATION
+  CHANGE_EMAIL_ON_CONFIRMATION,
+  HIDE_SUCCESS_SETTINGS_UPDATE
 } from "./types";
 import history from "../helpers/history";
 import {SubmissionError} from "redux-form";
@@ -64,6 +65,11 @@ export const changeSettings = values => async dispatch => {
       type: CHANGE_SETTINGS,
       payload: res.data.message
     });
+    setTimeout(() => {
+      dispatch({
+        type: HIDE_SUCCESS_SETTINGS_UPDATE,
+      });
+    }, 1500)
   } catch (e) {
     throw new SubmissionError({_error: e});
   }
