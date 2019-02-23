@@ -50,6 +50,7 @@ const PasswordChangeField = props => {
               );
               passwordFieldStatus({password: !passwordField.password});
             }}
+            style={styles.link}
           >
             {passwordField.password ? "Cancel" : "Change"}
           </a>

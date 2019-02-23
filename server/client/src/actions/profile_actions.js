@@ -7,7 +7,6 @@ import {
   CHANGE_SETTINGS,
   CHANGE_EMAIL_ON_CONFIRMATION,
   HIDE_SUCCESS_SETTINGS_UPDATE,
-  MUTE_NOTIFICATIONS
 } from "./types";
 import history from "../helpers/history";
 import {SubmissionError} from "redux-form";
@@ -75,17 +74,3 @@ export const changeSettings = values => async dispatch => {
     throw new SubmissionError({_error: e});
   }
 };
-
-// export const muteNotifications = () => async dispatch => {
-//   try {
-//     const res = await axios.get('/api/profile/muteNotifications');
-//     if (!res.data.success) {
-//       throw new Error(res.data.message)
-//     }
-//     dispatch({
-//       type: MUTE_NOTIFICATIONS
-//     })
-//   } catch (e) {
-//     throw new SubmissionError({_error: e});
-//   }
-// }

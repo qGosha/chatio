@@ -1,4 +1,4 @@
-import React, {useState, Fragment} from "react";
+import React, {useState, Fragment, useEffect} from "react";
 import {connect} from "react-redux";
 import * as actions from "../actions";
 import ModalWindow from "../components/modal";
@@ -14,6 +14,7 @@ const moment = require('moment');
 const omit = require('lodash.omit');
 const styles = {
   container: {
+    fontFamily: 'Roboto, sans-serif',
     gridColumn: "2 / 5",
   },
   saveButton: {
@@ -21,6 +22,18 @@ const styles = {
   },
   row: {
     borderBottom: '0.5px solid #a9a4a4a6'
+  },
+  messages: {
+    position: 'fixed',
+    top: 0,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    textAlign: 'left'
+  },
+  link: {
+    fontWeight: '600',
+    fontStyle: 'italic',
+    fontSize: '12px'
   }
 };
 
@@ -33,7 +46,8 @@ const Settings = props => {
     handleSubmit,
     form,
     standartImage,
-    deleteUser
+    deleteUser,
+    clearSubmitErrors,
   } = props;
 
   const { user } = auth;
@@ -61,6 +75,21 @@ const Settings = props => {
   }
   const [passwordField, passwordFieldStatus] = useState(false);
   const [settingsStatus, settingsStatusChange] = useState(defualtSettingsPositions);
+
+  useEffect( () => {
+  let timer;
+    if (error && error.message) {
+      timer = setTimeout( () => {
+        console.log(submitting);
+        clearSubmitErrors(form)
+      }, 1500);
+    }
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    }
+  }, [submitting]);
 
   const submitForm = values => {
     const valArr = Object.keys(values);
@@ -133,6 +162,7 @@ const Settings = props => {
               }
               settingsStatusChange({...settingsStatus, [field]: !value});
             }}
+            style={styles.link}
           >
             {value ? "Cancel" : "Change"}
           </a>
@@ -172,19 +202,20 @@ const Settings = props => {
            </Grid.Column>
           </Grid.Row>
           <Grid.Row>
-            <Grid.Column width={5} style={{textAlign:'left'}}>
+            <Grid.Column width={8} style={{textAlign:'left'}}>
+             <div style={styles.title}>Mute notifications:</div>
+            </Grid.Column>
+            <Grid.Column width={2} style={{textAlign:'left'}}>
               <Field
                 name={"mute"}
-                defaultValue={user.mute}
-                component={ ({ defaultValue, input: { value, onChange, ...input }, meta: { touched, error } }) => {
+                component={ ({ input: { value, onChange, ...input } }) => {
                   return (
                     <Form.Field>
                      <Checkbox
                        {...input}
-                       defaultValue={defaultValue}
                        type="checkbox"
                        onChange={(e, data) => onChange(data.checked)}
-                       defaultChecked={!!value }
+                       defaultChecked={ !!value }
                        toggle/>
                     </Form.Field>
                   )
@@ -204,13 +235,13 @@ const Settings = props => {
         Save
       </Button>
       {error && (
-        <Message negative style={{textAlign: "left"}}>
+        <Message negative style={styles.messages}>
           <Icon name="times circle" color="red" />
           <span>{error.message}</span>
         </Message>
       )}
       {showSuccessUpdate && (
-        <Message positive style={{textAlign: "left"}}>
+        <Message positive style={styles.messages}>
           <Icon name="check circle" color="green" />
           <span>Settings were successfully updated</span>
         </Message>
@@ -253,13 +284,16 @@ const Settings = props => {
   );
 };
 
-function mapStateToProps({auth, settings}) {
-  return {auth, settings, initialValues: auth.user.mute};
-}
-
-const ConnectedSettings = connect(mapStateToProps, actions)(Settings);
-
-export default reduxForm({
+const ConnectedSettings = reduxForm({
   form: "settingsForm",
   validate
-})(ConnectedSettings);
+})(Settings);
+
+
+function mapStateToProps({auth, settings}) {
+  return {auth, settings, initialValues: {
+    mute: auth.user.mute
+  }};
+}
+
+ export default connect(mapStateToProps, actions)(ConnectedSettings);

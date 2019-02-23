@@ -89,15 +89,6 @@ module.exports = (app) => {
     }
   });
 
-  // app.get('/api/profile/muteNotifications', loggedIn, async (req, res) => {
-  //   try {
-  //     const newUser =await User.findOneAndUpdate(
-  //       { _id: req.user._id },
-  //       { $set: { mute: true } },
-  //       { new: true, fields: { password: 0, __v: 0 } }
-  //   );
-  //   }
-  // });
 
   app.get('/api/profile/deleteProfile', loggedIn, async (req, res) => {
   try {

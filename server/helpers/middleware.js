@@ -17,10 +17,10 @@ const loggedIn = (req, res, next) => {
 const userInputCheck = async (req, res, next) => {
   let userData = pick(req.body, ['name', 'gender', 'dateOfBirth', 'city', 'email', 'password', 'oldPassword']);
   const isDataComplete = Object.keys(userData).every( i => userData[i]);
-  if(!isDataComplete) {
-    throw new Error('Please complete the form');
-  }
   try {
+    if(!isDataComplete) {
+      throw new Error('Please complete the form');
+    }
     if (userData.hasOwnProperty('email')) {
       await User.uniqEmailCheck(userData.email);
     }
@@ -33,6 +33,12 @@ const userInputCheck = async (req, res, next) => {
         userData = omit(userData, ['oldPassword'], ['password']);
       } else {
         throw new Error('Current password is wrong');
+      }
+    }
+    if (req.body.hasOwnProperty('mute')) {
+      userData = {...userData, mute: req.body.mute }
+      if (typeof userData.mute !== 'boolean') {
+        throw new Error('Check your checkbox field');
       }
     }
     if (userData.hasOwnProperty('dateOfBirth')) {

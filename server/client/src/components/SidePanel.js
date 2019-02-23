@@ -7,6 +7,7 @@ const styles = {
   container: {
     width: '80px',
     height: '100%',
+    fontFamily: 'Roboto, sans-serif',
   },
   img_block: {
     marginBottom: '7px',
@@ -26,6 +27,8 @@ const styles = {
     left: '0'
   },
   username: {
+    fontWeight: 600,
+    fontSize: '13px',
     wordBreak: 'break-all'
   }
 }

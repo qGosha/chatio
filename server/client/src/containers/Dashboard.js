@@ -189,10 +189,11 @@ class Dashboard extends Component {
         dashboard,
         auth,
         newMessageForAnotherDialog,
-        messageFromUnknown
+        messageFromUnknown,
       } = this.props;
       const {activeDialogWith, iHaveDialogWith} = dashboard;
-      if (message.sender !== auth.user._id) {
+      const { user } = auth;
+      if ((message.sender !== auth.user._id) && !user.mute) {
         try {
           await this.audio.play();
         } catch (e) {
@@ -250,13 +251,12 @@ class Dashboard extends Component {
   render() {
     const {
       auth,
-      deleteUser,
       dashboard,
       removeNotifications,
       closeDialog,
       markMsgRead,
       match,
-      location
+      location,
     } = this.props;
     const {activeDialogWith, allUsers} = dashboard;
     const {imagesWereUploaded, uploaderVisible, messageText} = this.state;
@@ -317,6 +317,7 @@ class Dashboard extends Component {
           auth={auth}
           logout={this.logout}
           location={location}
+          closeDialog={closeDialog}
         />
 
         <Switch>

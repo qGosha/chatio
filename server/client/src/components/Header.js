@@ -16,7 +16,7 @@ const styles = {
 }
 
 const PageHeader = (props) => {
-  const { logout, location, extraStyle, auth } = props;
+  const { logout, location, extraStyle, auth, closeDialog } = props;
   return (
   <div style={{ ...styles.headerCont, ...extraStyle }}>
       <Segment style={styles.header}>
@@ -39,7 +39,10 @@ const PageHeader = (props) => {
           color='blue'
           onClick={() => {
             if (location.pathname === '/dashboard/settings') return;
-            history.push('/dashboard/settings')}
+            history.push('/dashboard/settings');
+            closeDialog();
+          }
+
           }
         >
           <Icon name='setting' /> Settings
