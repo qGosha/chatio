@@ -7,12 +7,7 @@ import SocialButtons from "./socialButtons";
 import SearchCity from "./SearchCity";
 import SelectGender from "./SelectGender";
 
-const SignUpGrid = ({
-  submitForm,
-  results,
-  props,
-  setResults
-}) => {
+const SignUpGrid = ({submitForm, results, props, setResults}) => {
   const {error, handleSubmit, submitting, showLoadingScreen} = props;
   const label = {
     display: "block",
@@ -56,10 +51,10 @@ const SignUpGrid = ({
               <span style={label}>Birthday</span>
               <Form.Group widths="equal" style={{flexWrap: "nowrap"}}>
                 <Field
-                     name={'dateOfBirth'}
-                     placeholder={`Type new date`}
-                     component={DatePickComponent}
-                    />
+                  name={"dateOfBirth"}
+                  placeholder={`Type new date`}
+                  component={DatePickComponent}
+                />
               </Form.Group>
               <span style={label}>Your city</span>
               <SearchCity

@@ -15,7 +15,7 @@ const styles = {
 }
 
 const ChatSection = (props) => {
-  const { dashboard, auth, handleDialogScroll, handleRef, closeDialog, markMsgRead, removeNotifications, standartImage } = props;
+  const { dashboard, auth, handleDialogScroll, handleRef, closeDialog, markMsgRead, removeNotifications, standartImage, dynamicImageStyle } = props;
   const { currentMessages, activeDialogWith, newMsgNotifictions } = dashboard;
   const user = auth.user;
   const notReadMsg = currentMessages.some( msg => msg.recipient === user._id && !msg.read );
@@ -52,7 +52,7 @@ const ChatSection = (props) => {
     <Icon name='times' style={styles.close} onClick={closeDialog}/>
     <Ref innerRef={assignRef}>
      <Segment style={styles.dialog} onScroll={handleDialogScroll}>
-       <Messages messages={currentMessages} dashboard={dashboard} standartImage={standartImage} auth={auth}/>
+       <Messages messages={currentMessages} dashboard={dashboard} standartImage={standartImage} auth={auth} dynamicImageStyle={dynamicImageStyle}/>
      </Segment>
     </Ref>
    </Fragment>

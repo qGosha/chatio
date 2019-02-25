@@ -1,92 +1,91 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
-const { Schema } = mongoose;
+const mongoose = require("mongoose");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
+const {Schema} = mongoose;
 
 const userSchema = new Schema({
   name: String,
   gender: String,
   dateOfBirth: Date,
   city: String,
-  photos:[],
+  photos: [],
   email: {
     type: String,
     minLength: 1,
     trim: true,
     validate: {
       validator: validator.isEmail,
-      message: '{VALUE} is not a valid email'
+      message: "{VALUE} is not a valid email"
     }
   },
-    password: {
-      type: String,
-      minlength: 6,
-    },
-    google: {
-     googleId: String,
-     googleEmail: String
-   },
-   facebook: {
-     facebookId: String,
-     facebookEmail: String
-   },
-   isConfirmed: {
-     type: Boolean,
-     default: false
-   },
-   online: {
-     type: Boolean,
-     default: false
-   },
-   isOauth: {
-     type: Boolean,
-     default: false
-   },
+  password: {
+    type: String,
+    minlength: 6
+  },
+  google: {
+    googleId: String,
+    googleEmail: String
+  },
+  facebook: {
+    facebookId: String,
+    facebookEmail: String
+  },
+  isConfirmed: {
+    type: Boolean,
+    default: false
+  },
+  online: {
+    type: Boolean,
+    default: false
+  },
+  isOauth: {
+    type: Boolean,
+    default: false
+  },
 
-   mute: {
-     type: Boolean,
-     default: false
-   }
+  mute: {
+    type: Boolean,
+    default: false
+  }
 });
 
-userSchema.pre('save', function(next) {
+userSchema.pre("save", function(next) {
   const user = this;
   //to check if pass was modified to prevent already hashed pass from hashing
-  if(user.isModified('password')) {
+  if (user.isModified("password")) {
     try {
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(user.password, salt, (err, hash) => {
           user.password = hash;
           next();
-        })
+        });
       });
     } catch (e) {
-      throw new Error('Cannot complete hashing')
+      throw new Error("Cannot complete hashing");
     }
-
   } else {
     next();
   }
 });
 
-userSchema.statics.uniqEmailCheck = function (email) {
+userSchema.statics.uniqEmailCheck = function(email) {
   const User = this;
 
-  return User.findOne({email}).then((user) => {
+  return User.findOne({email}).then(user => {
     if (user) {
-      throw new Error('User with this email already exists');
+      throw new Error("User with this email already exists");
     } else {
       return Promise.resolve();
     }
   });
 };
 
-userSchema.statics.findByCredentials = function (email, password) {
+userSchema.statics.findByCredentials = function(email, password) {
   var User = this;
 
-  return User.findOne({email}).then((user) => {
+  return User.findOne({email}).then(user => {
     if (!user) {
-      throw new Error('No user with this credentials');
+      throw new Error("No user with this credentials");
     }
 
     return new Promise((resolve, reject) => {
@@ -95,10 +94,10 @@ userSchema.statics.findByCredentials = function (email, password) {
         if (res) {
           resolve(user);
         } else {
-          reject({message: 'Password is wrong'});
+          reject({message: "Password is wrong"});
         }
       });
     });
   });
 };
-mongoose.model('users', userSchema);
+mongoose.model("users", userSchema);

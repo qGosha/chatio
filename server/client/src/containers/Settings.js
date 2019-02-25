@@ -2,7 +2,17 @@ import React, {useState, Fragment, useEffect} from "react";
 import {connect} from "react-redux";
 import * as actions from "../actions";
 import ModalWindow from "../components/modal";
-import {Segment, Form, Grid, Image, Tab, Message, Icon, Button, Checkbox} from "semantic-ui-react";
+import {
+  Segment,
+  Form,
+  Grid,
+  Image,
+  Tab,
+  Message,
+  Icon,
+  Button,
+  Checkbox
+} from "semantic-ui-react";
 import {InputComponent, DatePickComponent} from "../helpers/common";
 import {reduxForm, Field, SubmissionError} from "redux-form";
 import {validate} from "../helpers/validation";
@@ -10,30 +20,30 @@ import SearchCity from "../components/SearchCity";
 import SelectGender from "../components/SelectGender";
 import FileButton from "../components/FileButton";
 import PasswordChangeField from "../components/PasswordChangeField";
-const moment = require('moment');
-const omit = require('lodash.omit');
+const moment = require("moment");
+const omit = require("lodash.omit");
 const styles = {
   container: {
-    fontFamily: 'Roboto, sans-serif',
-    gridColumn: "2 / 5",
+    fontFamily: "Roboto, sans-serif",
+    gridColumn: "2 / 5"
   },
   saveButton: {
-    marginTop: '30px'
+    marginTop: "30px"
   },
   row: {
-    borderBottom: '0.5px solid #a9a4a4a6'
+    borderBottom: "0.5px solid #a9a4a4a6"
   },
   messages: {
-    position: 'fixed',
+    position: "fixed",
     top: 0,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    textAlign: 'left'
+    left: "50%",
+    transform: "translateX(-50%)",
+    textAlign: "left"
   },
   link: {
-    fontWeight: '600',
-    fontStyle: 'italic',
-    fontSize: '12px'
+    fontWeight: "600",
+    fontStyle: "italic",
+    fontSize: "12px"
   }
 };
 
@@ -47,14 +57,14 @@ const Settings = props => {
     form,
     standartImage,
     deleteUser,
-    clearSubmitErrors,
+    clearSubmitErrors
   } = props;
 
-  const { user } = auth;
+  const {user} = auth;
   if (user.dateOfBirth) {
-    user.dateOfBirth = moment(user.dateOfBirth).format('YYYY-MM-DD');
+    user.dateOfBirth = moment(user.dateOfBirth).format("YYYY-MM-DD");
   }
-  const { isAvatarUploading, showSuccessUpdate } = settings;
+  const {isAvatarUploading, showSuccessUpdate} = settings;
   const myAvatar = user.photos.length ? user.photos[0] : standartImage;
 
   const aliaces = {
@@ -71,37 +81,42 @@ const Settings = props => {
     email: false,
     gender: false,
     city: false,
-    dateOfBirth: false,
-  }
+    dateOfBirth: false
+  };
   const [passwordField, passwordFieldStatus] = useState(false);
-  const [settingsStatus, settingsStatusChange] = useState(defualtSettingsPositions);
+  const [settingsStatus, settingsStatusChange] = useState(
+    defualtSettingsPositions
+  );
 
-  useEffect( () => {
-  let timer;
-    if (error && error.message) {
-      timer = setTimeout( () => {
-        console.log(submitting);
-        clearSubmitErrors(form)
-      }, 1500);
-    }
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
+  useEffect(
+    () => {
+      let timer;
+      if (error && error.message) {
+        timer = setTimeout(() => {
+          console.log(submitting);
+          clearSubmitErrors(form);
+        }, 1500);
       }
-    }
-  }, [submitting]);
+      return () => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+      };
+    },
+    [submitting]
+  );
 
   const submitForm = values => {
     const valArr = Object.keys(values);
     if (!valArr.length) return;
-    if (values.hasOwnProperty('city')) {
+    if (values.hasOwnProperty("city")) {
       const isCityPicked = results.some(i => i.title === values.city);
       if (!isCityPicked) {
         throw new SubmissionError({city: "Select your city"});
       }
     }
-    if (values.hasOwnProperty('repPassword')) {
-      values = omit(values, ['repPassword']);
+    if (values.hasOwnProperty("repPassword")) {
+      values = omit(values, ["repPassword"]);
     }
     settingsStatusChange(defualtSettingsPositions);
     passwordFieldStatus({password: false});
@@ -121,7 +136,7 @@ const Settings = props => {
         />
       );
     } else if (field === "gender") {
-      component = <SelectGender/>;
+      component = <SelectGender />;
     } else if (field === "dateOfBirth") {
       component = (
         <Field
@@ -143,32 +158,32 @@ const Settings = props => {
       );
     }
     return (
-    <Grid.Row key={i} style={styles.row}>
-      <Grid.Column width={2} style={{textAlign:'left'}}>
-        <div style={styles.title}>{`${aliaces[field]}:`}</div>
-      </Grid.Column>
-      <Grid.Column width={6}>
-        {value ? component : <div>{user[field] ? user[field] : ""}</div>}
-      </Grid.Column>
-      <Grid.Column width={2} style={{textAlign:'left'}}>
-        <div>
-          <a
-            onClick={() => {
-              if (value) {
-                if (settingsStatus.city) {
-                  setResults([]);
+      <Grid.Row key={i} style={styles.row}>
+        <Grid.Column width={2} style={{textAlign: "left"}}>
+          <div style={styles.title}>{`${aliaces[field]}:`}</div>
+        </Grid.Column>
+        <Grid.Column width={6}>
+          {value ? component : <div>{user[field] ? user[field] : ""}</div>}
+        </Grid.Column>
+        <Grid.Column width={2} style={{textAlign: "left"}}>
+          <div>
+            <a
+              onClick={() => {
+                if (value) {
+                  if (settingsStatus.city) {
+                    setResults([]);
+                  }
+                  props.clearFields(form, false, field);
                 }
-                props.clearFields(form, false, field);
-              }
-              settingsStatusChange({...settingsStatus, [field]: !value});
-            }}
-            style={styles.link}
-          >
-            {value ? "Cancel" : "Change"}
-          </a>
-        </div>
-    </Grid.Column>
-    </Grid.Row>
+                settingsStatusChange({...settingsStatus, [field]: !value});
+              }}
+              style={styles.link}
+            >
+              {value ? "Cancel" : "Change"}
+            </a>
+          </div>
+        </Grid.Column>
+      </Grid.Row>
     );
   });
 
@@ -179,53 +194,53 @@ const Settings = props => {
       onSubmit={handleSubmit(submitForm)}
       error={!!error}
     >
-    <Grid
-     textAlign="left"
-     stackable>
+      <Grid textAlign="left" stackable>
         {fields}
-       <PasswordChangeField
-         passwordField={passwordField}
-         passwordFieldStatus={passwordFieldStatus}
-         styles={styles}
-         clearFields={props.clearFields}
-         form={form}
-         />
-         <Grid.Row style={{justifyContent: 'flex-end'}}>
-           <Grid.Column width={5} style={{textAlign:'right'}}>
+        <PasswordChangeField
+          passwordField={passwordField}
+          passwordFieldStatus={passwordFieldStatus}
+          styles={styles}
+          clearFields={props.clearFields}
+          form={form}
+        />
+        <Grid.Row style={{justifyContent: "flex-end"}}>
+          <Grid.Column width={5} style={{textAlign: "right"}}>
             <Button
-             negative
-             onClick={() => modalStatusChange(true)}
-             type='reset'>
-             <Icon name='trash alternate' />
-             Delete account
+              negative
+              onClick={() => modalStatusChange(true)}
+              type="reset"
+            >
+              <Icon name="trash alternate" />
+              Delete account
             </Button>
-           </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={8} style={{textAlign:'left'}}>
-             <div style={styles.title}>Mute notifications:</div>
-            </Grid.Column>
-            <Grid.Column width={2} style={{textAlign:'left'}}>
-              <Field
-                name={"mute"}
-                component={ ({ input: { value, onChange, ...input } }) => {
-                  return (
-                    <Form.Field>
-                     <Checkbox
-                       {...input}
-                       type="checkbox"
-                       onChange={(e, data) => onChange(data.checked)}
-                       defaultChecked={ !!value }
-                       toggle/>
-                    </Form.Field>
-                  )
-                }}
-              />
-            </Grid.Column>
-         </Grid.Row>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={8} style={{textAlign: "left"}}>
+            <div style={styles.title}>Mute notifications:</div>
+          </Grid.Column>
+          <Grid.Column width={2} style={{textAlign: "left"}}>
+            <Field
+              name={"mute"}
+              component={({input: {value, onChange, ...input}}) => {
+                return (
+                  <Form.Field>
+                    <Checkbox
+                      {...input}
+                      type="checkbox"
+                      onChange={(e, data) => onChange(data.checked)}
+                      defaultChecked={!!value}
+                      toggle
+                    />
+                  </Form.Field>
+                );
+              }}
+            />
+          </Grid.Column>
+        </Grid.Row>
       </Grid>
       <Button
-        type='submit'
+        type="submit"
         primary
         size="large"
         loading={submitting}
@@ -235,13 +250,13 @@ const Settings = props => {
         Save
       </Button>
       {error && (
-        <Message negative style={styles.messages}>
+        <Message negative size="small" style={styles.messages}>
           <Icon name="times circle" color="red" />
           <span>{error.message}</span>
         </Message>
       )}
       {showSuccessUpdate && (
-        <Message positive style={styles.messages}>
+        <Message positive size="small" style={styles.messages}>
           <Icon name="check circle" color="green" />
           <span>Settings were successfully updated</span>
         </Message>
@@ -249,26 +264,25 @@ const Settings = props => {
     </Form>
   );
   const avatarPane = (
-    <Grid
-     stackable>
+    <Grid stackable>
       <Grid.Column>
-       <Segment>
-        <Image rounded size='small' verticalAlign='top' src={myAvatar} />
-        <FileButton
-          onSelect={props.changeAvatar}
-          primary
-          style={{marginTop: '1em'}}
-          disabled={isAvatarUploading}
-          loading={isAvatarUploading}
+        <Segment>
+          <Image rounded size="small" verticalAlign="top" src={myAvatar} />
+          <FileButton
+            onSelect={props.changeAvatar}
+            primary
+            style={{marginTop: "1em"}}
+            disabled={isAvatarUploading}
+            loading={isAvatarUploading}
           />
-       </Segment>
+        </Segment>
       </Grid.Column>
     </Grid>
-  )
+  );
   const panes = [
-  { menuItem: 'General', render: () => <Tab.Pane>{generalPane}</Tab.Pane> },
-  { menuItem: 'Avatar', render: () => <Tab.Pane>{avatarPane}</Tab.Pane> }
-]
+    {menuItem: "General", render: () => <Tab.Pane>{generalPane}</Tab.Pane>},
+    {menuItem: "Avatar", render: () => <Tab.Pane>{avatarPane}</Tab.Pane>}
+  ];
   return (
     <Fragment>
       <ModalWindow
@@ -279,7 +293,7 @@ const Settings = props => {
         onNegative={() => modalStatusChange(false)}
         onPositive={() => deleteUser()}
       />
-      <Tab panes={panes} style={styles.container}/>
+      <Tab panes={panes} style={styles.container} />
     </Fragment>
   );
 };
@@ -289,11 +303,14 @@ const ConnectedSettings = reduxForm({
   validate
 })(Settings);
 
-
 function mapStateToProps({auth, settings}) {
-  return {auth, settings, initialValues: {
-    mute: auth.user.mute
-  }};
+  return {
+    auth,
+    settings,
+    initialValues: {
+      mute: auth.user.mute
+    }
+  };
 }
 
- export default connect(mapStateToProps, actions)(ConnectedSettings);
+export default connect(mapStateToProps, actions)(ConnectedSettings);

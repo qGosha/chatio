@@ -1,24 +1,37 @@
 import React from "react";
-import { Input, Button } from 'semantic-ui-react';
+import {Input, Button} from "semantic-ui-react";
 
 const styles = {
   footer: {
-    gridArea: 'footer',
-    display: 'grid',
-    gridTemplateColumns: '5fr 1fr 1fr',
-    gridTemplateRows: '0.4fr'
+    gridColumn: "2 / 5"
   }
-}
+};
 
-const Footer = (props) => {
-  const { onSubmit, messageText, onChange, handleSendClick, handleImageSendClick } = props;
+const Footer = props => {
+  const {
+    onSubmit,
+    messageText,
+    onChange,
+    handleSendClick,
+    handleImageSendClick
+  } = props;
   return (
     <form style={styles.footer} onSubmit={onSubmit}>
-     <Input value={messageText} fluid placeholder='Send...' onChange={onChange}/>
-     <Button onClick={handleSendClick}>Send</Button>
-     <Button icon='attach' onClick={handleImageSendClick} />
-   </form>
-  )
-}
+      <div style={{display: "flex"}}>
+        <Input
+          value={messageText}
+          fluid
+          placeholder="Send..."
+          onChange={onChange}
+          style={{flexGrow: 1}}
+        />
+        <Button primary onClick={handleSendClick}>
+          Send
+        </Button>
+        <Button icon="attach" onClick={handleImageSendClick} />
+      </div>
+    </form>
+  );
+};
 
 export default Footer;

@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
-
+const mongoose = require("mongoose");
+const {Schema} = mongoose;
 
 const conversationSchema = new Schema({
- members: [{ type : mongoose.Schema.Types.ObjectId, ref: 'user' }]
+  members: [{type: mongoose.Schema.Types.ObjectId, ref: "user"}]
 });
 
-mongoose.model('conversations', conversationSchema);
+mongoose.model("conversations", conversationSchema);

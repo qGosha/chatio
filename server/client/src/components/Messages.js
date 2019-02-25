@@ -22,10 +22,17 @@ const styles = {
     fontSize: '9px',
     color: 'gray'
   },
-  image: {
-    maxWidth: '300px',
-    maxHeight: '300px'
-  }
+  dynamicImageStyle: {
+     minWidth: '80px',
+     minHeight: '80px',
+     maxWidth: '300px',
+     maxHeight: '300px',
+   },
+   imgS: {
+     objectFit: "cover",
+     maxWidth: 'inherit',
+     maxHeight: 'inherit'
+   }
 }
 
 const Messages = ({messages, dashboard, auth, standartImage}) => {
@@ -55,19 +62,10 @@ const Messages = ({messages, dashboard, auth, standartImage}) => {
     const mine = (item.sender === activeDialogWith) ? false : true;
     const dynamicTexStyle = {
       marginLeft: shouldUseAvatar ? '8px' : '48px',
-    }
-
-    const dynamicImageStyle = {
-      width: '300px',
-      height: '300px',
     };
-    const imgS = {
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover'
-    }
+
     const content = item.message.image.image ?
-    <div style={dynamicImageStyle}><Image style={imgS} src={item.message.text ? item.message.text : standartImage}/></div>
+    <div style={styles.dynamicImageStyle}><Image style={styles.imgS} src={item.message.text ? item.message.text : standartImage}/></div>
     : <div>{item.message && item.message.text}</div>;
     return(
       <Fragment key={item._id}>

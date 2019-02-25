@@ -11,14 +11,14 @@ const styles = {
    borderRadius: 0
  },
  headerCont: {
-   gridArea: 'menu / menu / header/ header'
+   gridArea: "menu / menu / header / header"
  }
 }
 
 const PageHeader = (props) => {
-  const { logout, location, extraStyle, auth, closeDialog } = props;
+  const { logout, location, auth, closeDialog, mobileStyle } = props;
   return (
-  <div style={{ ...styles.headerCont, ...extraStyle }}>
+  <div style={{...mobileStyle }}>
       <Segment style={styles.header}>
         { auth.user.isConfirmed ?
         <Fragment>
@@ -61,6 +61,4 @@ const PageHeader = (props) => {
 
   )
 }
-// <Button onClick={openModal}>Delete profile</Button>
-
 export default PageHeader;

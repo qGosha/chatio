@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   GET_PEERS,
   USER_CHANGESTATUS,
@@ -15,21 +15,17 @@ import {
   CREATE_NEW_CONVERSATION,
   ERROR,
   SET_SOCKET
-} from './types';
-import history from '../helpers/history';
+} from "./types";
+import history from "../helpers/history";
 
 export const getPeers = () => async dispatch => {
-  const res = await axios.get('/api/search/allUsers');
+  const res = await axios.get("/api/search/allUsers");
   if (res.data.success) {
-    const {
-      allUsers,
-      iHaveDialogWith,
-      newMsgNotifictions
-    } = res.data.message
-    let all = {}
+    const {allUsers, iHaveDialogWith, newMsgNotifictions} = res.data.message;
+    let all = {};
     allUsers.forEach(user => {
-      all[user._id] = user
-    })
+      all[user._id] = user;
+    });
     dispatch({
       payload: {
         all,
@@ -39,18 +35,13 @@ export const getPeers = () => async dispatch => {
       type: GET_PEERS
     });
   }
-}
+};
 
-export const userChangedStatus = (data) => async (dispatch, getState) => {
-  const {
-    dashboard
-  } = getState();
+export const userChangedStatus = data => async (dispatch, getState) => {
+  const {dashboard} = getState();
 
-  const {
-    id,
-    online
-  } = data;
-  console.log(id, ' : ', online);
+  const {id, online} = data;
+  console.log(id, " : ", online);
   const allUsers = dashboard.allUsers;
   const user = allUsers && allUsers[id];
   if (!user) return;
@@ -62,9 +53,9 @@ export const userChangedStatus = (data) => async (dispatch, getState) => {
       type: USER_CHANGESTATUS
     });
   }
-}
+};
 export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
-  const res = await axios.post('/api/chat/dialogs', {
+  const res = await axios.post("/api/chat/dialogs", {
     id,
     skip
   });
@@ -72,7 +63,7 @@ export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
     if (!res.data.message.length) {
       return dispatch({
         type: UPLOAD_MESSAGES_END
-      })
+      });
     }
     dispatch({
       payload: {
@@ -81,11 +72,10 @@ export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
       type: UPLOAD_MESSAGES_ONSCROLL
     });
   }
-}
+};
 
-
-export const openDialog = (id) => async dispatch => {
-  const res = await axios.post('/api/chat/openDialog', {
+export const openDialog = id => async dispatch => {
+  const res = await axios.post("/api/chat/openDialog", {
     id
   });
   if (res.data.success) {
@@ -97,84 +87,81 @@ export const openDialog = (id) => async dispatch => {
       },
       type: OPEN_DIALOG
     });
-    if(window.location.pathname !== '/dashboard') {
-      history.push('/dashboard');
+    if (window.location.pathname !== "/dashboard") {
+      history.push("/dashboard");
     }
   }
-}
+};
 
 export const closeDialog = () => async dispatch => {
   dispatch({
     type: CLOSE_DIALOG
   });
-}
+};
 
 export const removeNotifications = id => async dispatch => {
   dispatch({
     payload: id,
     type: REMOVE_NOTIFICATIONS
-  })
-}
+  });
+};
 
 export const createNewConversation = id => async dispatch => {
-  const res = await axios.post('/api/chat/createNewConversation', { id });
+  const res = await axios.post("/api/chat/createNewConversation", {id});
   if (res.data.success) {
     dispatch({
       payload: id,
       type: CREATE_NEW_CONVERSATION
-    })
+    });
   }
-}
+};
 
 export const messageFromUnknown = id => async dispatch => {
-   dispatch({
-     payload: id,
-     type: MSG_FROM_UNKNOWN
-   })
-}
+  dispatch({
+    payload: id,
+    type: MSG_FROM_UNKNOWN
+  });
+};
 
-export const markMsgRead = (ids, updatedMsg, activeDialogWith) => async dispatch => {
-  await axios.post('/api/chat/markMsgRead', {
+export const markMsgRead = (
+  ids,
+  updatedMsg,
+  activeDialogWith
+) => async dispatch => {
+  await axios.post("/api/chat/markMsgRead", {
     ids,
     activeDialogWith
-  })
+  });
   dispatch({
     payload: updatedMsg,
     type: MARK_MSG_READ
-  })
-}
+  });
+};
 
 export const msgReadByPeer = updatedMsg => async dispatch => {
   dispatch({
     payload: updatedMsg,
     type: MARK_MSG_READ
-  })
-}
+  });
+};
 
 export const newMessageForAnotherDialog = id => async dispatch => {
   dispatch({
     payload: id,
     type: NEW_MSG_NOTIFICATION
-  })
-}
+  });
+};
 
-export const addMessage = (message) => async (dispatch, getState) => {
-  const {
-    dashboard
-  } = getState();
-  const {
-    activeDialogWith
-  } = dashboard;
-  if (
-    activeDialogWith &&
-    activeDialogWith === message.sender
-  ) {
+export const addMessage = message => async (dispatch, getState) => {
+  const {dashboard} = getState();
+  const {activeDialogWith} = dashboard;
+  if (activeDialogWith && activeDialogWith === message.sender) {
     message.read = true;
     const ids = [message._id];
-    await axios.post('/api/chat/markMsgRead', {
+    await axios.post("/api/chat/markMsgRead", {
       ids,
       activeDialogWith
-    })
+    });
   }
   if (message) {
     dispatch({
@@ -182,33 +169,32 @@ export const addMessage = (message) => async (dispatch, getState) => {
       type: ADD_MESSAGE
     });
   }
-}
-export const addImageUrl = (message) => async dispatch => {
+};
+export const addImageUrl = message => async dispatch => {
   if (message) {
-
     dispatch({
       payload: message,
       type: ADD_IMAGE_URL
     });
   }
-}
+};
 
-export const sendImages = (data) => async dispatch => {
- try {
-   const res = await axios.post('/api/chat/uploadImages', data);
-   if (!res.data.success) {
-     throw new Error(res.data.error);
-   }
- } catch(e) {
-   dispatch({
-     payload: e,
-     type: ERROR
-   });
- }
+export const sendImages = data => async dispatch => {
+  try {
+    const res = await axios.post("/api/chat/uploadImages", data);
+    if (!res.data.success) {
+      throw new Error(res.data.error);
+    }
+  } catch (e) {
+    dispatch({
+      payload: e,
+      type: ERROR
+    });
+  }
 };
 export const setSocket = socket => async dispatch => {
   dispatch({
     payload: socket,
     type: SET_SOCKET
-  })
-}
+  });
+};

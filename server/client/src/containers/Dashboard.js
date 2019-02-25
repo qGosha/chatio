@@ -11,6 +11,7 @@ import Footer from "../components/Footer";
 import Settings from "./Settings";
 import AvatarBlock from "../components/AvatarBlock";
 import {Route, Switch} from "react-router-dom";
+import Media from 'react-media';
 
 const sound = require("../sounds/msg.mp3");
 const standartImage = require("../img/square-image.png");
@@ -27,11 +28,41 @@ const styles = {
     width: "100vw",
     height: "100vh"
   },
-
+  header: {
+    gridArea: 'menu / menu / header / header'
+  },
   sendButton: {
     display: "flex",
     flexDirection: "row"
+  },
+ dynamicImageStyle: {
+    minHeight: '200px',
+    maxWidth: '300px',
+    maxHeight: '300px',
   }
+};
+
+const mobileGrid = {
+    grid: {
+        display: "grid",
+        gridTemplateAreas:
+        `'header header header header header '
+         'menu avatar avatar avatar avatar '
+         'menu main main main main '
+         'menu footer footer footer footer '`,
+        gridTemplateColumns: "1fr 4fr 4fr 4fr",
+        gridGap: "10px",
+        width: "100vw",
+        height: "100vh"
+      },
+    header: {
+      gridArea: 'header / header / header'
+    },
+    dynamicImageStyle: {
+       minHeight: '150px',
+       maxWidth: '300px',
+       maxHeight: '300px',
+     }
 };
 
 class Dashboard extends Component {
@@ -79,8 +110,6 @@ class Dashboard extends Component {
   };
 
   handleOpenDialog = async id => {
-    const {activeDialogWith} = this.props.dashboard;
-    if (id === activeDialogWith) return;
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
     await this.props.openDialog(id);
@@ -171,17 +200,21 @@ class Dashboard extends Component {
     socket.on("userChangedStatus", message => {
       this.props.userChangedStatus(message);
     });
-    socket.on("imageHasBeenUploaded", message => {
+    socket.on("imageHasBeenUploaded", async message => {
       const dialog = this.dialog;
       let scroll;
       if (dialog) {
         if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
           scroll = true;
         }
-        this.props.addImageUrl(message);
-        if (scroll) {
-          dialog.scrollTop = dialog.scrollHeight;
+        let img = new Image();
+        img.onload = () => {
+          this.props.addImageUrl(message);
+          if (scroll) {
+            dialog.scrollTop = dialog.scrollHeight;
+          }
         }
+        img.src = message.message.text;
       }
     });
     socket.on("inboundMessage", async message => {
@@ -271,16 +304,18 @@ class Dashboard extends Component {
           allUsers={allUsers}
           auth={auth}
           openDialog={this.handleOpenDialog}
+          standartImage={standartImage}
         />
       </Fragment>
     );
 
-    const chattingSection = () => (
+    const chattingSection = (dynamicImageStyle) => (
       <Fragment>
         <AvatarBlock
           auth={auth}
           allUsers={allUsers}
           activeDialogWith={activeDialogWith}
+          standartImage={standartImage}
         />
         <ChatSection
           dashboard={dashboard}
@@ -291,6 +326,7 @@ class Dashboard extends Component {
           markMsgRead={markMsgRead}
           removeNotifications={removeNotifications}
           standartImage={standartImage}
+          dynamicImageStyle={dynamicImageStyle}
         />
         <Footer
           onSubmit={e => {
@@ -306,24 +342,25 @@ class Dashboard extends Component {
         />
       </Fragment>
     );
-
-    return (
-      <div style={styles.grid}>
+    const content = style => (
+      <div style={style.grid}>
         <SidePanel
           dashboard={dashboard}
           openDialog={id => this.handleOpenDialog(id)}
+          standartImage={standartImage}
         />
         <PageHeader
           auth={auth}
           logout={this.logout}
           location={location}
           closeDialog={closeDialog}
+          mobileStyle={style.header}
         />
 
         <Switch>
-          <Route exact path={`${match.url}`} render={ activeDialogWith ? chattingSection : welcomeSection} />
+          <Route exact path={`${match.url}`} render={ activeDialogWith ? () => chattingSection(style.dynamicImageStyle) : welcomeSection } />
           <Route
-            path="/dashboard/settings"
+            path={`${match.url}/settings`}
             render={() => <Settings standartImage={standartImage}/>}
           />
         </Switch>
@@ -337,6 +374,14 @@ class Dashboard extends Component {
           />
         )}
       </div>
+    )
+
+    return (
+      <Media query="(max-width: 599px)">
+          {matches =>
+            matches ? content(mobileGrid) : content(styles)
+          }
+        </Media>
     );
   }
 }

@@ -89,11 +89,7 @@ class Confirmation extends Component {
     };
     return (
       <div>
-        <PageHeader
-          auth={auth}
-          logout={this.logout}
-          location={location}
-        />
+        <PageHeader auth={auth} logout={this.logout} location={location} />
 
         <Grid
           textAlign="center"
