@@ -196,13 +196,15 @@ const Settings = props => {
     >
       <Grid textAlign="left" stackable>
         {fields}
-        <PasswordChangeField
-          passwordField={passwordField}
-          passwordFieldStatus={passwordFieldStatus}
-          styles={styles}
-          clearFields={props.clearFields}
-          form={form}
-        />
+        {!user.isOauth ? (
+          <PasswordChangeField
+            passwordField={passwordField}
+            passwordFieldStatus={passwordFieldStatus}
+            styles={styles}
+            clearFields={props.clearFields}
+            form={form}
+          />
+        ) : null}
         <Grid.Row style={{justifyContent: "flex-end"}}>
           <Grid.Column width={5} style={{textAlign: "right"}}>
             <Button
