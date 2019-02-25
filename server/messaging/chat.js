@@ -7,6 +7,7 @@ module.exports = io => {
   io.on("connection", async socket => {
     if (socket.request.session.passport) {
       const userId = socket.request.session.passport.user;
+      console.log(userId);
       const getIHaveDialogWith = await Conversation.find({
         members: {$all: [userId]}
       });
