@@ -178,7 +178,7 @@ class Dashboard extends Component {
   componentDidMount() {
     this.audio.load();
     this.normalTitle = document.title;
-    const socket = io("http://localhost:5000");
+    const socket = io("https://im-messenger.herokuapp.com");
     this.props.setSocket(socket);
     const keys = {
       hidden: "visibilitychange",

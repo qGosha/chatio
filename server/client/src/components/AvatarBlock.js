@@ -51,22 +51,26 @@ const AvatarBlock = ({allUsers, auth, activeDialogWith, standartImage}) => {
         style={{
           width: "2em",
           height: "2em",
-          background: `url(${
+          backgroundImage: `url(${
             user.photos.length ? user.photos[0] : standartImage
-          }) no-repeat center`,
+          })`,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
           backgroundSize: "cover"
         }}
       />
       <Icon name="angle double right" style={styles.icon} />
       <div
-        style={{
-          width: "2em",
-          height: "2em",
-          background: `url(${
-            peer && peer.photos.length ? peer.photos[0] : standartImage
-          }) no-repeat center`,
-          backgroundSize: "cover"
-        }}
+      style={{
+        width: "2em",
+        height: "2em",
+        backgroundImage: `url(${
+           peer && peer.photos.length ? peer.photos[0] : standartImage
+        })`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundSize: "cover"
+      }}
       />
     </div>
   );
