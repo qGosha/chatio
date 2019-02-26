@@ -25,6 +25,7 @@ export const DatePickComponent = ({
         iconPosition="left"
         closable={true}
         startMode="year"
+        readonly={true}
         {...custom}
         dateFormat="MM-DD-YYYY"
         minDate="01-01-1900"
