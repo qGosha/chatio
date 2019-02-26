@@ -92,7 +92,7 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
 
   const angleSwitch = (
     <div style={{...styles.angle, left: visible ? '80px' : 0}} onClick={() => changeVisible(!visible)}>
-     <Icon name='angle left' style={styles.angleIcon}/>
+     <Icon name={ visible ? 'angle left' : 'angle right'} style={styles.angleIcon}/>
    </div>
  );
 

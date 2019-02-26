@@ -12,7 +12,8 @@ const styles = {
     width: '100%',
     paddingRight: '60px',
     borderRadius: '6px',
-    outline: 0
+    outline: 0,
+    fontSize: '16px'
   },
   icon: {
     position: 'absolute',
