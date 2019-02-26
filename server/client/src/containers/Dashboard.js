@@ -59,7 +59,7 @@ const mobileGrid = {
          'main main main'
          'footer footer footer'`,
         gridTemplateColumns: "4fr 4fr 4fr",
-        gridTemplateRows: '0fr 0fr 0fr 4fr',
+        gridAutoRows: 'min-content',
         gridGap: "10px",
         height: "100vh"
       },
