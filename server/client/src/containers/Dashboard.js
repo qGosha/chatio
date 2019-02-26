@@ -72,7 +72,7 @@ const mobileGrid = {
        maxHeight: '300px',
      },
      chatWindow: {
-       height: '350px'
+       height: '450px'
      },
      headerButtonJustify: {
        justifyContent: 'center'
@@ -373,10 +373,7 @@ class Dashboard extends Component {
 
         <Switch>
           <Route exact path={`${match.url}`} render={ activeDialogWith ? () => chattingSection(style) : welcomeSection } />
-          <Route
-            path={`${match.url}/settings`}
-            render={() => <Settings standartImage={standartImage}/>}
-          />
+    
         </Switch>
 
         {imagesWereUploaded ? null : (
