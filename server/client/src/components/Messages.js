@@ -16,7 +16,7 @@ const styles = {
     width: '3em',
   },
   text: {
-    wordBreak: 'break',
+    wordBreak: 'break-all',
   },
   timestamp: {
     fontSize: '9px',
@@ -30,8 +30,6 @@ const styles = {
    },
    imgS: {
      objectFit: "cover",
-     maxWidth: 'inherit',
-     maxHeight: 'inherit'
    }
 }
 
@@ -60,7 +58,7 @@ const Messages = ({messages, dashboard, auth, standartImage}) => {
     const shouldShowDivider = (currentDate !== formattedDate) ? true : false;
     currentDate = formattedDate;
     const mine = (item.sender === activeDialogWith) ? false : true;
-    const dynamicTexStyle = {
+    const dynamicTextStyle = {
       marginLeft: shouldUseAvatar ? '8px' : '48px',
     };
 
@@ -72,7 +70,7 @@ const Messages = ({messages, dashboard, auth, standartImage}) => {
         { shouldShowDivider ? <Divider horizontal><span style={styles.timestamp}>{currentDate}</span></Divider> : null }
         <div style={{...styles.messageContainer, backgroundColor: item.read ? '#fff' : 'beige'}}>
          { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar} avatar/> : null }
-         <div style={{...styles.text, ...dynamicTexStyle}}>
+         <div style={{...styles.text, ...dynamicTextStyle}}>
            { content }
            <span style={styles.timestamp}>{moment(item.timestamp).format('HH:mm')}</span>
          </div>

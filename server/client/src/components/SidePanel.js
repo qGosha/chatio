@@ -1,5 +1,5 @@
 import React from "react";
-import {Segment, Image, Label} from "semantic-ui-react";
+import {Segment, Image, Label, Icon, Transition} from "semantic-ui-react";
 
 
 const styles = {
@@ -29,6 +29,20 @@ const styles = {
     fontWeight: 600,
     fontSize: "13px",
     wordBreak: "break-all"
+  },
+  angle: {
+    position:'absolute',
+    top: '50%',
+    left: 0,
+    width: '15px',
+    backgroundColor: '#ded7d7',
+    height: '30px',
+    borderBottomRightRadius: '15px',
+    borderTopRightRadius: '15px'
+  },
+  angleIcon: {
+    position:'absolute',
+    top: '5px'
   }
 };
 
@@ -76,9 +90,14 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
     });
 
   return (
-    <div style={{gridArea: "menu", zIndex: "10"}}>
+  <Transition.Group animation='slide left' duration={500}>  
+    <div style={{gridArea: "menu", zIndex: "10", position:'relative'}}>
       <Segment style={styles.container}>{avatars}</Segment>
+      <div style={styles.angle}>
+       <Icon name='angle right' style={styles.angleIcon}/>
+      </div>
     </div>
+  </Transition.Group>
   );
 };
 
