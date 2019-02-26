@@ -25,7 +25,6 @@ const styles = {
      'menu main main main'
      'menu footer footer footer'`,
     gridTemplateColumns: "1fr 4fr 4fr 4fr",
-    gridTemplateRows: '1fr 3fr 4fr 4fr',
     gridGap: "10px",
     height: "100vh",
     overflowY: 'hidden'
