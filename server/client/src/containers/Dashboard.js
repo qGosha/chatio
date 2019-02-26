@@ -61,7 +61,7 @@ const mobileGrid = {
         gridTemplateColumns: "4fr 4fr 4fr",
         gridAutoRows: 'min-content',
         gridGap: "10px",
-        height: "100vh"
+        height: "fit-content"
       },
     header: {
       gridArea: 'header / header / header'
