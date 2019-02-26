@@ -18,9 +18,6 @@ export const DatePickComponent = ({
       <DateInput
         {...input}
         onChange={handleChange}
-        onFocus={e => {
-          return (e.target.autocomplete = "custom");
-        }}
         placeholder="Date"
         iconPosition="left"
         closable={true}
