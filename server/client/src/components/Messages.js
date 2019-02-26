@@ -27,6 +27,7 @@ const styles = {
      minHeight: '80px',
      maxWidth: '300px',
      maxHeight: '300px',
+     overflow: 'hidden'
    },
    imgS: {
      objectFit: "cover",

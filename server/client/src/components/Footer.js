@@ -3,9 +3,8 @@ import {TextArea, Icon} from "semantic-ui-react";
 
 const styles = {
   footer: {
-    // gridColumn: "2 / 5"
     gridArea: 'footer',
-    marginRight: '10px',
+    marginRight: '10px'
   },
   area: {
     transition: 'border-bottom-color 0.3s linear',

@@ -19,17 +19,19 @@ const standartImage = require("../img/square-image.png");
 const styles = {
   grid: {
     display: "grid",
-    gridTemplateAreas: `'menu header header header header '
-     'menu avatar avatar avatar avatar '
-     'menu main main main main '
-     'menu footer footer footer footer '`,
+    gridTemplateAreas:
+    `'header header header header'
+     'menu avatar avatar avatar'
+     'menu main main main'
+     'menu footer footer footer'`,
     gridTemplateColumns: "1fr 4fr 4fr 4fr",
+    gridTemplateRows: '1fr 3fr 4fr 4fr',
     gridGap: "10px",
-    width: "100vw",
-    height: "100vh"
+    height: "100vh",
+    overflowY: 'hidden'
   },
   header: {
-    gridArea: 'menu / menu / header / header'
+    gridArea: 'header'
   },
   sendButton: {
     display: "flex",
@@ -57,6 +59,7 @@ const mobileGrid = {
          'main main main'
          'footer footer footer'`,
         gridTemplateColumns: "4fr 4fr 4fr",
+        gridTemplateRows: '0fr 0fr 0fr 4fr',
         gridGap: "10px",
         width: "100vw",
         height: "100vh"
@@ -190,7 +193,7 @@ class Dashboard extends Component {
   componentDidMount() {
     this.audio.load();
     this.normalTitle = document.title;
-    const socket = io("localhost:5000");
+    const socket = io("https://im-messenger.herokuapp.com");
     this.props.setSocket(socket);
     const keys = {
       hidden: "visibilitychange",

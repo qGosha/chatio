@@ -47,7 +47,7 @@ const styles = {
 };
 
 const SidePanel = ({dashboard, openDialog, standartImage}) => {
-  const [visible, changeVisible] = useState(true);
+  const [visible, changeVisible] = useState(false);
   const {iHaveDialogWith, allUsers, newMsgNotifictions} = dashboard;
   if (!allUsers) return null;
   const avatars =
@@ -90,19 +90,26 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
       );
     });
 
+  const angleSwitch = (
+    <div style={{...styles.angle, left: visible ? '80px' : 0}} onClick={() => changeVisible(!visible)}>
+     <Icon name='angle left' style={styles.angleIcon}/>
+   </div>
+ );
+
   return (
     <Media query="(max-width: 599px)">
         {matches =>
           matches ? (
             <Transition.Group animation='slide right' duration={500} style={{zIndex: "10", position:'fixed', top:0, bottom: 0}}>
-                {visible ? <Segment style={styles.container}>{avatars}</Segment>  : null }
-                 <Fragment>
-                <div style={styles.angle} onClick={() =>changeVisible(!visible)}>
-                 <Icon name='angle right' style={styles.angleIcon}/>
-                </div></Fragment>
+                {visible ?
+                  <div>
+                    <Segment style={styles.container}>{avatars}</Segment>
+                    {angleSwitch}
+                 </div> : null }
+                 { !visible ? angleSwitch : null }
             </Transition.Group>
           ) : (
-            <div style={{gridArea: "menu", zIndex: "10"}}>
+            <div style={{gridArea: "menu", zIndex: "10", marginTop: '-10px'}}>
               <Segment style={styles.container}>{avatars}</Segment>
             </div>
           )

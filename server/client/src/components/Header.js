@@ -8,9 +8,6 @@ const styles = {
    padding: '10px',
    backgroundColor: '#bdd2e6',
    borderRadius: 0
- },
- headerCont: {
-   gridArea: "menu / menu / header / header"
  }
 }
 
