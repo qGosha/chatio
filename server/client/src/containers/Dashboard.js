@@ -373,7 +373,10 @@ class Dashboard extends Component {
 
         <Switch>
           <Route exact path={`${match.url}`} render={ activeDialogWith ? () => chattingSection(style) : welcomeSection } />
-    
+          <Route
+            path={`${match.url}/settings`}
+            render={() => <Settings standartImage={standartImage}/>}
+          />
         </Switch>
 
         {imagesWereUploaded ? null : (
