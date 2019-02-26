@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, Fragment } from "react";
 import {Segment, Image, Label, Icon, Transition} from "semantic-ui-react";
-
+import Media from 'react-media';
 
 const styles = {
   container: {
@@ -31,7 +31,7 @@ const styles = {
     wordBreak: "break-all"
   },
   angle: {
-    position:'absolute',
+    position:'fixed',
     top: '50%',
     left: 0,
     width: '15px',
@@ -47,6 +47,7 @@ const styles = {
 };
 
 const SidePanel = ({dashboard, openDialog, standartImage}) => {
+  const [visible, changeVisible] = useState(true);
   const {iHaveDialogWith, allUsers, newMsgNotifictions} = dashboard;
   if (!allUsers) return null;
   const avatars =
@@ -90,14 +91,23 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
     });
 
   return (
-  <Transition.Group animation='slide left' duration={500}>  
-    <div style={{gridArea: "menu", zIndex: "10", position:'relative'}}>
-      <Segment style={styles.container}>{avatars}</Segment>
-      <div style={styles.angle}>
-       <Icon name='angle right' style={styles.angleIcon}/>
-      </div>
-    </div>
-  </Transition.Group>
+    <Media query="(max-width: 599px)">
+        {matches =>
+          matches ? (
+            <Transition.Group animation='slide right' duration={500} style={{zIndex: "10", position:'fixed', top:0, bottom: 0}}>
+                {visible ? <Segment style={styles.container}>{avatars}</Segment>  : null }
+                 <Fragment>
+                <div style={styles.angle} onClick={() =>changeVisible(!visible)}>
+                 <Icon name='angle right' style={styles.angleIcon}/>
+                </div></Fragment>
+            </Transition.Group>
+          ) : (
+            <div style={{gridArea: "menu", zIndex: "10"}}>
+              <Segment style={styles.container}>{avatars}</Segment>
+            </div>
+          )
+        }
+      </Media>
   );
 };
 

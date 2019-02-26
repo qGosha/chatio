@@ -5,7 +5,6 @@ import history from '../helpers/history';
 const styles = {
   header: {
    display: 'flex',
-   justifyContent: 'flex-end',
    padding: '10px',
    backgroundColor: '#bdd2e6',
    borderRadius: 0
@@ -16,10 +15,10 @@ const styles = {
 }
 
 const PageHeader = (props) => {
-  const { logout, location, auth, closeDialog, mobileStyle } = props;
+  const { logout, location, auth, closeDialog, topStyle } = props;
   return (
-  <div style={{...mobileStyle }}>
-      <Segment style={styles.header}>
+  <div style={{...topStyle.header }}>
+      <Segment style={{...styles.header, ...topStyle.headerButtonJustify}}>
         { auth.user.isConfirmed ?
         <Fragment>
           <Button

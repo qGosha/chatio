@@ -39,6 +39,12 @@ const styles = {
     minHeight: '200px',
     maxWidth: '300px',
     maxHeight: '300px',
+  },
+  chatWindow: {
+    height: '350px'
+  },
+  headerButtonJustify: {
+    justifyContent: 'flex-end'
   }
 };
 
@@ -46,11 +52,11 @@ const mobileGrid = {
     grid: {
         display: "grid",
         gridTemplateAreas:
-        `'header header header header header '
-         'menu avatar avatar avatar avatar '
-         'menu main main main main '
-         'menu footer footer footer footer '`,
-        gridTemplateColumns: "1fr 4fr 4fr 4fr",
+        `'header header header'
+         'avatar avatar avatar'
+         'main main main'
+         'footer footer footer'`,
+        gridTemplateColumns: "4fr 4fr 4fr",
         gridGap: "10px",
         width: "100vw",
         height: "100vh"
@@ -62,6 +68,12 @@ const mobileGrid = {
        minHeight: '150px',
        maxWidth: '300px',
        maxHeight: '300px',
+     },
+     chatWindow: {
+       height: '450px'
+     },
+     headerButtonJustify: {
+       justifyContent: 'center'
      }
 };
 
@@ -309,7 +321,7 @@ class Dashboard extends Component {
       </Fragment>
     );
 
-    const chattingSection = (dynamicImageStyle) => (
+    const chattingSection = style => (
       <Fragment>
         <AvatarBlock
           auth={auth}
@@ -326,7 +338,7 @@ class Dashboard extends Component {
           markMsgRead={markMsgRead}
           removeNotifications={removeNotifications}
           standartImage={standartImage}
-          dynamicImageStyle={dynamicImageStyle}
+          topStyle={style}
         />
         <Footer
           onSubmit={e => {
@@ -354,11 +366,11 @@ class Dashboard extends Component {
           logout={this.logout}
           location={location}
           closeDialog={closeDialog}
-          mobileStyle={style.header}
+          topStyle={style}
         />
 
         <Switch>
-          <Route exact path={`${match.url}`} render={ activeDialogWith ? () => chattingSection(style.dynamicImageStyle) : welcomeSection } />
+          <Route exact path={`${match.url}`} render={ activeDialogWith ? () => chattingSection(style) : welcomeSection } />
           <Route
             path={`${match.url}/settings`}
             render={() => <Settings standartImage={standartImage}/>}

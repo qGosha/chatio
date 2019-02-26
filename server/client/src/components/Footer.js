@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import {TextArea, Button, Icon} from "semantic-ui-react";
+import {TextArea, Icon} from "semantic-ui-react";
 
 const styles = {
   footer: {
-    gridColumn: "2 / 5"
+    // gridColumn: "2 / 5"
+    gridArea: 'footer',
+    marginRight: '10px',
   },
   area: {
     transition: 'border-bottom-color 0.3s linear',

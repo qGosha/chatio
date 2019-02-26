@@ -5,7 +5,7 @@ import {Image, Icon} from "semantic-ui-react";
 const styles = {
   container: {
     width: "100%",
-    gridArea: "avatar / avatar / avatar / avatar"
+    gridArea: "avatar"
   },
   chatImg: {
     display: "flex",
@@ -19,6 +19,12 @@ const styles = {
   img: {
     width: "100px",
     height: "100px"
+  },
+  singleAvatar: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
   }
 };
 
@@ -28,7 +34,7 @@ const AvatarBlock = ({allUsers, auth, activeDialogWith, standartImage}) => {
   const peer = allUsers[activeDialogWith];
   const online = allUsers && allUsers[user._id].online;
   const alone = (
-    <div>
+    <div style={styles.singleAvatar}>
       <h2>{`Hello ${user.name}`}</h2>
       <Image
         style={styles.img}

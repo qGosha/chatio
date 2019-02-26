@@ -5,7 +5,7 @@ import {Segment, Image} from "semantic-ui-react";
 const styles = {
   container: {
     width: "100%",
-    gridArea: "main / main / main / main",
+    gridArea: "main",
     height: "350px",
     overflowY: "scroll",
     padding: "10px"
@@ -23,7 +23,8 @@ const styles = {
     height: "3em"
   },
   imgContainer: {
-    display: "flex"
+    display: "flex",
+    justifyContent: 'center'
   },
   cont: {
     width: "3em",

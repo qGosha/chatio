@@ -25,7 +25,8 @@ const omit = require("lodash.omit");
 const styles = {
   container: {
     fontFamily: "Roboto, sans-serif",
-    gridColumn: "2 / 5"
+    // gridColumn: "2 / 5"
+    gridArea: 'menu / main / main / main'
   },
   saveButton: {
     marginTop: "30px"
