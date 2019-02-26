@@ -23,7 +23,8 @@ export const DatePickComponent = ({
         }}
         placeholder="Date"
         iconPosition="left"
-        closable={false}
+        closable={true}
+        closeOnMouseLeave={false}
         startMode="year"
         readOnly={true}
         {...custom}
