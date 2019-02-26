@@ -72,7 +72,7 @@ const mobileGrid = {
        maxHeight: '300px',
      },
      chatWindow: {
-       height: '450px'
+       height: '350px'
      },
      headerButtonJustify: {
        justifyContent: 'center'
