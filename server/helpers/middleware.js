@@ -55,13 +55,12 @@ const userInputCheck = async (req, res, next) => {
         dateError = "Incorrect date";
       } else if (new Date(date).getFullYear() < 1900) {
         dateError = "The date is too far in the past";
-      } else if (moment(date).isAfter(new Date())) {
+      } else if (moment(date, "MM-DD-YYYY").isAfter(new Date())) {
         dateError = "The date is in the future";
       }
       if (dateError) {
         throw new Error(dateError);
       }
-      userData.dateOfBirth = new Date(date).toISOString();
     }
     res.locals.userData = userData;
     next();
