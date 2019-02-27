@@ -306,6 +306,7 @@ class Dashboard extends Component {
           auth={auth}
           allUsers={allUsers}
           activeDialogWith={activeDialogWith}
+          standartImage={standartImage}
         />
         <WelcomePage
           allUsers={allUsers}
