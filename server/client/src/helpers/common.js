@@ -27,6 +27,7 @@ export const DatePickComponent = ({
         closeOnMouseLeave={false}
         startMode="year"
         readOnly={true}
+        hideOnScroll={false}
         {...custom}
         dateFormat="MM-DD-YYYY"
         minDate="01-01-1900"
