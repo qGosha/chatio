@@ -63,6 +63,7 @@ const Settings = props => {
   const {user} = auth;
   if (user.dateOfBirth) {
     user.dateOfBirth = moment.utc(user.dateOfBirth).format("MM-DD-YYYY");
+    alert(user.dateOfBirth)
   }
   const {isAvatarUploading, showSuccessUpdate} = settings;
   const myAvatar = user.photos.length ? user.photos[0] : standartImage;
