@@ -6,7 +6,6 @@ const mail = require("../helpers/mail");
 const crypto = require("crypto");
 
 const changeUserStatus = async (id, online) => {
-  console.log("changeUserStatus", id, online);
   return new Promise((res, rej) => {
     const updatedUser = User.findOneAndUpdate(
       {_id: id},

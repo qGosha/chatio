@@ -38,7 +38,7 @@ const SignUpGrid = ({submitForm, results, props, setResults}) => {
             onSubmit={handleSubmit(submitForm)}
             error={!!error}
           >
-            <Segment stacked>
+            <Segment stacked style={{fontSize: '16px'}}>
               <span style={label}>Name</span>
               <Field
                 name="name"

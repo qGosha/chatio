@@ -36,7 +36,7 @@ const Login = ({
             onSubmit={handleSubmit(localLoginUser)}
             error={!!error}
           >
-            <Segment stacked>
+            <Segment stacked style={{fontSize: '16px'}}>
               <Field
                 name="email"
                 fluid

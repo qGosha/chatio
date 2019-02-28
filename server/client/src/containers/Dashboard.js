@@ -26,8 +26,8 @@ const styles = {
      'menu footer footer footer'`,
     gridTemplateColumns: "1fr 4fr 4fr 4fr",
     gridGap: "10px",
-    height: "100vh",
-    overflowY: 'hidden'
+    gridAutoRows: 'min-content',
+    height: "fit-content"
   },
   sendButton: {
     display: "flex",
@@ -110,7 +110,6 @@ class Dashboard extends Component {
       const {activeDialogWith} = this.props.dashboard;
       const skip = this.uploadTriggerCount + 20;
       this.uploadTriggerCount = skip;
-      console.log("alaaaarm");
       await this.props.uploadMessagesOnScroll(activeDialogWith, skip);
       this.uploadNewTrigger = false;
     }
@@ -185,7 +184,8 @@ class Dashboard extends Component {
   componentDidMount() {
     this.audio.load();
     this.normalTitle = document.title;
-    const socket = io("https://im-messenger.herokuapp.com");
+    // const socket = io("https://im-messenger.herokuapp.com");
+    const socket = io("localhost:5000");
     this.props.setSocket(socket);
     const keys = {
       hidden: "visibilitychange",
@@ -278,7 +278,6 @@ class Dashboard extends Component {
       });
       msgReadByPeer(updatedMsg);
     });
-    socket.on("disconnect", e => console.log("disconnected", e));
     this.props.getPeers();
   }
 

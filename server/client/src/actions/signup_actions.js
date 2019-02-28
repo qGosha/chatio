@@ -6,7 +6,6 @@ import {SubmissionError} from "redux-form";
 export const signUpUser = values => async dispatch => {
   try {
     const res = await axios.post("/api/signup", values);
-    console.log(res);
     const {data} = res;
     if (data.success) {
       dispatch({type: LOGIN_USER, payload: data.message});

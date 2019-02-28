@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState } from "react";
 import {Segment, Image, Label, Icon, Transition} from "semantic-ui-react";
 import Media from 'react-media';
 
@@ -6,12 +6,15 @@ const styles = {
   container: {
     width: "80px",
     height: "100%",
-    fontFamily: "Roboto, sans-serif"
+    fontFamily: "Roboto, sans-serif",
+    border: 'none',
+    boxShadow: 'none'
   },
   img_block: {
     marginBottom: "7px",
     textAlign: "center",
-    cursor: "pointer"
+    cursor: "pointer",
+    borderBottom: '0.5px solid #e4dada'
   },
   img: {
     width: "3em",
@@ -43,6 +46,17 @@ const styles = {
   angleIcon: {
     position:'absolute',
     top: '5px'
+  },
+  area: {
+    gridArea: "menu",
+    zIndex: "10",
+    marginTop: '-8px'
+  },
+  mobileArea: {
+    zIndex: "10",
+    position:'fixed',
+    top:0,
+    bottom: 0
   }
 };
 
@@ -100,7 +114,7 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
     <Media query="(max-width: 599px)">
         {matches =>
           matches ? (
-            <Transition.Group animation='slide right' duration={500} style={{zIndex: "10", position:'fixed', top:0, bottom: 0}}>
+            <Transition.Group animation='slide right' duration={500} style={styles.mobileArea}>
                 {visible ?
                   <div>
                     <Segment style={styles.container}>{avatars}</Segment>
@@ -109,7 +123,7 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
                  { !visible ? angleSwitch : null }
             </Transition.Group>
           ) : (
-            <div style={{gridArea: "menu", zIndex: "10", marginTop: '-10px'}}>
+            <div style={styles.area}>
               <Segment style={styles.container}>{avatars}</Segment>
             </div>
           )

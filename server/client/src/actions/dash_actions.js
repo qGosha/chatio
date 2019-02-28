@@ -41,7 +41,6 @@ export const userChangedStatus = data => async (dispatch, getState) => {
   const {dashboard} = getState();
 
   const {id, online} = data;
-  console.log(id, " : ", online);
   const allUsers = dashboard.allUsers;
   const user = allUsers && allUsers[id];
   if (!user) return;
