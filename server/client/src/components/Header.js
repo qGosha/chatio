@@ -13,9 +13,10 @@ const styles = {
 
 const PageHeader = (props) => {
   const { logout, location, auth, closeDialog, topStyle } = props;
+  const extraStyle = topStyle && topStyle.headerButtonJustify;
   return (
-  <div style={{...topStyle.header }}>
-      <Segment style={{...styles.header, ...topStyle.headerButtonJustify}}>
+  <div style={{gridArea: 'header'}}>
+      <Segment style={{...styles.header, ...extraStyle}}>
         { auth.user.isConfirmed ?
         <Fragment>
           <Button

@@ -87,9 +87,14 @@ class Confirmation extends Component {
         </Message>
       );
     };
+    const topStyleForHeader = {
+      headerButtonJustify: {
+        justifyContent: 'flex-end'
+      }
+    }
     return (
       <div>
-        <PageHeader auth={auth} logout={this.logout} location={location} />
+        <PageHeader auth={auth} logout={this.logout} location={location} topStyle={topStyleForHeader}/>
 
         <Grid
           textAlign="center"

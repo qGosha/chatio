@@ -54,7 +54,7 @@ const Messages = ({messages, dashboard, auth, standartImage}) => {
       shouldUseAvatar = true;
       lastMessageFrom = item.sender;
     }
-    const formattedDate = moment(item.timestamp).format('YYYY-MM-DD');
+    const formattedDate = moment(item.timestamp).format('MM-DD-YYYY');
 
     const shouldShowDivider = (currentDate !== formattedDate) ? true : false;
     currentDate = formattedDate;

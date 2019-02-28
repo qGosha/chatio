@@ -29,9 +29,6 @@ const styles = {
     height: "100vh",
     overflowY: 'hidden'
   },
-  header: {
-    gridArea: 'header'
-  },
   sendButton: {
     display: "flex",
     flexDirection: "row"
@@ -62,9 +59,6 @@ const mobileGrid = {
         gridGap: "10px",
         height: "fit-content"
       },
-    header: {
-      gridArea: 'header / header / header'
-    },
     dynamicImageStyle: {
        minHeight: '150px',
        maxWidth: '300px',
@@ -312,6 +306,7 @@ class Dashboard extends Component {
           auth={auth}
           allUsers={allUsers}
           activeDialogWith={activeDialogWith}
+          standartImage={standartImage}
         />
         <WelcomePage
           allUsers={allUsers}

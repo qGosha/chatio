@@ -27,7 +27,7 @@
     "redux": "^4.0.0",
     "redux-form": "^7.4.2",
     "redux-thunk": "^2.3.0",
-    "semantic-ui-calendar-react": "https://github.com/qGosha/semantic-ui-calendar-react/tarball/ed0eee14cb434c0b191cb3b12e20a285e0c99444",
+    "semantic-ui-calendar-react": "github:qGosha/semantic-ui-calendar-react",
     "semantic-ui-react": "^0.82.5",
     "socket.io-client": "^2.1.1",
     "uuid": "^3.3.2"
