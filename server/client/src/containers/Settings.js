@@ -62,7 +62,7 @@ const Settings = props => {
 
   const {user} = auth;
   if (user.dateOfBirth) {
-    user.dateOfBirth = moment.utc(user.dateOfBirth).format("MM-DD-YYYY");
+    user.dateOfBirth = moment.utc(user.dateOfBirth).format("MM/DD/YYYY");
     alert(user.dateOfBirth)
   }
   const {isAvatarUploading, showSuccessUpdate} = settings;
