@@ -72,9 +72,9 @@ const ResetPassword = ({
   );
 };
 
-const ConnectedLogin = connect(null, actions)(Login);
+const ConnectedResetPassword = connect(null, actions)(ResetPassword );
 
 export default reduxForm({
-  form: "loginForm",
+  form: "resetPassword",
   validate
-})(ConnectedLogin);
+})(ConnectedResetPassword);
