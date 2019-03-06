@@ -13,7 +13,6 @@ const tokenSchema = new Schema({
   },
   pin: {
     type: String,
-    required: true
   },
   createdAt: {
     type: Date,

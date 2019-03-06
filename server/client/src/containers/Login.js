@@ -24,7 +24,7 @@ const Login = ({
       divided
       columns={2}
       relaxed
-      style={{paddingTop: "3rem"}}
+      style={{paddingTop: "2rem"}}
     >
       <Grid.Row>
         <Grid.Column>
@@ -74,6 +74,9 @@ const Login = ({
           </Form>
           <Message>
             New to us? <Link to="/signup">Sign Up</Link>
+          </Message>
+          <Message>
+          <Link to="/password_recovery">Restore password</Link>
           </Message>
         </Grid.Column>
         <Grid.Column>

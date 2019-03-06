@@ -5,6 +5,7 @@ import Dashboard from './Dashboard';
 import Confirmation from './Confirmation';
 import Login from './Login';
 import Signup from './Signup';
+import ResetPassword from './PasswordRecovery';
 import Loadable from 'react-loading-overlay';
 import * as actions from '../actions';
 import {connect} from 'react-redux';
@@ -38,6 +39,7 @@ class App extends Component {
           <PrivateRoute path='/dashboard' auth={auth} component={Dashboard}/>
           <EnterRoute path='/login' auth={auth} component={Login}/>
           <Route exact path='/signup' auth={auth} component={Signup}/>
+          <Route exact path='/password_recovery' auth={auth} component={ResetPassword}/>
           <ConfirmRoute path='/confirmation' auth={auth} component={Confirmation}/>
          </Switch>
         </Router>

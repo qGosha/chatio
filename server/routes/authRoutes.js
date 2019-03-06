@@ -1,6 +1,10 @@
+const mongoose = require("mongoose");
+const User = mongoose.model("users");
 const passport = require("passport");
 const {loggedIn} = require("../helpers/middleware");
 const omit = require("lodash.omit");
+const pick = require("lodash.pick");
+const {sendTokenEmail} = require("../helpers/help_functions");
 
 module.exports = app => {
   app.get(
@@ -55,6 +59,29 @@ module.exports = app => {
       }
     }
   );
+
+  app.post('/api/reset_password', async (req, res) => {
+    const userData = pick(req.body, ["email"]);
+    const { email } = userData;
+    try {
+      if (!email) {
+        throw new Error("Please complete the form");
+      }
+       const user = await User.findOne({email});
+       if (!user) {
+         throw new Error("No user with this email");
+       }
+       await sendTokenEmail(req, user, { type: 'resetPassword', email });
+       return res.send({
+         success: true
+       });
+    } catch (error) {
+      return res.send({
+        success: false,
+        message: error.message
+      });
+    }
+  })
 
   app.get("/api/logout", (req, res) => {
     req.logout();

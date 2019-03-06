@@ -18,7 +18,7 @@ module.exports = app => {
         email: userData.email,
         password: userData.password
       }).save();
-      sendTokenEmail(req, user);
+      sendTokenEmail(req, user, { type: 'verifToken', email: user.email });
       req.login(user, loginErr => {
         if (loginErr) {
           throw loginErr;
@@ -47,7 +47,7 @@ module.exports = app => {
     }
     try {
       await Token.findOneAndRemove({_userId: req.user._id});
-      sendTokenEmail(req, req.user);
+      sendTokenEmail(req, user, { type: 'verifToken', email: user.email });
       return res.status(200).send({
         success: true
       });

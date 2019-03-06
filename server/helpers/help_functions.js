@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const User = mongoose.model("users");
 const Token = mongoose.model("verifTokens");
 const nodemailer = require("nodemailer");
-const mail = require("../helpers/mail");
+const verifUserMail = require("../helpers/verifUserMail");
+const resetPasswordMail = require("../helpers/resetPasswordMail");
 const crypto = require("crypto");
 
 const changeUserStatus = async (id, online) => {
@@ -20,13 +21,14 @@ const changeUserStatus = async (id, online) => {
   });
 };
 
-const sendTokenEmail = async (req, user) => {
+const sendTokenEmail = async (req, user, options) => {
+   const pin = options.type === 'verifUser' ? Math.floor(Math.random() * 1000000000 + 1)
+    .toString()
+    .slice(0, 4) : null;
   const token = await new Token({
     _userId: user._id,
     token: crypto.randomBytes(16).toString("hex"),
-    pin: Math.floor(Math.random() * 1000000000 + 1)
-      .toString()
-      .slice(0, 4)
+    pin
   }).save();
   const transporter = nodemailer.createTransport({
     service: "Mail.ru",
@@ -35,13 +37,21 @@ const sendTokenEmail = async (req, user) => {
       pass: process.env.GMAIL_PASSWORD
     }
   });
-  const link = `https://${req.headers.host}/api/confirmation/${token.token}`;
-  const letter = mail(link, token.pin);
+  let link, letter, subject;
+  if (options.type === 'verifToken') {
+     link = `https://${req.headers.host}/api/confirmation/${token.token}`;
+     letter = verifUserMail(link, token.pin);
+     subject = "Account Verification Token";
+  } else if (options.type === 'resetPassword') {
+    link = `https://${req.headers.host}/reset_password/${token.token}`;
+    letter = resetPasswordMail(link, user.name);
+    subject = "Password reset link";
+  }
 
   const mailOptions = {
     from: process.env.GMAIL_USERNAME,
-    to: user.email,
-    subject: "Account Verification Token",
+    to: options.email,
+    subject: subject,
     html: letter
   };
   await transporter.sendMail(mailOptions);
