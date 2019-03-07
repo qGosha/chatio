@@ -4,12 +4,16 @@ import history from "../helpers/history";
 import {SubmissionError} from "redux-form";
 
 export const fetchUser = () => async dispatch => {
-  const user = await axios.get("/api/current_user");
-  if (user) {
-    dispatch({type: FETCH_USER, payload: user.data});
-    history.replace("/dashboard");
-  } else {
-    dispatch({type: ERROR, payload: user});
+  try {
+    const res = await axios.get("/api/current_user");
+    if (res) {
+      dispatch({type: FETCH_USER, payload: res.data});
+      // history.replace("/dashboard");
+    } else {
+      throw new Error(res);
+    }
+  } catch (error) {
+    dispatch({type: ERROR, payload: error.message});
   }
 };
 

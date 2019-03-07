@@ -37,16 +37,17 @@ module.exports = app => {
   });
 
   app.get("/api/resendToken", async (req, res) => {
-    if (!req.user) {
+    const { user } = req;
+    if (!user) {
       return res.status(404).send({
         success: false
       });
     }
-    if (req.user.isConfirmed) {
+    if (user.isConfirmed) {
       return res.status(404);
     }
     try {
-      await Token.findOneAndRemove({_userId: req.user._id});
+      await Token.findOneAndRemove({_userId: user._id});
       sendTokenEmail(req, user, { type: 'verifToken', email: user.email });
       return res.status(200).send({
         success: true

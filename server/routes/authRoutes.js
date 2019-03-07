@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const User = mongoose.model("users");
+const Token = mongoose.model("verifTokens");
 const passport = require("passport");
 const {loggedIn} = require("../helpers/middleware");
 const omit = require("lodash.omit");
@@ -60,7 +61,7 @@ module.exports = app => {
     }
   );
 
-  app.post('/api/reset_password', async (req, res) => {
+  app.post('/api/reset_password_email', async (req, res) => {
     const userData = pick(req.body, ["email"]);
     const { email } = userData;
     try {
@@ -71,7 +72,8 @@ module.exports = app => {
        if (!user) {
          throw new Error("No user with this email");
        }
-       await sendTokenEmail(req, user, { type: 'resetPassword', email });
+       const token = await Token.findOne({_userId: user._id});
+       await sendTokenEmail(req, user, { type: 'resetPassword', email, token });
        return res.send({
          success: true
        });
@@ -81,7 +83,28 @@ module.exports = app => {
         message: error.message
       });
     }
-  })
+  });
+
+  app.get("/api/reset_password/", async (req, res) => {
+    try {
+      const { token } = req.body;
+      const userToken = await Token.findByToken(token);
+      const user = await User.findById(token._userId);
+      if (!user) {
+        return res
+          .status(400)
+          .send("We were unable to find a user for this token.");
+      }
+      //left here
+      await Token.findOneAndRemove({_id: token._id});
+      return res.redirect("/dashboard");
+    } catch (error) {
+      return res.send({
+        success: false,
+        message: error.message
+      });
+    }
+  });
 
   app.get("/api/logout", (req, res) => {
     req.logout();

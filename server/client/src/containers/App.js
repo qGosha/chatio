@@ -5,7 +5,8 @@ import Dashboard from './Dashboard';
 import Confirmation from './Confirmation';
 import Login from './Login';
 import Signup from './Signup';
-import ResetPassword from './PasswordRecovery';
+import PasswordRecovery from './PasswordRecovery';
+import PasswordReset from './PasswordReset';
 import Loadable from 'react-loading-overlay';
 import * as actions from '../actions';
 import {connect} from 'react-redux';
@@ -37,10 +38,12 @@ class App extends Component {
          <Switch>
           <PrivateRoute exact path='/' auth={auth} component={Dashboard}/>
           <PrivateRoute path='/dashboard' auth={auth} component={Dashboard}/>
-          <EnterRoute path='/login' auth={auth} component={Login}/>
-          <Route exact path='/signup' auth={auth} component={Signup}/>
-          <Route exact path='/password_recovery' auth={auth} component={ResetPassword}/>
+          <EnterRoute exact path='/login' auth={auth} component={Login}/>
+          <EnterRoute exact path='/signup' auth={auth} component={Signup}/>
+          <EnterRoute exact path='/password_recovery' auth={auth} component={PasswordRecovery}/>
+          <EnterRoute exact path='/password_recovery/:token' auth={auth} component={PasswordReset}/>
           <ConfirmRoute path='/confirmation' auth={auth} component={Confirmation}/>
+          <Route component={() => <div>No match</div>}/>
          </Switch>
         </Router>
       </Loadable>

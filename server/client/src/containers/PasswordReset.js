@@ -8,20 +8,31 @@ import * as actions from "../actions";
 import {validate} from "../helpers/validation";
 import axios from "axios";
 
-const ResetPassword = ({
+const styles = {
+  label: {
+    fontWeight: 'bold',
+    display: 'block',
+    textAlign: 'left',
+    marginBottom: '5px'
+  },
+
+}
+
+const PasswordRecovery = ({
   error,
   handleSubmit,
   submitting,
   clearFields,
   form,
-  submitSucceeded
+  match
 }) => {
-  const sendLink = async value => {
+  const sendPasswords = async value => {
+    const { params } = match;
     try {
-      const res = await axios.post('/api/reset_password_email', value);
+      const res = await axios.post('/api/reset_password', params.token);
       const {data} = res;
       if (data.success) {
-        clearFields(form, false, 'email');
+        // clearFields(form, false, 'email'); left here
       } else throw Error(data.message);
     } catch (err) {
       throw new SubmissionError({_error: err});
@@ -43,19 +54,30 @@ const ResetPassword = ({
           </Header>
           <Form
             size="large"
-            onSubmit={handleSubmit(sendLink)}
+            onSubmit={handleSubmit(sendPasswords)}
             error={!!error}
           >
             <Segment stacked style={{fontSize: '16px'}}>
-              <Field
-                name="email"
-                fluid
-                icon="user"
-                iconPosition="left"
-                title="Enter your email address"
-                placeholder="E-mail address"
-                component={InputComponent}
-              />
+            <span style={styles.label}>Password</span>
+            <Field
+              fluid
+              name="password"
+              icon="lock"
+              iconPosition="left"
+              placeholder="Password"
+              type="password"
+              component={InputComponent}
+            />
+            <span style={styles.label}>Repeat your password</span>
+            <Field
+              fluid
+              name="repPassword"
+              icon="lock"
+              iconPosition="left"
+              placeholder="Repeat your password"
+              type="password"
+              component={InputComponent}
+            />
               <Form.Button
                 color="blue"
                 fluid
@@ -88,9 +110,9 @@ const ResetPassword = ({
   );
 };
 
-const ConnectedResetPassword = connect(null, actions)(ResetPassword);
+const ConnectedPasswordRecovery = connect(null, actions)(PasswordRecovery);
 
 export default reduxForm({
   form: "resetPassword",
   validate
-})(ConnectedResetPassword);
+})(ConnectedPasswordRecovery);

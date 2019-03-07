@@ -22,14 +22,22 @@ const changeUserStatus = async (id, online) => {
 };
 
 const sendTokenEmail = async (req, user, options) => {
-   const pin = options.type === 'verifUser' ? Math.floor(Math.random() * 1000000000 + 1)
-    .toString()
-    .slice(0, 4) : null;
-  const token = await new Token({
-    _userId: user._id,
-    token: crypto.randomBytes(16).toString("hex"),
-    pin
-  }).save();
+  let pin;
+  if (options.type === 'verifToken') {
+    pin = Math.floor(Math.random() * 1000000000 + 1)
+      .toString()
+      .slice(0, 4)
+  }
+  let token;
+  if (options.token) {
+    token = options.token;
+  } else {
+    token = await new Token({
+      _userId: user._id,
+      token: crypto.randomBytes(16).toString("hex"),
+      pin
+    }).save();
+  };
   const transporter = nodemailer.createTransport({
     service: "Mail.ru",
     auth: {
@@ -43,7 +51,7 @@ const sendTokenEmail = async (req, user, options) => {
      letter = verifUserMail(link, token.pin);
      subject = "Account Verification Token";
   } else if (options.type === 'resetPassword') {
-    link = `https://${req.headers.host}/reset_password/${token.token}`;
+    link = `https://${req.headers.host}/password_recovery/${token.token}`;
     letter = resetPasswordMail(link, user.name);
     subject = "Password reset link";
   }
