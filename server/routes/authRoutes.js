@@ -6,6 +6,7 @@ const {loggedIn} = require("../helpers/middleware");
 const omit = require("lodash.omit");
 const pick = require("lodash.pick");
 const {sendTokenEmail} = require("../helpers/help_functions");
+const {ObjectId} = require("mongodb");
 
 module.exports = app => {
   app.get(
@@ -85,19 +86,37 @@ module.exports = app => {
     }
   });
 
-  app.get("/api/reset_password/", async (req, res) => {
+  app.post("/api/reset_password/", async (req, res) => {
     try {
-      const { token } = req.body;
-      const userToken = await Token.findByToken(token);
-      const user = await User.findById(token._userId);
-      if (!user) {
-        return res
-          .status(400)
-          .send("We were unable to find a user for this token.");
+      const { token, password, repPassword } = req.body;
+      if (!token || !password || !repPassword) {
+        throw new Error('Please complete the form')
       }
-      //left here
-      await Token.findOneAndRemove({_id: token._id});
-      return res.redirect("/dashboard");
+      if (password !== repPassword) {
+        throw new Error('Passwords don\'t match');
+      }
+      const userToken = await Token.findByToken(token);
+      if(!userToken) {
+        throw new Error('Token is not valid')
+      }
+      const user = await User.findById(userToken._userId);
+      if (!user) {
+        throw new Error('We were unable to find a user for this token.')
+      }
+      user.password = password;
+      await user.save();
+
+      req.login(user, loginErr => {
+        if (loginErr) {
+          throw loginErr;
+        }
+      });
+      res.send({
+        success: true,
+        message: req.user
+      });
+      await Token.findOneAndRemove({_id: userToken._id});
+      return;
     } catch (error) {
       return res.send({
         success: false,

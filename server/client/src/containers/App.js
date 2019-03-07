@@ -5,6 +5,7 @@ import Dashboard from './Dashboard';
 import Confirmation from './Confirmation';
 import Login from './Login';
 import Signup from './Signup';
+import NoMatch from '../components/NoMatch';
 import PasswordRecovery from './PasswordRecovery';
 import PasswordReset from './PasswordReset';
 import Loadable from 'react-loading-overlay';
@@ -43,7 +44,7 @@ class App extends Component {
           <EnterRoute exact path='/password_recovery' auth={auth} component={PasswordRecovery}/>
           <EnterRoute exact path='/password_recovery/:token' auth={auth} component={PasswordReset}/>
           <ConfirmRoute path='/confirmation' auth={auth} component={Confirmation}/>
-          <Route component={() => <div>No match</div>}/>
+          <Route component={NoMatch}/>
          </Switch>
         </Router>
       </Loadable>

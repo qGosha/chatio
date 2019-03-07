@@ -32,6 +32,7 @@ const userInputCheck = async (req, res, next) => {
       await User.uniqEmailCheck(userData.email);
     }
     if (userData.hasOwnProperty("oldPassword")) {
+      //we change password here because findOneAndUpdate doesn't trigger presave function on model
       const user = await User.findById(req.user._id);
       const match = await bcrypt.compare(userData.oldPassword, user.password);
       if (match) {

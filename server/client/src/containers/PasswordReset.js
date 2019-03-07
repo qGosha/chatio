@@ -24,19 +24,13 @@ const PasswordRecovery = ({
   submitting,
   clearFields,
   form,
-  match
+  match,
+  resetPassword
 }) => {
-  const sendPasswords = async value => {
+  const sendPasswords = async values => {
     const { params } = match;
-    try {
-      const res = await axios.post('/api/reset_password', params.token);
-      const {data} = res;
-      if (data.success) {
-        // clearFields(form, false, 'email'); left here
-      } else throw Error(data.message);
-    } catch (err) {
-      throw new SubmissionError({_error: err});
-    }
+    const { token } = params;
+    await resetPassword({token, ...values});
   }
   return (
     <Grid
@@ -88,12 +82,6 @@ const PasswordRecovery = ({
                 Reset
               </Form.Button>
             </Segment>
-            {submitSucceeded && (
-              <Message positive style={{textAlign: "left"}}>
-                <Icon name="check circle" color="green" />
-                <span>Success! A password reset email has been sent to your email</span>
-              </Message>
-            )}
             {error && (
               <Message negative style={{textAlign: "left"}}>
                 <Icon name="times circle" color="red" />

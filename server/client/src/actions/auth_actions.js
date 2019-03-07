@@ -8,7 +8,6 @@ export const fetchUser = () => async dispatch => {
     const res = await axios.get("/api/current_user");
     if (res) {
       dispatch({type: FETCH_USER, payload: res.data});
-      // history.replace("/dashboard");
     } else {
       throw new Error(res);
     }
@@ -31,6 +30,21 @@ export const localLoginUser = values => async dispatch => {
     throw new SubmissionError({_error: err});
   }
 };
+
+export const resetPassword = values => async dispatch => {
+  try {
+    const res = await axios.post('/api/reset_password', { ...values });
+    const {data} = res;
+    if (data.success) {
+      dispatch({type: LOGIN_USER, payload: data.message});
+      history.replace("/dashboard");
+    } else {
+      throw Error(data.message);
+    }
+  } catch (err) {
+    throw new SubmissionError({_error: err});
+  }
+}
 
 export const logoutUser = () => async dispatch => {
   await axios.get("/api/logout");
