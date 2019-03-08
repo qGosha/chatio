@@ -44,6 +44,17 @@ const PageHeader = (props) => {
         >
           <Icon name='setting' /> Settings
         </Button>
+        <Button
+        size='tiny'
+        color='blue'
+        active={location.pathname === '/dashboard/messages'}
+        onClick={() => {
+          if (location.pathname === '/dashboard/messages') return;
+          history.push('/dashboard/messages')}
+        }
+      >
+        <Icon name='chat' /> Messages
+      </Button>
        </Fragment> :
        null }
         <Button

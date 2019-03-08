@@ -9,9 +9,10 @@ import PageHeader from "../components/Header";
 import ChatSection from "../components/ChatSection";
 import Footer from "../components/Footer";
 import Settings from "./Settings";
+import MessagesList from "../components/MessagesList";
 import AvatarBlock from "../components/AvatarBlock";
 import {Route, Switch} from "react-router-dom";
-import Media from 'react-media';
+import Media from "react-media";
 
 const sound = require("../sounds/msg.mp3");
 const standartImage = require("../img/square-image.png");
@@ -19,57 +20,55 @@ const standartImage = require("../img/square-image.png");
 const styles = {
   grid: {
     display: "grid",
-    gridTemplateAreas:
-    `'header header header header'
+    gridTemplateAreas: `'header header header header'
      'menu avatar avatar avatar'
      'menu main main main'
      'menu footer footer footer'`,
     gridTemplateColumns: "1fr 4fr 4fr 4fr",
     gridGap: "10px",
-    gridAutoRows: 'min-content',
+    gridAutoRows: "min-content",
     height: "fit-content"
   },
   sendButton: {
     display: "flex",
     flexDirection: "row"
   },
- dynamicImageStyle: {
-    minHeight: '200px',
-    maxWidth: '300px',
-    maxHeight: '300px',
+  dynamicImageStyle: {
+    minHeight: "200px",
+    maxWidth: "300px",
+    maxHeight: "300px"
   },
   chatWindow: {
-    height: '350px'
+    height: "350px"
   },
   headerButtonJustify: {
-    justifyContent: 'flex-end'
+    justifyContent: "flex-end"
   }
 };
 
 const mobileGrid = {
-    grid: {
-        display: "grid",
-        gridTemplateAreas:
-        `'header header header'
+  grid: {
+    display: "grid",
+    gridTemplateAreas: `'header header header'
          'avatar avatar avatar'
          'main main main'
          'footer footer footer'`,
-        gridTemplateColumns: "4fr 4fr 4fr",
-        gridAutoRows: 'min-content',
-        gridGap: "10px",
-        height: "fit-content"
-      },
-    dynamicImageStyle: {
-       minHeight: '150px',
-       maxWidth: '300px',
-       maxHeight: '300px',
-     },
-     chatWindow: {
-       height: '450px'
-     },
-     headerButtonJustify: {
-       justifyContent: 'center'
-     }
+    gridTemplateColumns: "4fr 4fr 4fr",
+    gridAutoRows: "min-content",
+    gridGap: "10px",
+    height: "fit-content"
+  },
+  dynamicImageStyle: {
+    minHeight: "150px",
+    maxWidth: "300px",
+    maxHeight: "300px"
+  },
+  chatWindow: {
+    height: "450px"
+  },
+  headerButtonJustify: {
+    justifyContent: "center"
+  }
 };
 
 class Dashboard extends Component {
@@ -104,7 +103,7 @@ class Dashboard extends Component {
     if (this.uploadNewTrigger || haveAllMessagesBeenFetched) return;
     const target = e.target;
     const height =
-      (target.scrollHeight - target.scrollTop) / target.scrollHeight * 100;
+      ((target.scrollHeight - target.scrollTop) / target.scrollHeight) * 100;
     if (height > 50) {
       this.uploadNewTrigger = true;
       const {activeDialogWith} = this.props.dashboard;
@@ -149,7 +148,7 @@ class Dashboard extends Component {
     const {messageText} = this.state;
     const {createNewConversation, dashboard} = this.props;
     const {activeDialogWith, iHaveDialogWith} = dashboard;
-    const { socket } = dashboard;
+    const {socket} = dashboard;
     if (!messageText || !activeDialogWith) return;
     const newMessage = {
       message: {
@@ -182,9 +181,11 @@ class Dashboard extends Component {
   };
 
   componentDidMount() {
+
     this.audio.load();
     this.normalTitle = document.title;
-    const socket = io("https://im-messenger.herokuapp.com");
+    // const socket = io("https://im-messenger.herokuapp.com");
+    const socket = io("localhost:5000");
     this.props.setSocket(socket);
     const keys = {
       hidden: "visibilitychange",
@@ -219,7 +220,7 @@ class Dashboard extends Component {
           if (scroll) {
             dialog.scrollTop = dialog.scrollHeight;
           }
-        }
+        };
         img.src = message.message.text;
       }
     });
@@ -228,11 +229,11 @@ class Dashboard extends Component {
         dashboard,
         auth,
         newMessageForAnotherDialog,
-        messageFromUnknown,
+        messageFromUnknown
       } = this.props;
       const {activeDialogWith, iHaveDialogWith} = dashboard;
-      const { user } = auth;
-      if ((message.sender !== auth.user._id) && !user.mute) {
+      const {user} = auth;
+      if (message.sender !== auth.user._id && !user.mute) {
         try {
           await this.audio.play();
         } catch (e) {
@@ -294,7 +295,7 @@ class Dashboard extends Component {
       closeDialog,
       markMsgRead,
       match,
-      location,
+      location
     } = this.props;
     const {activeDialogWith, allUsers} = dashboard;
     const {imagesWereUploaded, uploaderVisible, messageText} = this.state;
@@ -364,10 +365,21 @@ class Dashboard extends Component {
         />
 
         <Switch>
-          <Route exact path={`${match.url}`} render={ activeDialogWith ? () => chattingSection(style) : welcomeSection } />
+          <Route
+            exact
+            path={`${match.url}`}
+            render={
+              activeDialogWith ? () => chattingSection(style) : welcomeSection
+            }
+          />
           <Route
             path={`${match.url}/settings`}
-            render={() => <Settings standartImage={standartImage}/>}
+            render={() => <Settings standartImage={standartImage} />}
+          />
+          <Route
+            exact
+            path={`${match.url}/messages`}
+            render={() => <MessagesList dashboard={dashboard} />}
           />
         </Switch>
 
@@ -380,14 +392,12 @@ class Dashboard extends Component {
           />
         )}
       </div>
-    )
+    );
 
     return (
       <Media query="(max-width: 599px)">
-          {matches =>
-            matches ? content(mobileGrid) : content(styles)
-          }
-        </Media>
+        {matches => (matches ? content(mobileGrid) : content(styles))}
+      </Media>
     );
   }
 }
@@ -396,4 +406,7 @@ function mapStateToProps({auth, dashboard}) {
   return {auth, dashboard};
 }
 
-export default connect(mapStateToProps, actions)(Dashboard);
+export default connect(
+  mapStateToProps,
+  actions
+)(Dashboard);

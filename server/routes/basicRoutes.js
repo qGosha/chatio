@@ -51,6 +51,16 @@ module.exports = (app, io) => {
         },
         {sender: 1, _id: 0}
       );
+      const initialMessagesForEveryPeer = await Message.aggregate([
+        {
+          $match: {
+            recipient: ObjectId("5c776964addeaa00166e04c3"),
+            sender: { $in: [ObjectId("5c7769c5addeaa00166e04c4"), ObjectId("5c776927addeaa00166e04c2")] }
+          }},
+          {
+            $group: { _id: "$sender" }
+          }
+      ])
       let newMsgNotifictions = {};
       getNewMsgNotifictions.forEach(item => {
         const s = item.sender;
@@ -62,7 +72,7 @@ module.exports = (app, io) => {
       });
       res.send({
         success: true,
-        message: {allUsers, iHaveDialogWith, newMsgNotifictions}
+        message: {allUsers, iHaveDialogWith, newMsgNotifictions, initialMessagesForEveryPeer}
       });
     } catch (error) {
       res.send({

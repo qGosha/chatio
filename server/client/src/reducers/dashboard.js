@@ -21,6 +21,7 @@ const initialState = {
   socket: null,
   allUsers: null,
   iHaveDialogWith: null,
+  initialMessagesForEveryPeer: {},
   activeDialogWith: null,
   currentMessages: [],
   haveAllMessagesBeenFetched: false,
@@ -30,12 +31,13 @@ export function dashboard(state = initialState, action) {
   const payload = action.payload;
   switch (action.type) {
     case GET_PEERS:
-      const {all, iHaveDialogWith, newMsgNotifictions} = payload;
+      const {all, iHaveDialogWith, newMsgNotifictions, initialMessagesForEveryPeer} = payload;
       return {
         ...state,
         allUsers: all,
         iHaveDialogWith,
-        newMsgNotifictions
+        newMsgNotifictions,
+        initialMessagesForEveryPeer
       };
     case USER_CHANGESTATUS:
       return {...state, allUsers: payload};
