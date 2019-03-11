@@ -22,6 +22,9 @@ const userSchema = new Schema({
     type: String,
     minlength: 6
   },
+  seedPasswordLookup: {
+    type: String,
+  },
   google: {
     googleId: String,
     googleEmail: String

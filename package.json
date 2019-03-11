@@ -11,7 +11,9 @@
     "client": "npm run start --prefix server/client",
     "dev": "concurrently \"npm run startdev\" \"npm run client\"",
     "devbrk": "concurrently \"npm run startdevd\" \"npm run client\"",
-    "test": "NODE_ENV=test || SET \"NODE_ENV=test\" && nodemon --exec mocha -R \"./server/test/*.js\""
+    "test": "NODE_ENV=test || SET \"NODE_ENV=test\" && nodemon --exec mocha -R \"./server/test/*.js\"",
+    "seed": "NODE_ENV=seed || SET \"NODE_ENV=seed\" && node \"./server/test/seed.js\"",
+    "seedbrk": "NODE_ENV=seed || SET \"NODE_ENV=seed\" && node --inspect-brk ./server/test/seed.js"
   },
   "engines": {
     "node": "10.5.0"

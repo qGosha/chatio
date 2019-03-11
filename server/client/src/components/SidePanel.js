@@ -66,7 +66,7 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
   if (!allUsers) return null;
   const avatars =
     iHaveDialogWith &&
-    iHaveDialogWith.map(friend => {
+    iHaveDialogWith.slice(0,5).map(friend => {
       const user = allUsers[friend];
       const photo = user && user.photos[0];
       const notifications = newMsgNotifictions[friend];

@@ -31,18 +31,32 @@ module.exports = (app, io) => {
 
   app.get("/api/search/allUsers", loggedIn, async (req, res) => {
     try {
-      const allUsers = await User.find(
-        {},
-        {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
-      );
+      // const allUsers = await User.find(
+      //   {},
+      //   {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
+      // );
+      // const userIdString = req.user._id.toString();
+
       const getIHaveDialogWith = await Conversation.find({
-        members: {$all: [req.user._id]}
-      });
-      const userIdString = req.user._id.toString();
-      const iHaveDialogWithIds = getIHaveDialogWith.map(
-        i => i.members.filter(r => r.toString() !== userIdString)[0]
-      );
-      const iHaveDialogWith = iHaveDialogWithIds.map(i => i.toString());
+        members: {$in: [req.user._id]}
+      })
+        .populate({
+          path: "members",
+          model: User,
+          select: "_id",
+          match: {_id: {$ne: req.user._id}}
+        })
+        const iHaveDialogWithIds = getIHaveDialogWith.map(i => i.members[0]._id);
+      // const getIHaveDialogWith = await Conversation.find({
+      //   members: {$all: [req.user._id]}
+      // }).populate({
+      //   path: "members", model: User
+      // });
+      // const iHaveDialogWithIds = getIHaveDialogWith.map(
+      //   i => i.members.filter(r => r.toString() !== userIdString)[0]
+      // );
+      // const iHaveDialogWith = iHaveDialogWithIds.map(i => i.toString());
+      const messages = await Promise.all(iHaveDialogWithIds.map( id => {return Message.find({ $or: [ { recipient: req.user._id }, { sender: id } ] })}))
       const getNewMsgNotifictions = await Message.find(
         {
           recipient: req.user._id,
@@ -51,16 +65,17 @@ module.exports = (app, io) => {
         },
         {sender: 1, _id: 0}
       );
-      const initialMessagesForEveryPeer = await Message.aggregate([
-        {
-          $match: {
-            recipient: ObjectId("5c776964addeaa00166e04c3"),
-            sender: { $in: [ObjectId("5c7769c5addeaa00166e04c4"), ObjectId("5c776927addeaa00166e04c2")] }
-          }},
-          {
-            $group: { _id: "$sender" }
-          }
-      ])
+      // const initialMessagesForEveryPeer = await Message.aggregate([
+      //   {
+      //     $match: {
+      //       recipient: ObjectId("5c776964addeaa00166e04c3"),
+      //       sender: { $in: [ObjectId("5c7769c5addeaa00166e04c4"), ObjectId("5c776927addeaa00166e04c2")] }
+      //     }},
+      //     {
+      //       $group: { _id: "$sender", message: { text: { $last: "$text" } } }
+      //     },
+      //     { $unwind : "$" }
+      // ])
       let newMsgNotifictions = {};
       getNewMsgNotifictions.forEach(item => {
         const s = item.sender;
@@ -72,7 +87,7 @@ module.exports = (app, io) => {
       });
       res.send({
         success: true,
-        message: {allUsers, iHaveDialogWith, newMsgNotifictions, initialMessagesForEveryPeer}
+        message: {allUsers, iHaveDialogWith, newMsgNotifictions}
       });
     } catch (error) {
       res.send({

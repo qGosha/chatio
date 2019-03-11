@@ -8,7 +8,7 @@ module.exports = io => {
     if (socket.request.session.passport) {
       const userId = socket.request.session.passport.user;
       const getIHaveDialogWith = await Conversation.find({
-        members: {$all: [userId]}
+        members: {$in: [userId]}
       });
       const iHaveDialogWith = getIHaveDialogWith.map(i =>
         i.members.filter(r => r.toString() !== userId)[0].toString()
