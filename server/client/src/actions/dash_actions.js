@@ -21,17 +21,11 @@ import history from "../helpers/history";
 export const getPeers = () => async dispatch => {
   const res = await axios.get("/api/search/allUsers");
   if (res.data.success) {
-    const {allUsers, iHaveDialogWith, newMsgNotifictions, initialMessagesForEveryPeer} = res.data.message;
-    let all = {};
-    allUsers.forEach(user => {
-      all[user._id] = user;
-    });
+    const {messagesForEveryContact, newMsgNotifictions} = res.data.message;
     dispatch({
       payload: {
-        all,
-        iHaveDialogWith,
-        newMsgNotifictions,
-        initialMessagesForEveryPeer
+        messagesForEveryContact,
+        newMsgNotifictions
       },
       type: GET_PEERS
     });

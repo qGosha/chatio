@@ -31,6 +31,7 @@ module.exports = (app, io) => {
 
   app.get("/api/search/allUsers", loggedIn, async (req, res) => {
     try {
+      const userId = req.user._id;
       // const allUsers = await User.find(
       //   {},
       //   {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
@@ -38,13 +39,13 @@ module.exports = (app, io) => {
       // const userIdString = req.user._id.toString();
 
       const getIHaveDialogWith = await Conversation.find({
-        members: {$in: [req.user._id]}
+        members: {$in: [userId]}
       })
         .populate({
           path: "members",
           model: User,
           select: "_id",
-          match: {_id: {$ne: req.user._id}}
+          match: {_id: {$ne: userId}}
         })
         const iHaveDialogWithIds = getIHaveDialogWith.map(i => i.members[0]._id);
       // const getIHaveDialogWith = await Conversation.find({
@@ -56,15 +57,34 @@ module.exports = (app, io) => {
       //   i => i.members.filter(r => r.toString() !== userIdString)[0]
       // );
       // const iHaveDialogWith = iHaveDialogWithIds.map(i => i.toString());
-      const messages = await Promise.all(iHaveDialogWithIds.map( id => {return Message.find({ $or: [ { recipient: req.user._id }, { sender: id } ] })}))
-      const getNewMsgNotifictions = await Message.find(
-        {
-          recipient: req.user._id,
-          read: false,
-          sender: {$in: iHaveDialogWithIds}
-        },
-        {sender: 1, _id: 0}
-      );
+      const getMessages = await Promise.all(iHaveDialogWithIds.map( id => {
+        return Message.find({
+          sender: {$in: [id, userId]},
+          recipient: {$in: [id, userId]}
+        })
+        .sort({timestamp: -1})
+        .limit(20);
+      }
+    ));
+    const messages = getMessages.reduce((a, b) => a.concat(b), []);
+    let messagesForEveryContact = {};
+    iHaveDialogWithIds.forEach( id => {
+      messagesForEveryContact[id] = messages.filter( message => message.sender === id || message.recipient === id);
+    })
+    // messages.forEach( message => {
+    //   if (messagesForEveryContact[message.sender])
+    // })
+    const getNewMsgNotifictions = messages.filter( message => {
+      return message.recipient === userId && message.read === false
+    })
+      // const getNewMsgNotifictions = await Message.find(
+      //   {
+      //     recipient: req.user._id,
+      //     read: false,
+      //     sender: {$in: iHaveDialogWithIds}
+      //   },
+      //   {sender: 1, _id: 0}
+      // );
       // const initialMessagesForEveryPeer = await Message.aggregate([
       //   {
       //     $match: {
@@ -87,7 +107,7 @@ module.exports = (app, io) => {
       });
       res.send({
         success: true,
-        message: {allUsers, iHaveDialogWith, newMsgNotifictions}
+        message: {messagesForEveryContact, newMsgNotifictions}
       });
     } catch (error) {
       res.send({
