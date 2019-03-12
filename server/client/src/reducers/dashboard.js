@@ -14,7 +14,8 @@ import {
   MSG_FROM_UNKNOWN,
   CREATE_NEW_CONVERSATION,
   ERROR,
-  SET_SOCKET
+  SET_SOCKET,
+  OPEN_DIALOG_WITH_STRANGER
 } from "../actions/types";
 
 const initialState = {
@@ -47,12 +48,23 @@ export function dashboard(state = initialState, action) {
       return {
         ...state,
         activeDialogWith: payload.peerId,
-        currentMessages: payload.messages,
-        iHaveDialogWith: payload.isNewContact
-          ? [...state.iHaveDialogWith, payload.isNewContact]
-          : state.iHaveDialogWith,
         haveAllMessagesBeenFetched: false
       };
+    case OPEN_DIALOG_WITH_STRANGER: {
+      return {
+        ...state,
+        activeDialogWith: payload.peerId,
+        iHaveDialogWith: {
+          ...state.iHaveDialogWith,
+          [payload.peerId]: payload.newContact
+        },
+        messagesForEveryContact: {
+          ...state.messagesForEveryContact,
+          [payload.peerId]: []
+        },
+        haveAllMessagesBeenFetched: false
+      };
+    }
     case CLOSE_DIALOG:
       return {...state, activeDialogWith: null};
     case UPLOAD_MESSAGES_ONSCROLL:
@@ -67,7 +79,16 @@ export function dashboard(state = initialState, action) {
          }
       };
     case ADD_MESSAGE:
-      return {...state, currentMessages: [...state.currentMessages, payload]};
+    const {sender, message} = payload;
+    const doesExist = state.messagesForEveryContact[sender];
+      return {...state, messagesForEveryContact: {
+        ...state.messagesForEveryContact,
+        [sender]: doesExist && doesExist.length ?
+        [
+          ...state.messagesForEveryContact[sender],
+          message
+        ] : [message]
+      }};
     case ADD_IMAGE_URL:
       const currentMessages = state.currentMessages.map(x => {
         if (x._id === payload._id) {
@@ -79,15 +100,21 @@ export function dashboard(state = initialState, action) {
     case UPLOAD_MESSAGES_END:
       return {...state, haveAllMessagesBeenFetched: true};
     case MARK_MSG_READ:
-      return {...state, currentMessages: payload};
+      return {...state, messagesForEveryContact: {
+        ...state.messagesForEveryContact,
+        [payload.whose]: payload.updatedMsg
+      }};
     case MSG_FROM_UNKNOWN:
       return {
         ...state,
-        iHaveDialogWith: [...state.iHaveDialogWith, payload],
-        newMsgNotifictions: {...state.newMsgNotifictions, [payload]: 1}
+        iHaveDialogWith: {
+        ...state.iHaveDialogWith,
+        [payload._id]: payload
+        },
+        newMsgNotifictions: {...state.newMsgNotifictions, [payload._id]: 1}
       };
-    case CREATE_NEW_CONVERSATION:
-      return {...state, iHaveDialogWith: [...state.iHaveDialogWith, [payload._id]: payload]};
+    // case CREATE_NEW_CONVERSATION:
+    //   return {...state, iHaveDialogWith: [...state.iHaveDialogWith, [payload._id]: payload]};
     case REMOVE_NOTIFICATIONS:
       return {
         ...state,

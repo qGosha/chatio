@@ -29,13 +29,36 @@ module.exports = (app, io) => {
     }
   });
 
+  app.post("/api/getSpecificUser", loggedIn, async (req, res) => {
+    try {
+      const {id} = req.body;
+      const specificUser = await User.findOne(
+        {_id: id},
+        {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
+      );
+      if (specificUser) {
+        res.send({
+          success: true,
+          message: specificUser
+       })
+     } else {
+       throw new Error('No user found')
+     }
+   } catch (error) {
+     res.send({
+       success: false,
+       error: error.message
+     });
+   }
+  })
+
   app.get("/api/search/allUsers", loggedIn, async (req, res) => {
     try {
       const userId = req.user._id;
       const randomUsers = await User.find(
-        {},
+        {_id: {$ne: userId}},
         {name: 1, gender: 1, online: 1, photos: {$slice: 1}},
-        {_id: {$ne: userId}})
+      )
         .limit(20);
       // const allUsers = await User.find(
       //   {},
@@ -128,38 +151,41 @@ module.exports = (app, io) => {
     } catch (error) {
       res.send({
         success: false,
-        error
+        error: error.message
       });
     }
   });
 
-  app.post("/api/chat/openDialog", loggedIn, async (req, res) => {
-    const id = ObjectId(req.user._id);
-    const recipient = req.body.id;
-    if (!recipient) {
-      throw new Error("No recipients provsided");
-    }
-    try {
-      let newContactInList;
-
-      const messages = await Message.find({
-        sender: {$in: [id, ObjectId(recipient)]},
-        recipient: {$in: [ObjectId(recipient), id]}
-      })
-        .sort({timestamp: -1})
-        .limit(20);
-
-      res.send({
-        success: true,
-        message: {messages, newContactInList}
-      });
-    } catch (error) {
-      res.send({
-        success: false,
-        error
-      });
-    }
-  });
+  // app.post("/api/chat/openDialog", loggedIn, async (req, res) => {
+  //   const id = ObjectId(req.user._id);
+  //   const recipient = req.body.id;
+  //   if (!recipient) {
+  //     throw new Error("No recipients provsided");
+  //   }
+  //   try {
+  //     // let newContactInList;
+  //     //
+  //     // const messages = await Message.find({
+  //     //   sender: {$in: [id, ObjectId(recipient)]},
+  //     //   recipient: {$in: [ObjectId(recipient), id]}
+  //     // })
+  //     //   .sort({timestamp: -1})
+  //     //   .limit(20);
+  //    const newContact = await User.findOne(
+  //      {_id: recipient},
+  //      {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
+  //    );
+  //     res.send({
+  //       success: true,
+  //       message: newContact
+  //     });
+  //   } catch (error) {
+  //     res.send({
+  //       success: false,
+  //       error
+  //     });
+  //   }
+  // });
 
   app.post("/api/chat/dialogs", loggedIn, async (req, res) => {
     const id = ObjectId(req.user._id);
@@ -180,7 +206,7 @@ module.exports = (app, io) => {
     } catch (error) {
       res.send({
         success: false,
-        error
+        error: error.message
       });
     }
   });
@@ -254,14 +280,14 @@ module.exports = (app, io) => {
     const objIds = ids.map(id => ObjectId(id));
     try {
       await Message.updateMany({_id: {$in: objIds}}, {$set: {read: true}});
-      io.to(activeDialogWith).emit("msgHasBeenReadByPeer", ids);
+      io.to(activeDialogWith).emit("msgHasBeenReadByPeer", {ids, whose: (req.user._id).toString()});
       res.send({
         success: true
       });
     } catch (error) {
       res.send({
         success: false,
-        error: error || error.message
+        error: error.message
       });
     }
   });
@@ -279,19 +305,19 @@ module.exports = (app, io) => {
         throw new Error('Conversation alredy exists')
       }
       const newConv = await new Conversation({members: [objId, me]}).save();
-      const newFriend = Conversation.populate(newConv, {
-        path: 'members',
-        select: {"_id": 1, "name": 1, "photos": 1, "online": 1},
-        match: {_id: {$ne: me}}
-      })
+      // const newFriend = Conversation.populate(newConv, {
+      //   path: 'members',
+      //   select: {"_id": 1, "name": 1, "photos": 1, "online": 1},
+      //   match: {_id: {$ne: me}}
+      // })
       res.send({
-        message: newFriend[0],
+        // message: newFriend[0],
         success: true
       });
     } catch (error) {
       res.send({
         success: false,
-        error: error || error.message
+        error: error.message
       });
     }
   });

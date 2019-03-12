@@ -107,9 +107,7 @@ class Dashboard extends Component {
     if (height > 50) {
       this.uploadNewTrigger = true;
       const {activeDialogWith, messagesForEveryContact} = this.props.dashboard;
-      const skip = messagesForEveryContact[activeDialogWith].length;
-      // const skip = this.uploadTriggerCount + 20;
-      // this.uploadTriggerCount = skip;
+      const skip = this.uploadTriggerCount + messagesForEveryContact[activeDialogWith].length;
       await this.props.uploadMessagesOnScroll(activeDialogWith, skip);
       this.uploadNewTrigger = false;
     }
@@ -117,14 +115,16 @@ class Dashboard extends Component {
 
   handleOpenDialog = async id => {
     const { dashboard, openDialog } = this.props;
-    const { activeDialogWith, messagesForEveryContact } = dashboard;
-    let fetch = false;
-    if(!messagesForEveryContact.hasOwnProperty(activeDialogWith)) {
-      fetch = true;
+    const { activeDialogWith, messagesForEveryContact, randomUsers } = dashboard;
+    let newContact = false;
+    let contact;
+    if(!messagesForEveryContact.hasOwnProperty(id)) {
+      contact = randomUsers.find( i => i._id === id);
+      newContact = true;
     };
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
-    await openDialog(id, fetch);
+    await openDialog(id, newContact, contact);
     if (this.dialog) {
       this.dialog.scrollTop = this.dialog.scrollHeight;
     }
@@ -137,7 +137,7 @@ class Dashboard extends Component {
   sendImages = () => {
     const {pictures} = this.state;
     const {sendImages, createNewConversation, dashboard} = this.props;
-    const {activeDialogWith, iHaveDialogWith} = dashboard;
+    const {activeDialogWith, iHaveDialogWith, messagesForEveryContact} = dashboard;
 
     if (!pictures.length || !activeDialogWith) return;
     let formData = new FormData();
@@ -146,7 +146,7 @@ class Dashboard extends Component {
     });
     formData.append("activeDialogWith", activeDialogWith);
     sendImages(formData);
-    if (!iHaveDialogWith.hasOwnProperty(activeDialogWith)) {
+    if (!messagesForEveryContact[activeDialogWith].length) {
       createNewConversation(activeDialogWith);
     }
     this.setState({imagesWereUploaded: true, pictures: []});
@@ -154,7 +154,7 @@ class Dashboard extends Component {
   sendMessage = () => {
     const {messageText} = this.state;
     const {createNewConversation, dashboard} = this.props;
-    const {activeDialogWith, iHaveDialogWith} = dashboard;
+    const {activeDialogWith, iHaveDialogWith, messagesForEveryContact} = dashboard;
     const {socket} = dashboard;
     if (!messageText || !activeDialogWith) return;
     const newMessage = {
@@ -164,7 +164,7 @@ class Dashboard extends Component {
       recipient: activeDialogWith
     };
     socket.emit("outboundMessage", newMessage);
-    if (!iHaveDialogWith.hasOwnProperty(activeDialogWith)) {
+    if (!messagesForEveryContact[activeDialogWith].length) {
       createNewConversation(activeDialogWith);
     }
     this.setState({messageText: ""});
@@ -236,9 +236,11 @@ class Dashboard extends Component {
         dashboard,
         auth,
         newMessageForAnotherDialog,
-        messageFromUnknown
+        messageFromUnknown,
+        addMessage,
+        sortSidePanelDialogs
       } = this.props;
-      const {activeDialogWith, iHaveDialogWith} = dashboard;
+      const {activeDialogWith, iHaveDialogWith, messagesForEveryContact} = dashboard;
       const {user} = auth;
       if (message.sender !== auth.user._id && !user.mute) {
         try {
@@ -257,10 +259,9 @@ class Dashboard extends Component {
         const sender = message.sender;
         if (!iHaveDialogWith[sender]) {
           messageFromUnknown(sender);
-          return;
+        } else {
+          newMessageForAnotherDialog(sender);
         }
-        newMessageForAnotherDialog(sender);
-        return;
       }
       const dialog = this.dialog;
       let scroll;
@@ -268,22 +269,24 @@ class Dashboard extends Component {
         if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
           scroll = true;
         }
-        await this.props.addMessage(message);
-
+        await addMessage(message, activeDialogWith);
+        // sortSidePanelDialogs();
         this.uploadTriggerCount++;
         if (scroll) {
           dialog.scrollTop = dialog.scrollHeight;
         }
       }
     });
-    socket.on("msgHasBeenReadByPeer", async ids => {
+    socket.on("msgHasBeenReadByPeer", async options => {
+      const { ids, whose } = options;
       const {dashboard, msgReadByPeer} = this.props;
-      const {currentMessages} = dashboard;
-      const updatedMsg = currentMessages.map(msg => {
+      const {messagesForEveryContact} = dashboard;
+      const messagesArray = messagesForEveryContact[whose];
+      const updatedMsg = messagesArray.map(msg => {
         if (ids.includes(msg._id)) msg.read = true;
         return msg;
       });
-      msgReadByPeer(updatedMsg);
+      msgReadByPeer(updatedMsg, whose);
     });
     this.props.getPeers();
   }

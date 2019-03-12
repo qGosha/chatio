@@ -14,7 +14,8 @@ import {
   MSG_FROM_UNKNOWN,
   CREATE_NEW_CONVERSATION,
   ERROR,
-  SET_SOCKET
+  SET_SOCKET,
+  OPEN_DIALOG_WITH_STRANGER
 } from "./types";
 import history from "../helpers/history";
 
@@ -71,21 +72,18 @@ export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
   }
 };
 
-export const openDialog = (id, fetch) => async dispatch => {
-  if (fetch) {
-    const res = await axios.post("/api/chat/openDialog", {
-      id
-    });
-    if (res.data.success) {
+export const openDialog = (id, newContact, contact) => async dispatch => {
+  if (newContact) {
+    // const res = await axios.post("/api/chat/openDialog", {
+    //   id
+    // });
       dispatch({
         payload: {
           peerId: id,
-          messages: res.data.message.messages,
-          isNewContact: res.data.message.newContactInList
+          newContact: contact
         },
-        type: OPEN_DIALOG
+        type: OPEN_DIALOG_WITH_STRANGER
       });
-    }
   } else {
     dispatch({
       payload: {
@@ -114,20 +112,41 @@ export const removeNotifications = id => async dispatch => {
 };
 
 export const createNewConversation = id => async dispatch => {
-  const res = await axios.post("/api/chat/createNewConversation", {id});
-  if (res.data.success) {
+  try {
+    const res = await axios.post("/api/chat/createNewConversation", {id});
+    if (res.data.success) {
+      // dispatch({
+      //   payload: res.data.message,
+      //   type: CREATE_NEW_CONVERSATION
+      // });
+    } else {
+      throw new Error(res.data.error);
+    }
+  } catch (error) {
     dispatch({
-      payload: res.data.message,
-      type: CREATE_NEW_CONVERSATION
+      payload: error.message,
+      type: ERROR
     });
   }
+
 };
 
 export const messageFromUnknown = id => async dispatch => {
-  dispatch({
-    payload: id,
-    type: MSG_FROM_UNKNOWN
-  });
+  try {
+    const res = await axios.post('/api/getSpecificUser', { id });
+    if (res.data.success) {
+      dispatch({
+        payload: res.data.message,
+        type: MSG_FROM_UNKNOWN
+      });
+    }
+  } catch (error) {
+    dispatch({
+      payload: error.message,
+      type: ERROR
+    });
+  }
+
 };
 
 export const markMsgRead = (
@@ -145,9 +164,9 @@ export const markMsgRead = (
   });
 };
 
-export const msgReadByPeer = updatedMsg => async dispatch => {
+export const msgReadByPeer = (updatedMsg, whose) => async dispatch => {
   dispatch({
-    payload: updatedMsg,
+    payload: {updatedMsg, whose},
     type: MARK_MSG_READ
   });
 };
@@ -159,9 +178,8 @@ export const newMessageForAnotherDialog = id => async dispatch => {
   });
 };
 
-export const addMessage = message => async (dispatch, getState) => {
-  const {dashboard} = getState();
-  const {activeDialogWith} = dashboard;
+export const addMessage = (message, activeDialogWith) => async (dispatch, getState) => {
+  let sender;
   if (activeDialogWith && activeDialogWith === message.sender) {
     message.read = true;
     const ids = [message._id];
@@ -169,10 +187,15 @@ export const addMessage = message => async (dispatch, getState) => {
       ids,
       activeDialogWith
     });
+    sender = message.sender;
+  } else if (activeDialogWith && activeDialogWith === message.recipient) {
+    sender = message.recipient;
+  } else  {
+    sender = message.sender;
   }
   if (message) {
     dispatch({
-      payload: message,
+      payload: {sender, message},
       type: ADD_MESSAGE
     });
   }
