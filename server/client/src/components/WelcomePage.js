@@ -48,13 +48,9 @@ const styles = {
   }
 };
 
-const WelcomePage = ({allUsers, auth, openDialog, standartImage}) => {
-  if (!allUsers) return null;
-  const me = auth.user._id;
-  const users = Object.values(allUsers).filter(i => i._id !== me);
-  const avatars =
-    users &&
-    users.map(user => {
+const WelcomePage = ({randomUsers, openDialog, standartImage}) => {
+  if (!randomUsers) return null;
+  const avatars = randomUsers.map(user => {
       const photo = user.photos[0];
       return (
         <div

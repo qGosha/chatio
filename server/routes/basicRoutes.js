@@ -32,6 +32,11 @@ module.exports = (app, io) => {
   app.get("/api/search/allUsers", loggedIn, async (req, res) => {
     try {
       const userId = req.user._id;
+      const randomUsers = await User.find(
+        {},
+        {name: 1, gender: 1, online: 1, photos: {$slice: 1}},
+        {_id: {$ne: userId}})
+        .limit(20);
       // const allUsers = await User.find(
       //   {},
       //   {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
@@ -40,14 +45,19 @@ module.exports = (app, io) => {
 
       const getIHaveDialogWith = await Conversation.find({
         members: {$in: [userId]}
-      })
-        .populate({
-          path: "members",
-          model: User,
-          select: "_id",
-          match: {_id: {$ne: userId}}
-        })
-        const iHaveDialogWithIds = getIHaveDialogWith.map(i => i.members[0]._id);
+      }).populate({
+        path: "members",
+        model: User,
+        select: {"_id": 1, "name": 1, "photos": 1, "online": 1},
+        match: {_id: {$ne: userId}}
+      });
+      let iHaveDialogWith = {};
+      getIHaveDialogWith.forEach( i => {
+        if (i.members) {
+        iHaveDialogWith[i.members[0]._id] = i.members[0];
+        }
+      });
+      const iHaveDialogWithIds = Object.keys(iHaveDialogWith);
       // const getIHaveDialogWith = await Conversation.find({
       //   members: {$all: [req.user._id]}
       // }).populate({
@@ -57,26 +67,32 @@ module.exports = (app, io) => {
       //   i => i.members.filter(r => r.toString() !== userIdString)[0]
       // );
       // const iHaveDialogWith = iHaveDialogWithIds.map(i => i.toString());
-      const getMessages = await Promise.all(iHaveDialogWithIds.map( id => {
-        return Message.find({
-          sender: {$in: [id, userId]},
-          recipient: {$in: [id, userId]}
+      const getMessages = await Promise.all(
+        iHaveDialogWithIds.map(id => {
+          return Message.find({
+            sender: {$in: [id, userId]},
+            recipient: {$in: [id, userId]}
+          })
+            .sort({timestamp: -1})
+            .limit(20);
         })
-        .sort({timestamp: -1})
-        .limit(20);
-      }
-    ));
-    const messages = getMessages.reduce((a, b) => a.concat(b), []);
-    let messagesForEveryContact = {};
-    iHaveDialogWithIds.forEach( id => {
-      messagesForEveryContact[id] = messages.filter( message => message.sender === id || message.recipient === id);
-    })
-    // messages.forEach( message => {
-    //   if (messagesForEveryContact[message.sender])
-    // })
-    const getNewMsgNotifictions = messages.filter( message => {
-      return message.recipient === userId && message.read === false
-    })
+      );
+      const messages = getMessages.reduce((a, b) => a.concat(b), []);
+      let messagesForEveryContact = {};
+      iHaveDialogWithIds.forEach(id => {
+        const stringId = id.toString();
+        messagesForEveryContact[id] = messages.filter(
+          message =>
+            message.sender.toString() === stringId ||
+            message.recipient.toString() === stringId
+        );
+      });
+      // messages.forEach( message => {
+      //   if (messagesForEveryContact[message.sender])
+      // })
+      const getNewMsgNotifictions = messages.filter(message => {
+        return message.recipient === userId && message.read === false;
+      });
       // const getNewMsgNotifictions = await Message.find(
       //   {
       //     recipient: req.user._id,
@@ -107,7 +123,7 @@ module.exports = (app, io) => {
       });
       res.send({
         success: true,
-        message: {messagesForEveryContact, newMsgNotifictions}
+        message: {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers}
       });
     } catch (error) {
       res.send({
@@ -121,7 +137,7 @@ module.exports = (app, io) => {
     const id = ObjectId(req.user._id);
     const recipient = req.body.id;
     if (!recipient) {
-      throw new Error("No recepients provided");
+      throw new Error("No recipients provsided");
     }
     try {
       let newContactInList;
@@ -259,10 +275,17 @@ module.exports = (app, io) => {
       const getIHaveDialogWith = await Conversation.find({
         members: {$all: [objId, me]}
       });
-      if (!getIHaveDialogWith.length) {
-        await new Conversation({members: [objId, me]}).save();
+      if (getIHaveDialogWith.length) {
+        throw new Error('Conversation alredy exists')
       }
+      const newConv = await new Conversation({members: [objId, me]}).save();
+      const newFriend = Conversation.populate(newConv, {
+        path: 'members',
+        select: {"_id": 1, "name": 1, "photos": 1, "online": 1},
+        match: {_id: {$ne: me}}
+      })
       res.send({
+        message: newFriend[0],
         success: true
       });
     } catch (error) {

@@ -106,18 +106,25 @@ class Dashboard extends Component {
       ((target.scrollHeight - target.scrollTop) / target.scrollHeight) * 100;
     if (height > 50) {
       this.uploadNewTrigger = true;
-      const {activeDialogWith} = this.props.dashboard;
-      const skip = this.uploadTriggerCount + 20;
-      this.uploadTriggerCount = skip;
+      const {activeDialogWith, messagesForEveryContact} = this.props.dashboard;
+      const skip = messagesForEveryContact[activeDialogWith].length;
+      // const skip = this.uploadTriggerCount + 20;
+      // this.uploadTriggerCount = skip;
       await this.props.uploadMessagesOnScroll(activeDialogWith, skip);
       this.uploadNewTrigger = false;
     }
   };
 
   handleOpenDialog = async id => {
+    const { dashboard, openDialog } = this.props;
+    const { activeDialogWith, messagesForEveryContact } = dashboard;
+    let fetch = false;
+    if(!messagesForEveryContact.hasOwnProperty(activeDialogWith)) {
+      fetch = true;
+    };
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
-    await this.props.openDialog(id);
+    await openDialog(id, fetch);
     if (this.dialog) {
       this.dialog.scrollTop = this.dialog.scrollHeight;
     }
@@ -139,7 +146,7 @@ class Dashboard extends Component {
     });
     formData.append("activeDialogWith", activeDialogWith);
     sendImages(formData);
-    if (!iHaveDialogWith.includes(activeDialogWith)) {
+    if (!iHaveDialogWith.hasOwnProperty(activeDialogWith)) {
       createNewConversation(activeDialogWith);
     }
     this.setState({imagesWereUploaded: true, pictures: []});
@@ -157,7 +164,7 @@ class Dashboard extends Component {
       recipient: activeDialogWith
     };
     socket.emit("outboundMessage", newMessage);
-    if (!iHaveDialogWith.includes(activeDialogWith)) {
+    if (!iHaveDialogWith.hasOwnProperty(activeDialogWith)) {
       createNewConversation(activeDialogWith);
     }
     this.setState({messageText: ""});
@@ -247,12 +254,12 @@ class Dashboard extends Component {
         message.recipient !== activeDialogWith &&
         message.sender !== activeDialogWith
       ) {
-        const id = iHaveDialogWith.find(msg => msg === message.sender);
-        if (!id) {
-          messageFromUnknown(message.sender);
+        const sender = message.sender;
+        if (!iHaveDialogWith[sender]) {
+          messageFromUnknown(sender);
           return;
         }
-        newMessageForAnotherDialog(id);
+        newMessageForAnotherDialog(sender);
         return;
       }
       const dialog = this.dialog;
@@ -297,19 +304,20 @@ class Dashboard extends Component {
       match,
       location
     } = this.props;
-    const {activeDialogWith, allUsers} = dashboard;
+    const {activeDialogWith, randomUsers, iHaveDialogWith} = dashboard;
     const {imagesWereUploaded, uploaderVisible, messageText} = this.state;
     const welcomeSection = () => (
       <Fragment>
         <AvatarBlock
           auth={auth}
-          allUsers={allUsers}
+          randomUsers={randomUsers}
+          iHaveDialogWith={iHaveDialogWith}
           activeDialogWith={activeDialogWith}
           standartImage={standartImage}
         />
         <WelcomePage
-          allUsers={allUsers}
-          auth={auth}
+          randomUsers={randomUsers}
+          iHaveDialogWith={iHaveDialogWith}
           openDialog={this.handleOpenDialog}
           standartImage={standartImage}
         />
@@ -320,7 +328,8 @@ class Dashboard extends Component {
       <Fragment>
         <AvatarBlock
           auth={auth}
-          allUsers={allUsers}
+          randomUsers={randomUsers}
+          iHaveDialogWith={iHaveDialogWith}
           activeDialogWith={activeDialogWith}
           standartImage={standartImage}
         />

@@ -39,10 +39,10 @@ const Messages = ({messages, dashboard, auth, standartImage}) => {
   const sortedMessages = messages.sort( (a, b) =>  {
     return new Date(a.timestamp) - new Date(b.timestamp)
   })
-  const { activeDialogWith, allUsers } = dashboard;
+  const { activeDialogWith, iHaveDialogWith } = dashboard;
   const { user } = auth;
   const myAvatar = user.photos.length ? user.photos[0] : standartImage;
-  const peer = allUsers[activeDialogWith];
+  const peer = iHaveDialogWith[activeDialogWith];
   const peerAvatar = (peer && peer.photos.length) ? peer.photos[0] : standartImage;
   let shouldUseAvatar = true;
   let lastMessageFrom = sortedMessages[0].sender;

@@ -25,8 +25,9 @@ const ChatSection = props => {
     standartImage,
     topStyle
   } = props;
-  const {currentMessages, activeDialogWith, newMsgNotifictions} = dashboard;
+  const {messagesForEveryContact, activeDialogWith, newMsgNotifictions} = dashboard;
   const user = auth.user;
+  const currentMessages = messagesForEveryContact[activeDialogWith];
   const notReadMsg = currentMessages.some(
     msg => msg.recipient === user._id && !msg.read
   );

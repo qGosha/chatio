@@ -21,11 +21,13 @@ import history from "../helpers/history";
 export const getPeers = () => async dispatch => {
   const res = await axios.get("/api/search/allUsers");
   if (res.data.success) {
-    const {messagesForEveryContact, newMsgNotifictions} = res.data.message;
+    const {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers} = res.data.message;
     dispatch({
       payload: {
         messagesForEveryContact,
-        newMsgNotifictions
+        newMsgNotifictions,
+        iHaveDialogWith,
+        randomUsers
       },
       type: GET_PEERS
     });
@@ -61,6 +63,7 @@ export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
     }
     dispatch({
       payload: {
+        id,
         messages: res.data.message
       },
       type: UPLOAD_MESSAGES_ONSCROLL
@@ -68,22 +71,32 @@ export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
   }
 };
 
-export const openDialog = id => async dispatch => {
-  const res = await axios.post("/api/chat/openDialog", {
-    id
-  });
-  if (res.data.success) {
+export const openDialog = (id, fetch) => async dispatch => {
+  if (fetch) {
+    const res = await axios.post("/api/chat/openDialog", {
+      id
+    });
+    if (res.data.success) {
+      dispatch({
+        payload: {
+          peerId: id,
+          messages: res.data.message.messages,
+          isNewContact: res.data.message.newContactInList
+        },
+        type: OPEN_DIALOG
+      });
+    }
+  } else {
     dispatch({
       payload: {
-        peerId: id,
-        messages: res.data.message.messages,
-        isNewContact: res.data.message.newContactInList
+        peerId: id
       },
       type: OPEN_DIALOG
     });
-    if (window.location.pathname !== "/dashboard") {
-      history.push("/dashboard");
-    }
+  }
+
+  if (window.location.pathname !== "/dashboard") {
+    history.push("/dashboard");
   }
 };
 
@@ -104,7 +117,7 @@ export const createNewConversation = id => async dispatch => {
   const res = await axios.post("/api/chat/createNewConversation", {id});
   if (res.data.success) {
     dispatch({
-      payload: id,
+      payload: res.data.message,
       type: CREATE_NEW_CONVERSATION
     });
   }

@@ -62,22 +62,26 @@ const styles = {
 
 const SidePanel = ({dashboard, openDialog, standartImage}) => {
   const [visible, changeVisible] = useState(false);
-  const {iHaveDialogWith, allUsers, newMsgNotifictions} = dashboard;
-  if (!allUsers) return null;
+  const {iHaveDialogWith, newMsgNotifictions} = dashboard;
   const avatars =
     iHaveDialogWith &&
-    iHaveDialogWith.slice(0,5).map(friend => {
-      const user = allUsers[friend];
-      const photo = user && user.photos[0];
-      const notifications = newMsgNotifictions[friend];
+    Object.keys(iHaveDialogWith).slice(0,5).map( (id, i) => {
+      const friend = iHaveDialogWith[id];
+      let deleted, photo, notifications;
+      if (!friend._id) {
+         deleted = true;
+      } else {
+        photo = friend.photos[0];
+        notifications = newMsgNotifictions[id];
+      }
       const withNotificationStyles = {
         border: notifications ? "3px solid red" : "none"
       };
       return (
         <div
-          key={user ? user._id : friend}
+          key={deleted ? i : id}
           style={styles.img_block}
-          onClick={() => openDialog(user ? user._id : friend)}
+          onClick={() => openDialog(id)}
         >
           <div style={{position: "relative"}}>
             <Image
@@ -90,16 +94,16 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
                 {notifications}
               </Label>
             ) : null}
-            {user ? (
+            {!deleted ? (
               <div
                 style={{
                   ...styles.indicator,
-                  backgroundColor: user.online ? "green" : "red"
+                  backgroundColor: friend.online ? "green" : "red"
                 }}
               />
             ) : null}
           </div>
-          <span style={styles.username}>{user ? user.name : "Deleted"}</span>
+          <span style={styles.username}>{!deleted ? friend.name : "Deleted"}</span>
         </div>
       );
     });

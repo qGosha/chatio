@@ -20,22 +20,24 @@ import {
 const initialState = {
   socket: null,
   allUsers: null,
-  // iHaveDialogWith: null,
+  iHaveDialogWith: {},
   messagesForEveryContact: {},
   activeDialogWith: null,
-  // currentMessages: [],
   haveAllMessagesBeenFetched: false,
-  newMsgNotifictions: {}
+  newMsgNotifictions: {},
+  randomUsers: []
 };
 export function dashboard(state = initialState, action) {
   const payload = action.payload;
   switch (action.type) {
     case GET_PEERS:
-      const {messagesForEveryContact, newMsgNotifictions} = payload;
+      const {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers} = payload;
       return {
         ...state,
         messagesForEveryContact,
         newMsgNotifictions,
+        iHaveDialogWith,
+        randomUsers
       };
     case USER_CHANGESTATUS:
       return {...state, allUsers: payload};
@@ -56,7 +58,13 @@ export function dashboard(state = initialState, action) {
     case UPLOAD_MESSAGES_ONSCROLL:
       return {
         ...state,
-        currentMessages: [...state.currentMessages, ...payload.messages]
+        messagesForEveryContact: {
+          ...state.messagesForEveryContact,
+          [payload.id]: [
+            ...state.messagesForEveryContact[payload.id],
+            ...payload.messages
+          ]
+         }
       };
     case ADD_MESSAGE:
       return {...state, currentMessages: [...state.currentMessages, payload]};
@@ -79,7 +87,7 @@ export function dashboard(state = initialState, action) {
         newMsgNotifictions: {...state.newMsgNotifictions, [payload]: 1}
       };
     case CREATE_NEW_CONVERSATION:
-      return {...state, iHaveDialogWith: [...state.iHaveDialogWith, payload]};
+      return {...state, iHaveDialogWith: [...state.iHaveDialogWith, [payload._id]: payload]};
     case REMOVE_NOTIFICATIONS:
       return {
         ...state,

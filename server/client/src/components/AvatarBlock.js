@@ -28,11 +28,13 @@ const styles = {
   }
 };
 
-const AvatarBlock = ({allUsers, auth, activeDialogWith, standartImage}) => {
-  if (!allUsers) return null;
+const AvatarBlock = ({iHaveDialogWith, randomUsers, auth, activeDialogWith, standartImage}) => {
   const user = auth.user;
-  const peer = allUsers[activeDialogWith];
-  const online = allUsers && allUsers[user._id].online;
+  let peer;
+  if (iHaveDialogWith) {
+   peer = iHaveDialogWith[activeDialogWith] || randomUsers.find( user => user._id === activeDialogWith);
+  }
+  const online = activeDialogWith ? peer.online : user.online;
   const alone = (
     <div style={styles.singleAvatar}>
       <h2>{`Hello ${user.name}`}</h2>
