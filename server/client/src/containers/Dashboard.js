@@ -270,7 +270,7 @@ class Dashboard extends Component {
           scroll = true;
         }
         await addMessage(message, activeDialogWith);
-        // sortSidePanelDialogs();
+        sortSidePanelDialogs(iHaveDialogWith, messagesForEveryContact);
         this.uploadTriggerCount++;
         if (scroll) {
           dialog.scrollTop = dialog.scrollHeight;

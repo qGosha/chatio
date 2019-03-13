@@ -15,20 +15,22 @@ import {
   CREATE_NEW_CONVERSATION,
   ERROR,
   SET_SOCKET,
-  OPEN_DIALOG_WITH_STRANGER
+  OPEN_DIALOG_WITH_STRANGER,
+  SORT_PEER_IDS
 } from "./types";
 import history from "../helpers/history";
 
 export const getPeers = () => async dispatch => {
   const res = await axios.get("/api/search/allUsers");
   if (res.data.success) {
-    const {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers} = res.data.message;
+    const {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers, sortedPeerListForSidePanel} = res.data.message;
     dispatch({
       payload: {
         messagesForEveryContact,
         newMsgNotifictions,
         iHaveDialogWith,
-        randomUsers
+        randomUsers,
+        sortedPeerListForSidePanel
       },
       type: GET_PEERS
     });
@@ -200,6 +202,22 @@ export const addMessage = (message, activeDialogWith) => async (dispatch, getSta
     });
   }
 };
+
+export const sortSidePanelDialogs = (iHaveDialogWith, messagesForEveryContact) => async dispatch => {
+  // const { iHaveDialogWith, messagesForEveryContact } = props;
+  const sorted = Object.keys(iHaveDialogWith).sort( (a, b) => {
+      const lengthA = messagesForEveryContact[a].length;
+      const lengthB = messagesForEveryContact[b].length;
+      const firstMessageA = messagesForEveryContact[a][lengthA-1];
+      const firstMessageB = messagesForEveryContact[b][lengthB-1];
+      return new Date(firstMessageB && firstMessageB.timestamp) - new Date(firstMessageA && firstMessageA.timestamp);
+    });
+    dispatch({
+      payload: sorted,
+      type: SORT_PEER_IDS
+    });
+}
+
 export const addImageUrl = message => async dispatch => {
   if (message) {
     dispatch({

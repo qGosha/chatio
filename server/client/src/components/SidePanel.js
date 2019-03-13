@@ -62,18 +62,10 @@ const styles = {
 
 const SidePanel = ({dashboard, openDialog, standartImage}) => {
   const [visible, changeVisible] = useState(false);
-  const {iHaveDialogWith, newMsgNotifictions, messagesForEveryContact} = dashboard;
-  const array = Object.keys(iHaveDialogWith).sort( (a, b) => {
-      const firstMessageA = messagesForEveryContact[a][0];
-      const firstMessageB = messagesForEveryContact[b][0];
-      if (firstMessageA && firstMessageB) {
-        console.log(firstMessageB.timestamp);
-        return new Date(firstMessageB.timestamp) - new Date(firstMessageA.timestamp);
-      }
-    });
+  const {iHaveDialogWith, newMsgNotifictions, sortedPeerListForSidePanel} = dashboard;
   const avatars =
-    array.length &&
-    array.slice(0,5).map( (id, i) => {
+    sortedPeerListForSidePanel.length &&
+    sortedPeerListForSidePanel.slice(0,5).map( (id, i) => {
       const friend = iHaveDialogWith[id];
       let deleted, photo, notifications;
       if (!friend._id) {

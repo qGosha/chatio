@@ -60,11 +60,6 @@ module.exports = (app, io) => {
         {name: 1, gender: 1, online: 1, photos: {$slice: 1}},
       )
         .limit(20);
-      // const allUsers = await User.find(
-      //   {},
-      //   {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
-      // );
-      // const userIdString = req.user._id.toString();
 
       const getIHaveDialogWith = await Conversation.find({
         members: {$in: [userId]}
@@ -80,26 +75,19 @@ module.exports = (app, io) => {
         iHaveDialogWith[i.members[0]._id] = i.members[0];
         }
       });
+
       const iHaveDialogWithIds = Object.keys(iHaveDialogWith);
-      // const getIHaveDialogWith = await Conversation.find({
-      //   members: {$all: [req.user._id]}
-      // }).populate({
-      //   path: "members", model: User
-      // });
-      // const iHaveDialogWithIds = getIHaveDialogWith.map(
-      //   i => i.members.filter(r => r.toString() !== userIdString)[0]
-      // );
-      // const iHaveDialogWith = iHaveDialogWithIds.map(i => i.toString());
       const getMessages = await Promise.all(
         iHaveDialogWithIds.map(id => {
           return Message.find({
             sender: {$in: [id, userId]},
             recipient: {$in: [id, userId]}
           })
-            .sort({timestamp: -1})
+            .sort({timestamp: 1})
             .limit(20);
         })
       );
+
       const messages = getMessages.reduce((a, b) => a.concat(b), []);
       let messagesForEveryContact = {};
       iHaveDialogWithIds.forEach(id => {
@@ -110,31 +98,19 @@ module.exports = (app, io) => {
             message.recipient.toString() === stringId
         );
       });
-      // messages.forEach( message => {
-      //   if (messagesForEveryContact[message.sender])
-      // })
+
+      const sortedPeerListForSidePanel = Object.keys(iHaveDialogWith).sort( (a, b) => {
+          const lengthA = messagesForEveryContact[a].length;
+          const lengthB = messagesForEveryContact[b].length;
+          const firstMessageA = messagesForEveryContact[a][lengthA-1];
+          const firstMessageB = messagesForEveryContact[b][lengthB-1];
+          return new Date(firstMessageB && firstMessageB.timestamp) - new Date(firstMessageA && firstMessageA.timestamp);
+        });
+
       const getNewMsgNotifictions = messages.filter(message => {
         return message.recipient === userId && message.read === false;
       });
-      // const getNewMsgNotifictions = await Message.find(
-      //   {
-      //     recipient: req.user._id,
-      //     read: false,
-      //     sender: {$in: iHaveDialogWithIds}
-      //   },
-      //   {sender: 1, _id: 0}
-      // );
-      // const initialMessagesForEveryPeer = await Message.aggregate([
-      //   {
-      //     $match: {
-      //       recipient: ObjectId("5c776964addeaa00166e04c3"),
-      //       sender: { $in: [ObjectId("5c7769c5addeaa00166e04c4"), ObjectId("5c776927addeaa00166e04c2")] }
-      //     }},
-      //     {
-      //       $group: { _id: "$sender", message: { text: { $last: "$text" } } }
-      //     },
-      //     { $unwind : "$" }
-      // ])
+
       let newMsgNotifictions = {};
       getNewMsgNotifictions.forEach(item => {
         const s = item.sender;
@@ -146,7 +122,7 @@ module.exports = (app, io) => {
       });
       res.send({
         success: true,
-        message: {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers}
+        message: {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers, sortedPeerListForSidePanel}
       });
     } catch (error) {
       res.send({

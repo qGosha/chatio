@@ -15,13 +15,15 @@ import {
   CREATE_NEW_CONVERSATION,
   ERROR,
   SET_SOCKET,
-  OPEN_DIALOG_WITH_STRANGER
+  OPEN_DIALOG_WITH_STRANGER,
+  SORT_PEER_IDS
 } from "../actions/types";
 
 const initialState = {
   socket: null,
   allUsers: null,
   iHaveDialogWith: {},
+  sortedPeerListForSidePanel: [],
   messagesForEveryContact: {},
   activeDialogWith: null,
   haveAllMessagesBeenFetched: false,
@@ -32,13 +34,14 @@ export function dashboard(state = initialState, action) {
   const payload = action.payload;
   switch (action.type) {
     case GET_PEERS:
-      const {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers} = payload;
+      const {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers, sortedPeerListForSidePanel} = payload;
       return {
         ...state,
         messagesForEveryContact,
         newMsgNotifictions,
         iHaveDialogWith,
-        randomUsers
+        randomUsers,
+        sortedPeerListForSidePanel
       };
     case USER_CHANGESTATUS:
       return {...state, allUsers: payload};
@@ -89,6 +92,8 @@ export function dashboard(state = initialState, action) {
           message
         ] : [message]
       }};
+    case SORT_PEER_IDS:
+      return {...state, sortedPeerListForSidePanel: payload};
     case ADD_IMAGE_URL:
       const currentMessages = state.currentMessages.map(x => {
         if (x._id === payload._id) {
