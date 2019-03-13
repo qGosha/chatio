@@ -196,15 +196,17 @@ export const addMessage = (message, activeDialogWith) => async (dispatch, getSta
     sender = message.sender;
   }
   if (message) {
-    dispatch({
+    return dispatch({
       payload: {sender, message},
       type: ADD_MESSAGE
     });
   }
 };
 
-export const sortSidePanelDialogs = (iHaveDialogWith, messagesForEveryContact) => async dispatch => {
-  // const { iHaveDialogWith, messagesForEveryContact } = props;
+export const sortSidePanelDialogs = () => async (dispatch, getState) => {
+  const { dashboard } = getState();
+
+  const { messagesForEveryContact, iHaveDialogWith } = dashboard;
   const sorted = Object.keys(iHaveDialogWith).sort( (a, b) => {
       const lengthA = messagesForEveryContact[a].length;
       const lengthB = messagesForEveryContact[b].length;

@@ -258,9 +258,9 @@ class Dashboard extends Component {
       ) {
         const sender = message.sender;
         if (!iHaveDialogWith[sender]) {
-          messageFromUnknown(sender);
+          await messageFromUnknown(sender);
         } else {
-          newMessageForAnotherDialog(sender);
+          await newMessageForAnotherDialog(sender);
         }
       }
       const dialog = this.dialog;
@@ -269,13 +269,15 @@ class Dashboard extends Component {
         if (dialog.scrollTop + dialog.clientHeight === dialog.scrollHeight) {
           scroll = true;
         }
+      }
         await addMessage(message, activeDialogWith);
-        sortSidePanelDialogs(iHaveDialogWith, messagesForEveryContact);
-        this.uploadTriggerCount++;
+        
         if (scroll) {
           dialog.scrollTop = dialog.scrollHeight;
         }
-      }
+
+      sortSidePanelDialogs();
+      this.uploadTriggerCount++;
     });
     socket.on("msgHasBeenReadByPeer", async options => {
       const { ids, whose } = options;

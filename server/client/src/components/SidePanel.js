@@ -64,7 +64,7 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
   const [visible, changeVisible] = useState(false);
   const {iHaveDialogWith, newMsgNotifictions, sortedPeerListForSidePanel} = dashboard;
   const avatars =
-    sortedPeerListForSidePanel.length &&
+    sortedPeerListForSidePanel.length ?
     sortedPeerListForSidePanel.slice(0,5).map( (id, i) => {
       const friend = iHaveDialogWith[id];
       let deleted, photo, notifications;
@@ -106,7 +106,7 @@ const SidePanel = ({dashboard, openDialog, standartImage}) => {
           <span style={styles.username}>{!deleted ? friend.name : "Deleted"}</span>
         </div>
       );
-    });
+    }) : null;
 
   const angleSwitch = (
     <div style={{...styles.angle, left: visible ? '80px' : 0}} onClick={() => changeVisible(!visible)}>
