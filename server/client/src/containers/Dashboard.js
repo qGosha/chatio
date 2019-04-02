@@ -271,7 +271,7 @@ class Dashboard extends Component {
         }
       }
         await addMessage(message, activeDialogWith);
-        
+
         if (scroll) {
           dialog.scrollTop = dialog.scrollHeight;
         }

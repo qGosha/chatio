@@ -16,7 +16,8 @@ import {
   ERROR,
   SET_SOCKET,
   OPEN_DIALOG_WITH_STRANGER,
-  SORT_PEER_IDS
+  SORT_PEER_IDS,
+  PEER_CHANGESTATUS
 } from "./types";
 import history from "../helpers/history";
 
@@ -38,20 +39,22 @@ export const getPeers = () => async dispatch => {
 };
 
 export const userChangedStatus = data => async (dispatch, getState) => {
-  const {dashboard} = getState();
+  const {dashboard, auth} = getState();
 
   const {id, online} = data;
-  const allUsers = dashboard.allUsers;
-  const user = allUsers && allUsers[id];
-  if (!user) return;
-  user.online = online;
-  allUsers[id] = user;
-  if (data) {
+  if (id === auth.user._id) {
     dispatch({
-      payload: allUsers,
+      payload: online,
       type: USER_CHANGESTATUS
     });
+  } else {
+    dispatch({
+      payload: data,
+      type: PEER_CHANGESTATUS
+    });
   }
+  // const peers = dashboard.iHaveDialogWith;
+  // const user = peers && peers[id];
 };
 export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
   const res = await axios.post("/api/chat/dialogs", {

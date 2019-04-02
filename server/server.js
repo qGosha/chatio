@@ -23,7 +23,7 @@ const server = app.listen(port, () => {
 });
 const io = socketIO.listen(server, {
   pingInterval: 10,
-  pingTimeout: 4000
+  pingTimeout: 60000
 });
 io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);

@@ -1,6 +1,5 @@
 import {
   GET_PEERS,
-  USER_CHANGESTATUS,
   OPEN_DIALOG,
   ADD_MESSAGE,
   UPLOAD_MESSAGES_ONSCROLL,
@@ -16,7 +15,8 @@ import {
   ERROR,
   SET_SOCKET,
   OPEN_DIALOG_WITH_STRANGER,
-  SORT_PEER_IDS
+  SORT_PEER_IDS,
+  PEER_CHANGESTATUS
 } from "../actions/types";
 
 const initialState = {
@@ -43,8 +43,15 @@ export function dashboard(state = initialState, action) {
         randomUsers,
         sortedPeerListForSidePanel
       };
-    case USER_CHANGESTATUS:
-      return {...state, allUsers: payload};
+    case PEER_CHANGESTATUS:
+      const {id, online} = payload;
+      return {...state, iHaveDialogWith: {
+        ...state.iHaveDialogWith,
+        [state.iHaveDialogWith[id]]: {
+          ...state.iHaveDialogWith[id],
+          online
+        }
+      }};
     case SET_SOCKET:
       return {...state, socket: payload};
     case OPEN_DIALOG:

@@ -7,7 +7,8 @@ import {
   DELETE_USER,
   CHANGE_AVATAR,
   CHANGE_SETTINGS,
-  CHANGE_EMAIL_ON_CONFIRMATION
+  CHANGE_EMAIL_ON_CONFIRMATION,
+  USER_CHANGESTATUS
 } from "../actions/types";
 
 export function auth(state = null, action) {
@@ -32,6 +33,11 @@ export function auth(state = null, action) {
     case CHANGE_SETTINGS:
     case CHANGE_EMAIL_ON_CONFIRMATION:
       return {...state, user: payload};
+    case USER_CHANGESTATUS:
+      return {...state, user: {
+        ...state.user,
+        online: payload
+      }};
     default:
       return state;
   }
