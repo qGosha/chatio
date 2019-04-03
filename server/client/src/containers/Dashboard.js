@@ -246,7 +246,7 @@ class Dashboard extends Component {
         try {
           await this.audio.play();
         } catch (e) {
-          throw new Error(e);
+          // throw new Error(e);
         }
       }
       if (!this.state.isTabActive && message.sender !== auth.user._id) {

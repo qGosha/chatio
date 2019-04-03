@@ -47,7 +47,7 @@ export function dashboard(state = initialState, action) {
       const {id, online} = payload;
       return {...state, iHaveDialogWith: {
         ...state.iHaveDialogWith,
-        [state.iHaveDialogWith[id]]: {
+        [id]: {
           ...state.iHaveDialogWith[id],
           online
         }
