@@ -24,7 +24,13 @@ import history from "../helpers/history";
 export const getPeers = () => async dispatch => {
   const res = await axios.get("/api/search/allUsers");
   if (res.data.success) {
-    const {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers, sortedPeerListForSidePanel} = res.data.message;
+    const {
+      messagesForEveryContact,
+      newMsgNotifictions,
+      iHaveDialogWith,
+      randomUsers,
+      sortedPeerListForSidePanel
+    } = res.data.message;
     dispatch({
       payload: {
         messagesForEveryContact,
@@ -53,8 +59,6 @@ export const userChangedStatus = data => async (dispatch, getState) => {
       type: PEER_CHANGESTATUS
     });
   }
-  // const peers = dashboard.iHaveDialogWith;
-  // const user = peers && peers[id];
 };
 export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
   const res = await axios.post("/api/chat/dialogs", {
@@ -79,16 +83,13 @@ export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
 
 export const openDialog = (id, newContact, contact) => async dispatch => {
   if (newContact) {
-    // const res = await axios.post("/api/chat/openDialog", {
-    //   id
-    // });
-      dispatch({
-        payload: {
-          peerId: id,
-          newContact: contact
-        },
-        type: OPEN_DIALOG_WITH_STRANGER
-      });
+    dispatch({
+      payload: {
+        peerId: id,
+        newContact: contact
+      },
+      type: OPEN_DIALOG_WITH_STRANGER
+    });
   } else {
     dispatch({
       payload: {
@@ -120,10 +121,6 @@ export const createNewConversation = id => async dispatch => {
   try {
     const res = await axios.post("/api/chat/createNewConversation", {id});
     if (res.data.success) {
-      // dispatch({
-      //   payload: res.data.message,
-      //   type: CREATE_NEW_CONVERSATION
-      // });
     } else {
       throw new Error(res.data.error);
     }
@@ -133,12 +130,11 @@ export const createNewConversation = id => async dispatch => {
       type: ERROR
     });
   }
-
 };
 
 export const messageFromUnknown = id => async dispatch => {
   try {
-    const res = await axios.post('/api/getSpecificUser', { id });
+    const res = await axios.post("/api/getSpecificUser", {id});
     if (res.data.success) {
       dispatch({
         payload: res.data.message,
@@ -151,7 +147,6 @@ export const messageFromUnknown = id => async dispatch => {
       type: ERROR
     });
   }
-
 };
 
 export const markMsgRead = (
@@ -183,7 +178,10 @@ export const newMessageForAnotherDialog = id => async dispatch => {
   });
 };
 
-export const addMessage = (message, activeDialogWith) => async (dispatch, getState) => {
+export const addMessage = (message, activeDialogWith) => async (
+  dispatch,
+  getState
+) => {
   let sender;
   if (activeDialogWith && activeDialogWith === message.sender) {
     message.read = true;
@@ -195,7 +193,7 @@ export const addMessage = (message, activeDialogWith) => async (dispatch, getSta
     sender = message.sender;
   } else if (activeDialogWith && activeDialogWith === message.recipient) {
     sender = message.recipient;
-  } else  {
+  } else {
     sender = message.sender;
   }
   if (message) {
@@ -207,26 +205,31 @@ export const addMessage = (message, activeDialogWith) => async (dispatch, getSta
 };
 
 export const sortSidePanelDialogs = () => async (dispatch, getState) => {
-  const { dashboard } = getState();
+  const {dashboard} = getState();
 
-  const { messagesForEveryContact, iHaveDialogWith } = dashboard;
-  const sorted = Object.keys(iHaveDialogWith).sort( (a, b) => {
-      const lengthA = messagesForEveryContact[a].length;
-      const lengthB = messagesForEveryContact[b].length;
-      const firstMessageA = messagesForEveryContact[a][lengthA-1];
-      const firstMessageB = messagesForEveryContact[b][lengthB-1];
-      return new Date(firstMessageB && firstMessageB.timestamp) - new Date(firstMessageA && firstMessageA.timestamp);
-    });
-    dispatch({
-      payload: sorted,
-      type: SORT_PEER_IDS
-    });
-}
+  const {messagesForEveryContact, iHaveDialogWith} = dashboard;
+  const sorted = Object.keys(iHaveDialogWith).sort((a, b) => {
+    const lengthA = messagesForEveryContact[a].length;
+    const lengthB = messagesForEveryContact[b].length;
+    const firstMessageA = messagesForEveryContact[a][lengthA - 1];
+    const firstMessageB = messagesForEveryContact[b][lengthB - 1];
+    return (
+      new Date(firstMessageB && firstMessageB.timestamp) -
+      new Date(firstMessageA && firstMessageA.timestamp)
+    );
+  });
+  dispatch({
+    payload: sorted,
+    type: SORT_PEER_IDS
+  });
+};
 
-export const addImageUrl = message => async dispatch => {
+export const addImageUrl = message => async (dispatch, getState) => {
+  const {auth} = getState();
   if (message) {
+    let idForUpdate = auth.user._id === message.sender ? message.recipient : message.sender;
     dispatch({
-      payload: message,
+      payload: {message, idForUpdate},
       type: ADD_IMAGE_URL
     });
   }

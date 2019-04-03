@@ -102,13 +102,16 @@ export function dashboard(state = initialState, action) {
     case SORT_PEER_IDS:
       return {...state, sortedPeerListForSidePanel: payload};
     case ADD_IMAGE_URL:
-      const currentMessages = state.currentMessages.map(x => {
-        if (x._id === payload._id) {
-          return {...x, ...payload};
-        }
-        return x;
-      });
-      return {...state, currentMessages};
+      const {idForUpdate} = payload;
+      return {...state, messagesForEveryContact: {
+        ...state.messagesForEveryContact,
+        [idForUpdate]: state.messagesForEveryContact[idForUpdate].map(m => {
+          if (m._id === payload.message._id) {
+            return {...m, ...payload.message};
+          }
+          return m;
+        })
+      }}
     case UPLOAD_MESSAGES_END:
       return {...state, haveAllMessagesBeenFetched: true};
     case MARK_MSG_READ:

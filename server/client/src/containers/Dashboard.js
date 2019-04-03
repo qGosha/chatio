@@ -107,26 +107,43 @@ class Dashboard extends Component {
     if (height > 50) {
       this.uploadNewTrigger = true;
       const {activeDialogWith, messagesForEveryContact} = this.props.dashboard;
-      const skip = this.uploadTriggerCount + messagesForEveryContact[activeDialogWith].length;
+      const skip =
+        this.uploadTriggerCount +
+        messagesForEveryContact[activeDialogWith].length;
       await this.props.uploadMessagesOnScroll(activeDialogWith, skip);
       this.uploadNewTrigger = false;
     }
   };
 
   handleOpenDialog = async id => {
-    const { dashboard, openDialog } = this.props;
-    const { activeDialogWith, messagesForEveryContact, randomUsers } = dashboard;
+    const {dashboard, openDialog} = this.props;
+    const {activeDialogWith, messagesForEveryContact, randomUsers} = dashboard;
     let newContact = false;
     let contact;
-    if(!messagesForEveryContact.hasOwnProperty(id)) {
-      contact = randomUsers.find( i => i._id === id);
+    if (!messagesForEveryContact.hasOwnProperty(id)) {
+      contact = randomUsers.find(i => i._id === id);
       newContact = true;
-    };
+    }
     this.uploadTriggerCount = 0;
     this.uploadNewTrigger = false;
     await openDialog(id, newContact, contact);
-    if (this.dialog) {
-      this.dialog.scrollTop = this.dialog.scrollHeight;
+    if (!newContact) {
+      const imgUrlArray = messagesForEveryContact[id]
+        .filter(m => m.message.image.image)
+        .map(m => m.message.text);
+      if (imgUrlArray.length) {
+        const promiseArray = imgUrlArray.map(url => {
+          return new Promise(res => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => res();
+          });
+        });
+        await Promise.all(promiseArray);
+      }
+      if (this.dialog) {
+        this.dialog.scrollTop = this.dialog.scrollHeight;
+      }
     }
   };
 
@@ -137,7 +154,11 @@ class Dashboard extends Component {
   sendImages = () => {
     const {pictures} = this.state;
     const {sendImages, createNewConversation, dashboard} = this.props;
-    const {activeDialogWith, iHaveDialogWith, messagesForEveryContact} = dashboard;
+    const {
+      activeDialogWith,
+      iHaveDialogWith,
+      messagesForEveryContact
+    } = dashboard;
 
     if (!pictures.length || !activeDialogWith) return;
     let formData = new FormData();
@@ -154,7 +175,11 @@ class Dashboard extends Component {
   sendMessage = () => {
     const {messageText} = this.state;
     const {createNewConversation, dashboard} = this.props;
-    const {activeDialogWith, iHaveDialogWith, messagesForEveryContact} = dashboard;
+    const {
+      activeDialogWith,
+      iHaveDialogWith,
+      messagesForEveryContact
+    } = dashboard;
     const {socket} = dashboard;
     if (!messageText || !activeDialogWith) return;
     const newMessage = {
@@ -188,7 +213,6 @@ class Dashboard extends Component {
   };
 
   componentDidMount() {
-
     this.audio.load();
     this.normalTitle = document.title;
     // const socket = io("https://im-messenger.herokuapp.com");
@@ -240,7 +264,11 @@ class Dashboard extends Component {
         addMessage,
         sortSidePanelDialogs
       } = this.props;
-      const {activeDialogWith, iHaveDialogWith, messagesForEveryContact} = dashboard;
+      const {
+        activeDialogWith,
+        iHaveDialogWith,
+        messagesForEveryContact
+      } = dashboard;
       const {user} = auth;
       if (message.sender !== auth.user._id && !user.mute) {
         try {
@@ -270,17 +298,17 @@ class Dashboard extends Component {
           scroll = true;
         }
       }
-        await addMessage(message, activeDialogWith);
+      await addMessage(message, activeDialogWith);
 
-        if (scroll) {
-          dialog.scrollTop = dialog.scrollHeight;
-        }
+      if (scroll) {
+        dialog.scrollTop = dialog.scrollHeight;
+      }
 
       sortSidePanelDialogs();
       this.uploadTriggerCount++;
     });
     socket.on("msgHasBeenReadByPeer", async options => {
-      const { ids, whose } = options;
+      const {ids, whose} = options;
       const {dashboard, msgReadByPeer} = this.props;
       const {messagesForEveryContact} = dashboard;
       const messagesArray = messagesForEveryContact[whose];

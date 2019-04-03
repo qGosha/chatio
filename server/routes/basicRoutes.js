@@ -40,39 +40,38 @@ module.exports = (app, io) => {
         res.send({
           success: true,
           message: specificUser
-       })
-     } else {
-       throw new Error('No user found')
-     }
-   } catch (error) {
-     res.send({
-       success: false,
-       error: error.message
-     });
-   }
-  })
+        });
+      } else {
+        throw new Error("No user found");
+      }
+    } catch (error) {
+      res.send({
+        success: false,
+        error: error.message
+      });
+    }
+  });
 
   app.get("/api/search/allUsers", loggedIn, async (req, res) => {
     try {
       const userId = req.user._id;
       const randomUsers = await User.find(
         {_id: {$ne: userId}},
-        {name: 1, gender: 1, online: 1, photos: {$slice: 1}},
-      )
-        .limit(20);
+        {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
+      ).limit(20);
 
       const getIHaveDialogWith = await Conversation.find({
         members: {$in: [userId]}
       }).populate({
         path: "members",
         model: User,
-        select: {"_id": 1, "name": 1, "photos": 1, "online": 1},
+        select: {_id: 1, name: 1, photos: 1, online: 1},
         match: {_id: {$ne: userId}}
       });
       let iHaveDialogWith = {};
-      getIHaveDialogWith.forEach( i => {
+      getIHaveDialogWith.forEach(i => {
         if (i.members) {
-        iHaveDialogWith[i.members[0]._id] = i.members[0];
+          iHaveDialogWith[i.members[0]._id] = i.members[0];
         }
       });
 
@@ -99,13 +98,18 @@ module.exports = (app, io) => {
         );
       });
 
-      const sortedPeerListForSidePanel = Object.keys(iHaveDialogWith).sort( (a, b) => {
+      const sortedPeerListForSidePanel = Object.keys(iHaveDialogWith).sort(
+        (a, b) => {
           const lengthA = messagesForEveryContact[a].length;
           const lengthB = messagesForEveryContact[b].length;
-          const firstMessageA = messagesForEveryContact[a][lengthA-1];
-          const firstMessageB = messagesForEveryContact[b][lengthB-1];
-          return new Date(firstMessageB && firstMessageB.timestamp) - new Date(firstMessageA && firstMessageA.timestamp);
-        });
+          const firstMessageA = messagesForEveryContact[a][lengthA - 1];
+          const firstMessageB = messagesForEveryContact[b][lengthB - 1];
+          return (
+            new Date(firstMessageB && firstMessageB.timestamp) -
+            new Date(firstMessageA && firstMessageA.timestamp)
+          );
+        }
+      );
 
       const getNewMsgNotifictions = messages.filter(message => {
         return message.recipient.equals(userId) && message.read === false;
@@ -122,7 +126,13 @@ module.exports = (app, io) => {
       });
       res.send({
         success: true,
-        message: {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers, sortedPeerListForSidePanel}
+        message: {
+          messagesForEveryContact,
+          newMsgNotifictions,
+          iHaveDialogWith,
+          randomUsers,
+          sortedPeerListForSidePanel
+        }
       });
     } catch (error) {
       res.send({
@@ -131,37 +141,6 @@ module.exports = (app, io) => {
       });
     }
   });
-
-  // app.post("/api/chat/openDialog", loggedIn, async (req, res) => {
-  //   const id = ObjectId(req.user._id);
-  //   const recipient = req.body.id;
-  //   if (!recipient) {
-  //     throw new Error("No recipients provsided");
-  //   }
-  //   try {
-  //     // let newContactInList;
-  //     //
-  //     // const messages = await Message.find({
-  //     //   sender: {$in: [id, ObjectId(recipient)]},
-  //     //   recipient: {$in: [ObjectId(recipient), id]}
-  //     // })
-  //     //   .sort({timestamp: -1})
-  //     //   .limit(20);
-  //    const newContact = await User.findOne(
-  //      {_id: recipient},
-  //      {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
-  //    );
-  //     res.send({
-  //       success: true,
-  //       message: newContact
-  //     });
-  //   } catch (error) {
-  //     res.send({
-  //       success: false,
-  //       error
-  //     });
-  //   }
-  // });
 
   app.post("/api/chat/dialogs", loggedIn, async (req, res) => {
     const id = ObjectId(req.user._id);
@@ -256,7 +235,10 @@ module.exports = (app, io) => {
     const objIds = ids.map(id => ObjectId(id));
     try {
       await Message.updateMany({_id: {$in: objIds}}, {$set: {read: true}});
-      io.to(activeDialogWith).emit("msgHasBeenReadByPeer", {ids, whose: (req.user._id).toString()});
+      io.to(activeDialogWith).emit("msgHasBeenReadByPeer", {
+        ids,
+        whose: req.user._id.toString()
+      });
       res.send({
         success: true
       });
@@ -278,16 +260,10 @@ module.exports = (app, io) => {
         members: {$all: [objId, me]}
       });
       if (getIHaveDialogWith.length) {
-        throw new Error('Conversation alredy exists')
+        throw new Error("Conversation alredy exists");
       }
       const newConv = await new Conversation({members: [objId, me]}).save();
-      // const newFriend = Conversation.populate(newConv, {
-      //   path: 'members',
-      //   select: {"_id": 1, "name": 1, "photos": 1, "online": 1},
-      //   match: {_id: {$ne: me}}
-      // })
       res.send({
-        // message: newFriend[0],
         success: true
       });
     } catch (error) {
