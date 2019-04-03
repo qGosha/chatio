@@ -108,7 +108,7 @@ module.exports = (app, io) => {
         });
 
       const getNewMsgNotifictions = messages.filter(message => {
-        return message.recipient === userId && message.read === false;
+        return message.recipient.equals(userId) && message.read === false;
       });
 
       let newMsgNotifictions = {};
