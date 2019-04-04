@@ -3,6 +3,7 @@ import {Segment, Icon, Ref} from "semantic-ui-react";
 import Messages from "../components/Messages";
 import {useEffect} from "react";
 import history from "../helpers/history";
+import { Redirect } from 'react-router'
 
 const styles = {
   dialog: {
@@ -27,6 +28,9 @@ const ChatSection = props => {
     topStyle
   } = props;
   const {messagesForEveryContact, activeDialogWith, newMsgNotifictions} = dashboard;
+  if(!activeDialogWith) {
+    return  <Redirect to="/dashboard"/>;
+  }
   const user = auth.user;
   const currentMessages = messagesForEveryContact[activeDialogWith];
   const notReadMsg = currentMessages.some(

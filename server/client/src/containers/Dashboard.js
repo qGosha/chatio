@@ -359,6 +359,7 @@ class Dashboard extends Component {
         />
         <WelcomePage
           randomUsers={randomUsers}
+          activeDialogWith={activeDialogWith}
           iHaveDialogWith={iHaveDialogWith}
           openDialog={this.handleOpenDialog}
           standartImage={standartImage}
@@ -419,16 +420,17 @@ class Dashboard extends Component {
           <Route
             exact
             path={`${match.url}`}
-            render={
-              activeDialogWith ? () => chattingSection(style) : welcomeSection
-            }
+            render={welcomeSection}
+          />
+          <Route
+            path={`${match.url}/chat`}
+            render={ () => chattingSection(style) }
           />
           <Route
             path={`${match.url}/settings`}
             render={() => <Settings standartImage={standartImage} />}
           />
           <Route
-            exact
             path={`${match.url}/messages`}
             render={() => <WrappedMessageList/>}
           />

@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import {Segment, Image} from "semantic-ui-react";
-
+import { Redirect } from 'react-router'
 
 const styles = {
   container: {
@@ -48,8 +48,11 @@ const styles = {
   }
 };
 
-const WelcomePage = ({randomUsers, openDialog, standartImage}) => {
+const WelcomePage = ({randomUsers, openDialog, standartImage, activeDialogWith}) => {
   if (!randomUsers) return null;
+  if(activeDialogWith) {
+    return  <Redirect to="/dashboard/chat"/>;
+  }
   const avatars = randomUsers.map(user => {
       const photo = user.photos[0];
       return (

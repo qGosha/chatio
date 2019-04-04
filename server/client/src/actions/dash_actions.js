@@ -81,6 +81,7 @@ export const uploadMessagesOnScroll = (id, skip) => async dispatch => {
 };
 
 export const openDialog = (id, newContact, contact) => async dispatch => {
+  history.push('/dashboard/chat')
   if (newContact) {
     dispatch({
       payload: {
@@ -98,9 +99,9 @@ export const openDialog = (id, newContact, contact) => async dispatch => {
     });
   }
 
-  if (window.location.pathname !== "/dashboard") {
-    history.push("/dashboard");
-  }
+  // if (window.location.pathname !== "/dashboard") {
+  //   history.push("/dashboard");
+  // }
 };
 
 export const closeDialog = () => async dispatch => {
@@ -161,14 +162,6 @@ export const markMsgRead = (
     type: MARK_MSG_READ
   });
 };
-
-// currentMessages.map(msg => {
-//   if (msg.recipient === user._id && !msg.read) {
-//     msg.read = true;
-//     ids.push(msg._id);
-//   }
-//   return msg;
-// });
 
 export const msgReadByPeer = (ids, whose) => async dispatch => {
   dispatch({
