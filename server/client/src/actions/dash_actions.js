@@ -16,7 +16,8 @@ import {
   SET_SOCKET,
   OPEN_DIALOG_WITH_STRANGER,
   SORT_PEER_IDS,
-  PEER_CHANGESTATUS
+  PEER_CHANGESTATUS,
+  DELETE_DIALOG
 } from "./types";
 import history from "../helpers/history";
 
@@ -109,6 +110,25 @@ export const closeDialog = () => async dispatch => {
     type: CLOSE_DIALOG
   });
 };
+
+export const removeConversation = id => async dispatch => {
+  try {
+    const res = await axios.post("/api/chat/deleteConversationForUser", {id});
+    if (res.data.success) {
+      dispatch({
+        type: DELETE_DIALOG
+      });
+    } else {
+      throw new Error(res.data.error);
+    }
+  } catch (error) {
+    dispatch({
+      payload: error.message,
+      type: ERROR
+    });
+  }
+};
+
 
 export const removeNotifications = id => async dispatch => {
   dispatch({

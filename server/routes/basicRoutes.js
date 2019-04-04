@@ -252,7 +252,9 @@ module.exports = (app, io) => {
 
   app.post("/api/chat/createNewConversation", loggedIn, async (req, res) => {
     const {id} = req.body;
-    if (!id) return;
+    if (!id) {
+      throw new Error("No id provided");
+    }
     const objId = ObjectId(id);
     const me = req.user._id;
     try {
@@ -263,6 +265,52 @@ module.exports = (app, io) => {
         throw new Error("Conversation alredy exists");
       }
       const newConv = await new Conversation({members: [objId, me]}).save();
+      res.send({
+        success: true
+      });
+    } catch (error) {
+      res.send({
+        success: false,
+        error: error.message
+      });
+    }
+  });
+
+  app.post("/api/chat/deleteConversationForUser", loggedIn, async (req, res) => {
+    const {id} = req.body;
+    if (!id) {
+      throw new Error("No id provided");
+    }
+    const objId = ObjectId(id);
+    const me = req.user._id;
+    try {
+      const convers = Conversation.findOne({members: {$all: [objId, me]}});
+      // if (convers['deletionHistory']) {
+      //   convers.deletionHistory[me.toString()] = {
+      //     dateFrom: new Date()
+      //   }
+      // } else {
+      //   convers.deletionHistory = {
+      //     [me.toString()]: {
+      //       dateFrom: new Date()
+      //     }
+      //   }
+      // }
+      convers.set('deletionHistory.'+ me, {
+            dateFrom: new Date()
+          });
+      await new Conversation(convers).save();
+      // await Conversation.findOneAndUpdate({
+      //   members: {$all: [objId, me]}
+      // },
+      // {
+      //     deletionHistory: {
+      //         [me]: {
+      //          user: me,
+      //          dateFrom: new Date()
+      //          }
+      //     }
+      // });
       res.send({
         success: true
       });

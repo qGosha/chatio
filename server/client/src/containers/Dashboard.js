@@ -310,12 +310,6 @@ class Dashboard extends Component {
     socket.on("msgHasBeenReadByPeer", async options => {
       const {ids, whose} = options;
       const {msgReadByPeer} = this.props;
-      // const {messagesForEveryContact} = dashboard;
-      // const messagesArray = messagesForEveryContact[whose];
-      // const updatedMsg = messagesArray.map(msg => {
-      //   if (ids.includes(msg._id)) msg.read = true;
-      //   return msg;
-      // });
       msgReadByPeer(ids, whose);
     });
     this.props.getPeers();
@@ -332,6 +326,7 @@ class Dashboard extends Component {
       auth,
       dashboard,
       removeNotifications,
+      removeConversation,
       closeDialog,
       markMsgRead,
       match,
@@ -343,6 +338,7 @@ class Dashboard extends Component {
       return (
         <MessagesList
           dashboard={dashboard}
+          removeConversation={removeConversation}
           openDialog={this.handleOpenDialog}
           {...props}
         />
