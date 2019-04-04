@@ -1,56 +1,255 @@
-import React from "react";
-import {Image, Divider, Segment, Item} from "semantic-ui-react";
+import React, {useState} from "react";
+import { Image, Icon, Segment } from "semantic-ui-react";
 const moment = require("moment");
 
 const styles = {
   container: {
-    gridArea: 'menu / main / main / main',
-    overflowY: 'scroll',
-    maxHeight: 'calc(100vh - 150px)',
-    padding: '5px'
+    gridArea: "menu / main / main / main",
+    overflowY: "scroll",
+    maxHeight: "calc(100vh - 150px)",
+    padding: "0 5px"
   },
-}
+  itemContainer: { 
+    display: "flex", 
+    flexDirection: "row", 
+    borderBottom: "1px solid #e8e5e5",
+  },
+  img: { 
+    height: "40px", 
+    width: "40px", 
+    marginRight: "15px",
+    alignSelf: 'center' 
+  },
+  messageContainer: {
+    display: "flex",
 
-const MessagesList = ({dashboard}) => {
-  const {messagesForEveryContact, iHaveDialogWith} = dashboard;
+    flexDirection: "row",
+    justifyContent:'space-between',   
+    width: "100%",
+    margin: '10px 0',
+    cursor: 'pointer'
+  },
+  name: { fontWeight: "bold" },
+  messageText: { marginBottom: "5px" },
+  contentContainer: {display: 'flex', flexDirection: 'column', position: 'relative',},
+  date: {
+    fontSize: '12px',
+    whiteSpace: 'nowrap',
+    color: '#767676',
+    marginRight: '20px'
+  },
+  times: {
+    position: 'absolute',
+    right: '0px',
+    fontSize: '12px',
+  }
+};
+
+const MessagesList = ({ dashboard, openDialog }) => {
+  const { messagesForEveryContact, iHaveDialogWith } = dashboard;
+  const [hoveredItem, changeHoveredItem] = useState(null);
+  const [isTimesHovered, changeTimesHover] = useState(false);
   const allMessages = {};
-  Object.keys(messagesForEveryContact).forEach( key => {
+  Object.keys(messagesForEveryContact).forEach(key => {
     let m = messagesForEveryContact[key];
-    allMessages[key] = m[m.length - 1] || [];
+    allMessages[key] = m[m.length - 1];
   });
-  // const messages = Object.keys(allMessages).map( id => {
-  //   let peer = iHaveDialogWith[id];
-  //   return (
-  //     <Item key={id}>
-  //       <Image size='mini' src={peer.photos[0]} />
-  //       <Item.Content>
-  //         <Item.Header>{peer.name}</Item.Header>
-  //         <Item.Description>{'Message'}</Item.Description>
-  //       </Item.Content>
-  //     </Item>
-  //   )
-  // })
-  const messages = Object.keys(allMessages).map( id => {
-    let peer = iHaveDialogWith[id];
+  const sortedMessagesKeys = Object.keys(allMessages).sort( (a, b) =>  {
+    return new Date(allMessages[b].timestamp) - new Date(allMessages[a].timestamp)
+  })
+  const messages = sortedMessagesKeys.map(id => {
+    const peer = iHaveDialogWith[id];
+    const isImageMessage = allMessages[id].message.image.image;
+    const timestamp = allMessages[id].timestamp;
+    let date;
+    if (moment(new Date()).isSame(timestamp, 'day')) {
+      date = moment(timestamp).format('h:mm a')
+    } else {
+      date = moment(timestamp).format('MMM D')
+    }
+    let message;
+    if (isImageMessage) {
+      message = <em>Image</em>
+    } else {
+      const text = allMessages[id].message.text,
+            width = window.innerWidth,
+            standardLength = 38,
+            standardWidth = 375,
+            number = Math.floor(width / standardWidth * standardLength);
+
+      message = text.length > number ? text.slice(0,number-3) + '...' : text;
+    }
+    const deleteIcon = <Icon 
+          name='times' 
+          style={{
+            ...styles.times,
+            color: (isTimesHovered && hoveredItem === id) ? 'black' : '#767676'
+          }}
+          onMouseEnter={() => changeTimesHover(true)}
+          onMouseLeave={() => changeTimesHover(false)}
+          />;
+    let deleteSign;
+    if(window.innerWidth > 780) {
+      deleteSign = hoveredItem === id ? deleteIcon : null;
+    } else {
+      deleteSign = deleteIcon
+    }
     return (
-      <div key={id} style={{display: 'flex', flexDirection: 'row', padding: '5px'}}>
-        <Image
-        style={{height: '40px', width: '40px', marginRight: '15px'}}
-        src={peer.photos[0]}
-        />
-        <div style={{display: 'flex', flexDirection: 'column', borderBottom: '1px solid #e8e5e5',
-    width: '100%'}}>
-          <span style={{fontWeight: 'bold'}}>{peer.name}</span>
-          <span style={{marginBottom: '5px'}}>{'Message'}</span>
+      <div key={id} style={{
+        ...styles.itemContainer,
+        backgroundColor: hoveredItem === id ? 'f5f7fa' : 'inherit' 
+        }}
+        onMouseEnter={() => changeHoveredItem(id)}
+        onMouseLeave={() => changeHoveredItem(null)}
+        onClick={() => openDialog(id)}
+        >
+        <Image style={styles.img} src={peer.photos[0]} />
+        <div style={styles.messageContainer}>
+         <div style={styles.contentContainer}>
+          <span style={styles.name}>{peer.name}</span>
+          <span style={styles.messageText}>{message}</span>
+         </div> 
+          <div style={styles.date}>
+            {date}
+          </div>  
+          {deleteSign}       
         </div>
       </div>
-    )
-  })
-  return (
-    <Segment style={styles.container}>
-        {messages}
-    </Segment>
-  )
+    );
+  });
+  return <Segment style={styles.container}>{messages}</Segment>;
 };
 
 export default MessagesList;
+
+
+//import React, {useState} from "react";
+// import { Image, Icon, Segment } from "semantic-ui-react";
+// import {connect} from "react-redux";
+// import * as actions from "../actions";
+// import ModalWindow from "../components/modal";
+// const moment = require("moment");
+
+// const styles = {
+//   container: {
+//     gridArea: "menu / main / main / main",
+//     overflowY: "scroll",
+//     maxHeight: "calc(100vh - 150px)",
+//     padding: "0 5px"
+//   },
+//   itemContainer: { 
+//     display: "flex", 
+//     flexDirection: "row", 
+//     borderBottom: "1px solid #e8e5e5",
+//   },
+//   img: { 
+//     height: "40px", 
+//     width: "40px", 
+//     marginRight: "15px",
+//     alignSelf: 'center' 
+//   },
+//   messageContainer: {
+//     display: "flex",
+
+//     flexDirection: "row",
+//     justifyContent:'space-between',   
+//     width: "100%",
+//     margin: '10px 0',
+//     cursor: 'pointer'
+//   },
+//   name: { fontWeight: "bold" },
+//   messageText: { marginBottom: "5px" },
+//   contentContainer: {display: 'flex', flexDirection: 'column', position: 'relative',},
+//   date: {
+//     fontSize: '12px',
+//     whiteSpace: 'nowrap',
+//     color: '#767676',
+//     marginRight: '20px'
+//   },
+//   times: {
+//     position: 'absolute',
+//     right: '0px',
+//     fontSize: '12px',
+//   }
+// };
+
+// const MessagesList = ({ dashboard }) => {
+//   const { messagesForEveryContact, iHaveDialogWith } = dashboard;
+//   const [hoveredItem, changeHoveredItem] = useState(null);
+//   const [isTimesHovered, changeTimesHover] = useState(false);
+//   const allMessages = {};
+//   Object.keys(messagesForEveryContact).forEach(key => {
+//     let m = messagesForEveryContact[key];
+//     allMessages[key] = m[m.length - 1];
+//   });
+//   const sortedMessagesKeys = Object.keys(allMessages).sort( (a, b) =>  {
+//     return new Date(allMessages[b].timestamp) - new Date(allMessages[a].timestamp)
+//   })
+//   const messages = sortedMessagesKeys.map(id => {
+//     const peer = iHaveDialogWith[id];
+//     const isImageMessage = allMessages[id].message.image.image;
+//     const timestamp = allMessages[id].timestamp;
+//     let date;
+//     if (moment(new Date()).isSame(timestamp, 'day')) {
+//       date = moment(timestamp).format('h:mm a')
+//     } else {
+//       date = moment(timestamp).format('MMM D')
+//     }
+//     let message;
+//     if (isImageMessage) {
+//       message = <em>Image</em>
+//     } else {
+//       const text = allMessages[id].message.text,
+//             width = window.innerWidth,
+//             standardLength = 38,
+//             standardWidth = 375,
+//             number = Math.floor(width / standardWidth * standardLength);
+
+//       message = text.length > number ? text.slice(0,number-3) + '...' : text;
+//     }
+//     const deleteIcon = <Icon 
+//           name='times' 
+//           style={{
+//             ...styles.times,
+//             color: (isTimesHovered && hoveredItem === id) ? 'black' : '#767676'
+//           }}
+//           onMouseEnter={() => changeTimesHover(true)}
+//           onMouseLeave={() => changeTimesHover(false)}
+//           />;
+//     let deleteSign;
+//     if(window.innerWidth > 780) {
+//       deleteSign = hoveredItem === id ? deleteIcon : null;
+//     } else {
+//       deleteSign = deleteIcon
+//     }
+//     return (
+//       <div key={id} style={{
+//         ...styles.itemContainer,
+//         backgroundColor: hoveredItem === id ? 'f5f7fa' : 'inherit' 
+//         }}
+//         onMouseEnter={() => changeHoveredItem(id)}
+//         onMouseLeave={() => changeHoveredItem(null)}
+//         >
+//         <Image style={styles.img} src={peer.photos[0]} />
+//         <div style={styles.messageContainer}>
+//          <div style={styles.contentContainer}>
+//           <span style={styles.name}>{peer.name}</span>
+//           <span style={styles.messageText}>{message}</span>
+//          </div> 
+//           <div style={styles.date}>
+//             {date}
+//           </div>  
+//           {deleteSign}       
+//         </div>
+//       </div>
+//     );
+//   });
+//   return <Segment style={styles.container}>{messages}</Segment>;
+// };
+
+// function mapStateToProps({dashboard}) {
+//   return {dashboard};
+// }
+
+// export default connect(mapStateToProps, actions)(MessagesList);
+

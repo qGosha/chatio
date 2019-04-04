@@ -339,6 +339,15 @@ class Dashboard extends Component {
     } = this.props;
     const {activeDialogWith, randomUsers, iHaveDialogWith} = dashboard;
     const {imagesWereUploaded, uploaderVisible, messageText} = this.state;
+    const WrappedMessageList = (props) => {
+      return (
+        <MessagesList
+          dashboard={dashboard}
+          openDialog={this.handleOpenDialog}
+          {...props}
+        />
+      )
+    }
     const welcomeSection = () => (
       <Fragment>
         <AvatarBlock
@@ -421,7 +430,7 @@ class Dashboard extends Component {
           <Route
             exact
             path={`${match.url}/messages`}
-            render={() => <MessagesList dashboard={dashboard} />}
+            render={() => <WrappedMessageList/>}
           />
         </Switch>
 
