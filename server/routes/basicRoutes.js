@@ -231,11 +231,11 @@ module.exports = (app, io) => {
   });
 
   app.post("/api/chat/markMsgRead", loggedIn, async (req, res) => {
-    const {ids, activeDialogWith} = req.body;
+    const {ids, whose} = req.body;
     const objIds = ids.map(id => ObjectId(id));
     try {
       await Message.updateMany({_id: {$in: objIds}}, {$set: {read: true}});
-      io.to(activeDialogWith).emit("msgHasBeenReadByPeer", {
+      io.to(whose).emit("msgHasBeenReadByPeer", {
         ids,
         whose: req.user._id.toString()
       });

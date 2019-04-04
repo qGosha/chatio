@@ -117,7 +117,10 @@ export function dashboard(state = initialState, action) {
     case MARK_MSG_READ:
       return {...state, messagesForEveryContact: {
         ...state.messagesForEveryContact,
-        [payload.whose]: payload.updatedMsg
+        [payload.whose]: state.messagesForEveryContact[payload.whose].map( msg => {
+          if (payload.ids.includes(msg._id)) msg.read = true;
+          return msg;
+        })
       }};
     case MSG_FROM_UNKNOWN:
       return {

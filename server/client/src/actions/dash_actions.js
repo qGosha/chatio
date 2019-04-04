@@ -150,22 +150,29 @@ export const messageFromUnknown = id => async dispatch => {
 
 export const markMsgRead = (
   ids,
-  updatedMsg,
-  activeDialogWith
+  whose
 ) => async dispatch => {
   await axios.post("/api/chat/markMsgRead", {
     ids,
-    activeDialogWith
+    whose
   });
   dispatch({
-    payload: updatedMsg,
+    payload: {ids, whose},
     type: MARK_MSG_READ
   });
 };
 
-export const msgReadByPeer = (updatedMsg, whose) => async dispatch => {
+// currentMessages.map(msg => {
+//   if (msg.recipient === user._id && !msg.read) {
+//     msg.read = true;
+//     ids.push(msg._id);
+//   }
+//   return msg;
+// });
+
+export const msgReadByPeer = (ids, whose) => async dispatch => {
   dispatch({
-    payload: {updatedMsg, whose},
+    payload: {ids, whose},
     type: MARK_MSG_READ
   });
 };
@@ -185,11 +192,12 @@ export const addMessage = (message, activeDialogWith) => async (
   if (activeDialogWith && activeDialogWith === message.sender) {
     message.read = true;
     const ids = [message._id];
+    sender = message.sender;
+    const whose = activeDialogWith;
     await axios.post("/api/chat/markMsgRead", {
       ids,
-      activeDialogWith
+      whose
     });
-    sender = message.sender;
   } else if (activeDialogWith && activeDialogWith === message.recipient) {
     sender = message.recipient;
   } else {

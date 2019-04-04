@@ -309,14 +309,14 @@ class Dashboard extends Component {
     });
     socket.on("msgHasBeenReadByPeer", async options => {
       const {ids, whose} = options;
-      const {dashboard, msgReadByPeer} = this.props;
-      const {messagesForEveryContact} = dashboard;
-      const messagesArray = messagesForEveryContact[whose];
-      const updatedMsg = messagesArray.map(msg => {
-        if (ids.includes(msg._id)) msg.read = true;
-        return msg;
-      });
-      msgReadByPeer(updatedMsg, whose);
+      const {msgReadByPeer} = this.props;
+      // const {messagesForEveryContact} = dashboard;
+      // const messagesArray = messagesForEveryContact[whose];
+      // const updatedMsg = messagesArray.map(msg => {
+      //   if (ids.includes(msg._id)) msg.read = true;
+      //   return msg;
+      // });
+      msgReadByPeer(ids, whose);
     });
     this.props.getPeers();
   }

@@ -50,7 +50,10 @@ const PageHeader = (props) => {
         active={location.pathname === '/dashboard/messages'}
         onClick={() => {
           if (location.pathname === '/dashboard/messages') return;
-          history.push('/dashboard/messages')}
+          history.push('/dashboard/messages');
+          closeDialog();
+        }
+
         }
       >
         <Icon name='chat' /> Messages

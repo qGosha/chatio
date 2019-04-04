@@ -2,6 +2,7 @@ import React, {Fragment} from "react";
 import {Segment, Icon, Ref} from "semantic-ui-react";
 import Messages from "../components/Messages";
 import {useEffect} from "react";
+import history from "../helpers/history";
 
 const styles = {
   dialog: {
@@ -41,17 +42,15 @@ const ChatSection = props => {
       if (notReadMsg) {
         let timer = setTimeout(() => {
           let ids = [];
-          const updatedMsg = currentMessages.map(msg => {
+          currentMessages.forEach(msg => {
             if (msg.recipient === user._id && !msg.read) {
-              msg.read = true;
               ids.push(msg._id);
             }
-            return msg;
           });
           if (newMsgNotifictions[activeDialogWith]) {
             removeNotifications(activeDialogWith);
           }
-          markMsgRead(ids, updatedMsg, activeDialogWith);
+          markMsgRead(ids, activeDialogWith);
         }, 1000);
         return () => clearTimeout(timer);
       }
@@ -64,7 +63,10 @@ const ChatSection = props => {
   return (
     <div style={{gridArea: "main"}}>
       <Fragment>
-        <Icon name="times" style={styles.close} onClick={closeDialog} />
+        <Icon name="times" style={styles.close} onClick={() => {
+          history.goBack();
+          closeDialog();
+        }} />
         <Ref innerRef={assignRef}>
           <Segment style={{...styles.dialog, ...topStyle.chatWindow}} onScroll={handleDialogScroll}>
             <Messages
