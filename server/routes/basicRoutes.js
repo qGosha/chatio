@@ -82,7 +82,7 @@ module.exports = (app, io) => {
             sender: {$in: [id, userId]},
             recipient: {$in: [id, userId]}
           })
-            .sort({timestamp: 1})
+            .sort({timestamp: -1})
             .limit(20);
         })
       );
@@ -102,8 +102,8 @@ module.exports = (app, io) => {
         (a, b) => {
           const lengthA = messagesForEveryContact[a].length;
           const lengthB = messagesForEveryContact[b].length;
-          const firstMessageA = messagesForEveryContact[a][lengthA - 1];
-          const firstMessageB = messagesForEveryContact[b][lengthB - 1];
+          const firstMessageA = messagesForEveryContact[a][0];
+          const firstMessageB = messagesForEveryContact[b][0];
           return (
             new Date(firstMessageB && firstMessageB.timestamp) -
             new Date(firstMessageA && firstMessageA.timestamp)
@@ -284,7 +284,24 @@ module.exports = (app, io) => {
     const objId = ObjectId(id);
     const me = req.user._id;
     try {
-      const convers = Conversation.findOne({members: {$all: [objId, me]}});
+      let convers = await Conversation.findOne({members: {$all: [objId, me]}});
+      let newConvers;
+      if(!convers['deletionHistory']) {
+        newConvers = [{user: me, dateFrom: new Date()}]
+      } else if (convers['deletionHistory'].some(m => m.user === me)) {
+        newConvers = convers.deletionHistory.map( i => {
+          if (i.user === me) {
+            return {
+              ...i,
+              dateFrom: new Date()
+            }
+          } else {
+            return i;
+          }
+         })
+      } else {
+        newConvers = [...convers['deletionHistory'], {user: me, dateFrom: new Date()}]
+      }
       // if (convers['deletionHistory']) {
       //   convers.deletionHistory[me.toString()] = {
       //     dateFrom: new Date()
@@ -296,10 +313,10 @@ module.exports = (app, io) => {
       //     }
       //   }
       // }
-      convers.set('deletionHistory.'+ me, {
-            dateFrom: new Date()
-          });
-      await new Conversation(convers).save();
+      // convers.set('deletionHistory.'+ me, {
+      //       dateFrom: new Date()
+      //     });
+      await new Conversation({deletionHistory: newConvers}).save();
       // await Conversation.findOneAndUpdate({
       //   members: {$all: [objId, me]}
       // },
