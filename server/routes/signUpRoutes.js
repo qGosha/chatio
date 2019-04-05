@@ -75,8 +75,7 @@ module.exports = app => {
         return res.status(400).send("This user has already been verified.");
       }
       user.isConfirmed = true;
-      await user.save();
-      await Token.findOneAndRemove({_id: token._id});
+      await Promise.all([user.save(), Token.findOneAndRemove({_id: token._id})])
       return res.redirect("/dashboard");
     } catch (error) {
       return res.status(404).send(error);
@@ -118,8 +117,8 @@ module.exports = app => {
         return res.status(400).send("This user has already been verified.");
       }
       user.isConfirmed = true;
-      const newUser = await user.save();
-      await Token.findOneAndRemove({_id: token._id});
+      const [newUser, ...rest] = Promise.all([user.save(), Token.findOneAndRemove({_id: token._id})]);
+      
       return res.status(200).send({
         success: true,
         message: newUser

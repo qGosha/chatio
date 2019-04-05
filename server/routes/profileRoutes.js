@@ -86,8 +86,7 @@ module.exports = app => {
           {$set: {...userData}},
           {new: true, fields: {password: 0, __v: 0}}
         );
-        await Token.findOneAndRemove({_userId: id});
-        await sendTokenEmail(req, newUser);
+        await Promise.all([Token.findOneAndRemove({_userId: id}), sendTokenEmail(req, newUser)]);
         res.send({
           success: true,
           message: newUser

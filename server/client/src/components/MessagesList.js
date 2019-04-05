@@ -59,7 +59,7 @@ const MessagesList = ({dashboard, openDialog, removeConversation}) => {
   const allMessages = {};
   Object.keys(messagesForEveryContact).forEach(key => {
     let m = messagesForEveryContact[key];
-    allMessages[key] = m[m.length - 1];
+    allMessages[key] = m[0];
   });
   const sortedMessagesKeys = Object.keys(allMessages)
     .filter(i => allMessages[i])

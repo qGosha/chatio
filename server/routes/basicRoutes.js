@@ -55,19 +55,21 @@ module.exports = (app, io) => {
   app.get("/api/search/allUsers", loggedIn, async (req, res) => {
     try {
       const userId = req.user._id;
-      const randomUsers = await User.find(
-        {_id: {$ne: userId}},
-        {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
-      ).limit(20);
+      const [randomUsers, getIHaveDialogWith] = await Promise.all([
+         User.find(
+          {_id: {$ne: userId}},
+          {name: 1, gender: 1, online: 1, photos: {$slice: 1}}
+        ).limit(20),
+         Conversation.find({
+          members: {$in: [userId]}
+        }).populate({
+          path: "members",
+          model: User,
+          select: {_id: 1, name: 1, photos: 1, online: 1},
+          match: {_id: {$ne: userId}}
+        })
+      ]);
 
-      const getIHaveDialogWith = await Conversation.find({
-        members: {$in: [userId]}
-      }).populate({
-        path: "members",
-        model: User,
-        select: {_id: 1, name: 1, photos: 1, online: 1},
-        match: {_id: {$ne: userId}}
-      });
       let iHaveDialogWith = {};
       getIHaveDialogWith.forEach(i => {
         if (i.members) {
@@ -100,8 +102,8 @@ module.exports = (app, io) => {
 
       const sortedPeerListForSidePanel = Object.keys(iHaveDialogWith).sort(
         (a, b) => {
-          const lengthA = messagesForEveryContact[a].length;
-          const lengthB = messagesForEveryContact[b].length;
+          // const lengthA = messagesForEveryContact[a].length;
+          // const lengthB = messagesForEveryContact[b].length;
           const firstMessageA = messagesForEveryContact[a][0];
           const firstMessageB = messagesForEveryContact[b][0];
           return (

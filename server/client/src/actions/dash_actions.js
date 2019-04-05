@@ -229,10 +229,8 @@ export const sortSidePanelDialogs = () => async (dispatch, getState) => {
 
   const {messagesForEveryContact, iHaveDialogWith} = dashboard;
   const sorted = Object.keys(iHaveDialogWith).sort((a, b) => {
-    const lengthA = messagesForEveryContact[a].length;
-    const lengthB = messagesForEveryContact[b].length;
-    const firstMessageA = messagesForEveryContact[a][lengthA - 1];
-    const firstMessageB = messagesForEveryContact[b][lengthB - 1];
+    const firstMessageA = messagesForEveryContact[a][0];
+    const firstMessageB = messagesForEveryContact[b][0];
     return (
       new Date(firstMessageB && firstMessageB.timestamp) -
       new Date(firstMessageA && firstMessageA.timestamp)

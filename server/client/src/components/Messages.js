@@ -36,9 +36,7 @@ const styles = {
 
 const Messages = ({messages, dashboard, auth, standartImage}) => {
   if(!dashboard || !auth || !messages.length) return null;
-  const sortedMessages = messages.sort( (a, b) =>  {
-    return new Date(a.timestamp) - new Date(b.timestamp)
-  })
+  const sortedMessages = [...messages].reverse();
   const { activeDialogWith, iHaveDialogWith } = dashboard;
   const { user } = auth;
   const myAvatar = user.photos.length ? user.photos[0] : standartImage;

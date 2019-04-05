@@ -95,8 +95,8 @@ export function dashboard(state = initialState, action) {
         ...state.messagesForEveryContact,
         [sender]: doesExist && doesExist.length ?
         [
-          ...state.messagesForEveryContact[sender],
-          message
+          message,
+          ...state.messagesForEveryContact[sender],        
         ] : [message]
       }};
     case SORT_PEER_IDS:
