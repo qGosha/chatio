@@ -71,23 +71,42 @@ module.exports = (app, io) => {
       ]);
 
       let iHaveDialogWith = {};
+      let deletionHistory = {};
+
       getIHaveDialogWith.forEach(i => {
+        const peerId = i.members[0]._id
         if (i.members) {
-          iHaveDialogWith[i.members[0]._id] = i.members[0];
+          iHaveDialogWith[peerId] = i.members[0];
+          if (i.deletionHistory.length) {
+            const myDeletionHistory = i.deletionHistory.find( u => u.user.equals(userId))
+            if(myDeletionHistory) {
+              deletionHistory[peerId] = myDeletionHistory.dateFrom
+            }
+          }
         }
       });
 
       const iHaveDialogWithIds = Object.keys(iHaveDialogWith);
       const getMessages = await Promise.all(
         iHaveDialogWithIds.map(id => {
-          return Message.find({
-            sender: {$in: [id, userId]},
-            recipient: {$in: [id, userId]}
-          })
-            .sort({timestamp: -1})
-            .limit(20);
+          if(deletionHistory[id]) {
+            return Message.find({
+              sender: {$in: [id, userId]},
+              recipient: {$in: [id, userId]},
+              timestamp: {$gt: deletionHistory[id]}
+            })
+              .sort({timestamp: -1})
+              .limit(20);
+          } else {
+            return Message.find({
+              sender: {$in: [id, userId]},
+              recipient: {$in: [id, userId]}
+            })
+              .sort({timestamp: -1})
+              .limit(20);
+          }
         })
-      );
+        );
 
       const messages = getMessages.reduce((a, b) => a.concat(b), []);
       let messagesForEveryContact = {};
@@ -99,7 +118,11 @@ module.exports = (app, io) => {
             message.recipient.toString() === stringId
         );
       });
-
+      Object.keys(messagesForEveryContact).forEach(id => {
+        if(!messagesForEveryContact[id].length) {
+          delete iHaveDialogWithIds[id]
+        }
+      })
       const sortedPeerListForSidePanel = Object.keys(iHaveDialogWith).sort(
         (a, b) => {
           // const lengthA = messagesForEveryContact[a].length;
@@ -148,13 +171,34 @@ module.exports = (app, io) => {
     const id = ObjectId(req.user._id);
     const recipient = req.body.id;
     try {
-      const messages = await Message.find({
+      const convers = await Conversation.find({
+       members: {$all: [id, recipient]}
+     })
+     const history = convers[0].deletionHistory
+     let wasDeletedOn
+     if(history && history.length) {
+       const myDeletionHistory = history.find( u => u.user.equals(id))
+       wasDeletedOn = myDeletionHistory && myDeletionHistory.dateFrom
+     }
+     let messages;
+     if (wasDeletedOn) {
+       messages = await Message.find({
+        sender: {$in: [id, ObjectId(recipient)]},
+        recipient: {$in: [ObjectId(recipient), id]},
+        timestamp: {$gt: wasDeletedOn}
+      })
+        .skip(req.body.skip || 0)
+        .sort({timestamp: -1})
+        .limit(20);
+     } else {
+       messages = await Message.find({
         sender: {$in: [id, ObjectId(recipient)]},
         recipient: {$in: [ObjectId(recipient), id]}
       })
         .skip(req.body.skip || 0)
         .sort({timestamp: -1})
         .limit(20);
+     }
 
       res.send({
         success: true,
@@ -264,7 +308,9 @@ module.exports = (app, io) => {
         members: {$all: [objId, me]}
       });
       if (getIHaveDialogWith.length) {
-        throw new Error("Conversation alredy exists");
+        return res.send({
+          success: true
+        });
       }
       const newConv = await new Conversation({members: [objId, me]}).save();
       res.send({
@@ -290,46 +336,18 @@ module.exports = (app, io) => {
       let newConvers;
       if(!convers['deletionHistory']) {
         newConvers = [{user: me, dateFrom: new Date()}]
-      } else if (convers['deletionHistory'].some(m => m.user === me)) {
+      } else if (convers['deletionHistory'].some(m => m.user.equals(me))) {
         newConvers = convers.deletionHistory.map( i => {
-          if (i.user === me) {
-            return {
-              ...i,
-              dateFrom: new Date()
-            }
-          } else {
-            return i;
+          if (i.user.equals(me)) {
+            i.dateFrom = new Date()
           }
+          return i;
          })
       } else {
         newConvers = [...convers['deletionHistory'], {user: me, dateFrom: new Date()}]
       }
-      // if (convers['deletionHistory']) {
-      //   convers.deletionHistory[me.toString()] = {
-      //     dateFrom: new Date()
-      //   }
-      // } else {
-      //   convers.deletionHistory = {
-      //     [me.toString()]: {
-      //       dateFrom: new Date()
-      //     }
-      //   }
-      // }
-      // convers.set('deletionHistory.'+ me, {
-      //       dateFrom: new Date()
-      //     });
-      await new Conversation({deletionHistory: newConvers}).save();
-      // await Conversation.findOneAndUpdate({
-      //   members: {$all: [objId, me]}
-      // },
-      // {
-      //     deletionHistory: {
-      //         [me]: {
-      //          user: me,
-      //          dateFrom: new Date()
-      //          }
-      //     }
-      // });
+      convers.deletionHistory = newConvers
+      await convers.save();
       res.send({
         success: true
       });

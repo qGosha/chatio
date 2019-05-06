@@ -16,7 +16,8 @@ import {
   SET_SOCKET,
   OPEN_DIALOG_WITH_STRANGER,
   SORT_PEER_IDS,
-  PEER_CHANGESTATUS
+  PEER_CHANGESTATUS,
+  DELETE_DIALOG
 } from "../actions/types";
 
 const initialState = {
@@ -96,7 +97,7 @@ export function dashboard(state = initialState, action) {
         [sender]: doesExist && doesExist.length ?
         [
           message,
-          ...state.messagesForEveryContact[sender],        
+          ...state.messagesForEveryContact[sender],
         ] : [message]
       }};
     case SORT_PEER_IDS:
@@ -131,8 +132,16 @@ export function dashboard(state = initialState, action) {
         },
         newMsgNotifictions: {...state.newMsgNotifictions, [payload._id]: 1}
       };
-    // case CREATE_NEW_CONVERSATION:
-    //   return {...state, iHaveDialogWith: [...state.iHaveDialogWith, [payload._id]: payload]};
+    case DELETE_DIALOG:
+      let {[payload]: omitD, ...resD} = state.iHaveDialogWith
+      let {[payload]: omitM, ...resM} = state.messagesForEveryContact
+      let newSideList = state.sortedPeerListForSidePanel.filter( i => i !== payload)
+      return {
+        ...state,
+        iHaveDialogWith: resD,
+        messagesForEveryContact: resM,
+        sortedPeerListForSidePanel: newSideList
+        };
     case REMOVE_NOTIFICATIONS:
       return {
         ...state,

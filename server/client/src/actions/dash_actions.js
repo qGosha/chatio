@@ -116,6 +116,7 @@ export const removeConversation = id => async dispatch => {
     const res = await axios.post("/api/chat/deleteConversationForUser", {id});
     if (res.data.success) {
       dispatch({
+        payload: id,
         type: DELETE_DIALOG
       });
     } else {
