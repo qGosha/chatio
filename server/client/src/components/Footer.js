@@ -1,27 +1,27 @@
-import React, { useState } from "react";
-import {TextArea, Icon} from "semantic-ui-react";
+import React, { useState } from "react"
+import { TextArea, Icon } from "semantic-ui-react"
 
 const styles = {
   footer: {
-    gridArea: 'footer',
-    marginRight: '10px'
+    gridArea: "footer",
+    marginRight: "10px"
   },
   area: {
-    transition: 'border-bottom-color 0.3s linear',
-    maxHeight: '200px',
-    width: '100%',
-    paddingRight: '60px',
-    borderRadius: '6px',
+    transition: "border-bottom-color 0.3s linear",
+    maxHeight: "200px",
+    width: "100%",
+    paddingRight: "60px",
+    borderRadius: "6px",
     outline: 0,
-    fontSize: '16px'
+    fontSize: "16px"
   },
   icon: {
-    position: 'absolute',
-    right: '30px',
-    bottom:'5px',
-    cursor: 'pointer'
+    position: "absolute",
+    right: "30px",
+    bottom: "5px",
+    cursor: "pointer"
   }
-};
+}
 
 const Footer = props => {
   const {
@@ -30,19 +30,19 @@ const Footer = props => {
     onChange,
     handleSendClick,
     handleImageSendClick
-  } = props;
+  } = props
   const defaultColor = {
-    color: '#394ce2'
+    color: "#394ce2"
   }
   const hoverColor = {
-    color: '#838ac3'
+    color: "#838ac3"
   }
-  const [iconHoverSend, changeIconHoverSend] = useState(defaultColor);
-  const [iconHoverAttach, changeIconHoverAttach] = useState(defaultColor);
+  const [iconHoverSend, changeIconHoverSend] = useState(defaultColor)
+  const [iconHoverAttach, changeIconHoverAttach] = useState(defaultColor)
 
   return (
     <form style={styles.footer} onSubmit={onSubmit}>
-       <div style={{position: 'relative'}}>
+      <div style={{ position: "relative" }}>
         <TextArea
           value={messageText}
           placeholder="Type your message..."
@@ -51,24 +51,24 @@ const Footer = props => {
           autoHeight
         />
         <Icon
-        onMouseEnter={() => changeIconHoverSend(hoverColor)}
-        onMouseLeave={() => changeIconHoverSend(defaultColor)}
-        name='send'
-        onClick={handleSendClick}
-        size='large'
-        style={{...styles.icon, ...iconHoverSend}}
+          onMouseEnter={() => changeIconHoverSend(hoverColor)}
+          onMouseLeave={() => changeIconHoverSend(defaultColor)}
+          name="send"
+          onClick={handleSendClick}
+          size="large"
+          style={{ ...styles.icon, ...iconHoverSend }}
         />
         <Icon
-        name="camera"
-        onClick={handleImageSendClick}
-        size='large'
-        style={{...styles.icon, ...iconHoverAttach, right: 0}}
-        onMouseEnter={() => changeIconHoverAttach(hoverColor)}
-        onMouseLeave={() => changeIconHoverAttach(defaultColor)}
+          name="camera"
+          onClick={handleImageSendClick}
+          size="large"
+          style={{ ...styles.icon, ...iconHoverAttach, right: 0 }}
+          onMouseEnter={() => changeIconHoverAttach(hoverColor)}
+          onMouseLeave={() => changeIconHoverAttach(defaultColor)}
         />
-        </div>
+      </div>
     </form>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer

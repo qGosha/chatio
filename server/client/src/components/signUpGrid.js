@@ -1,14 +1,14 @@
-import React from "react";
-import {InputComponent, DatePickComponent} from "../helpers/common";
-import {Form, Grid, Header, Message, Segment, Icon} from "semantic-ui-react";
-import {Field} from "redux-form";
-import {Link} from "react-router-dom";
-import SocialButtons from "./socialButtons";
-import SearchCity from "./SearchCity";
-import SelectGender from "./SelectGender";
+import React from "react"
+import { InputComponent, DatePickComponent } from "../helpers/common"
+import { Form, Grid, Header, Message, Segment, Icon } from "semantic-ui-react"
+import { Field } from "redux-form"
+import { Link } from "react-router-dom"
+import SocialButtons from "./socialButtons"
+import SearchCity from "./SearchCity"
+import SelectGender from "./SelectGender"
 
-const SignUpGrid = ({submitForm, results, props, setResults}) => {
-  const {error, handleSubmit, submitting, showLoadingScreen} = props;
+const SignUpGrid = ({ submitForm, results, props, setResults }) => {
+  const { error, handleSubmit, submitting, showLoadingScreen } = props
   const label = {
     display: "block",
     margin: "0 0 .28571429rem 0",
@@ -16,7 +16,7 @@ const SignUpGrid = ({submitForm, results, props, setResults}) => {
     fontSize: ".92857143em",
     fontWeight: "700",
     textAlign: "left"
-  };
+  }
   return (
     <Grid
       textAlign="center"
@@ -26,7 +26,7 @@ const SignUpGrid = ({submitForm, results, props, setResults}) => {
       divided
       columns="equal"
       relaxed
-      style={{paddingTop: "3rem"}}
+      style={{ paddingTop: "3rem" }}
     >
       <Grid.Row>
         <Grid.Column>
@@ -38,7 +38,7 @@ const SignUpGrid = ({submitForm, results, props, setResults}) => {
             onSubmit={handleSubmit(submitForm)}
             error={!!error}
           >
-            <Segment stacked style={{fontSize: '16px'}}>
+            <Segment stacked style={{ fontSize: "16px" }}>
               <span style={label}>Name</span>
               <Field
                 name="name"
@@ -49,7 +49,7 @@ const SignUpGrid = ({submitForm, results, props, setResults}) => {
               <span style={label}>Gender</span>
               <SelectGender />
               <span style={label}>Birthday</span>
-              <Form.Group widths="equal" style={{flexWrap: "nowrap"}}>
+              <Form.Group widths="equal" style={{ flexWrap: "nowrap" }}>
                 <Field
                   name={"dateOfBirth"}
                   placeholder={`Type new date`}
@@ -102,7 +102,7 @@ const SignUpGrid = ({submitForm, results, props, setResults}) => {
               </Form.Button>
             </Segment>
             {error && (
-              <Message negative style={{textAlign: "left"}}>
+              <Message negative style={{ textAlign: "left" }}>
                 <Icon name="times circle" color="red" />
                 <span>{error.message}</span>
               </Message>
@@ -117,7 +117,7 @@ const SignUpGrid = ({submitForm, results, props, setResults}) => {
         </Grid.Column>
       </Grid.Row>
     </Grid>
-  );
-};
+  )
+}
 
-export default SignUpGrid;
+export default SignUpGrid

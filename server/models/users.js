@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
-const {Schema} = mongoose;
+const mongoose = require("mongoose")
+const validator = require("validator")
+const bcrypt = require("bcryptjs")
+const { Schema } = mongoose
 
 const userSchema = new Schema({
   name: String,
@@ -23,7 +23,7 @@ const userSchema = new Schema({
     minlength: 6
   },
   seedPasswordLookup: {
-    type: String,
+    type: String
   },
   google: {
     googleId: String,
@@ -50,57 +50,57 @@ const userSchema = new Schema({
     type: Boolean,
     default: false
   }
-});
+})
 
 userSchema.pre("save", function(next) {
-  const user = this;
+  const user = this
   //to check if pass was modified to prevent already hashed pass from hashing
   if (user.isModified("password")) {
     try {
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(user.password, salt, (err, hash) => {
-          user.password = hash;
-          next();
-        });
-      });
+          user.password = hash
+          next()
+        })
+      })
     } catch (e) {
-      throw new Error("Cannot complete hashing");
+      throw new Error("Cannot complete hashing")
     }
   } else {
-    next();
+    next()
   }
-});
+})
 
 userSchema.statics.uniqEmailCheck = function(email) {
-  const User = this;
+  const User = this
 
-  return User.findOne({email}).then(user => {
+  return User.findOne({ email }).then(user => {
     if (user) {
-      throw new Error("User with this email already exists");
+      throw new Error("User with this email already exists")
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
-  });
-};
+  })
+}
 
 userSchema.statics.findByCredentials = function(email, password) {
-  var User = this;
+  var User = this
 
-  return User.findOne({email}).then(user => {
+  return User.findOne({ email }).then(user => {
     if (!user) {
-      throw new Error("No user with this credentials");
+      throw new Error("No user with this credentials")
     }
 
     return new Promise((resolve, reject) => {
       // Use bcrypt.compare to compare password and user.password
       bcrypt.compare(password, user.password, (err, res) => {
         if (res) {
-          resolve(user);
+          resolve(user)
         } else {
-          reject({message: "Password is wrong"});
+          reject({ message: "Password is wrong" })
         }
-      });
-    });
-  });
-};
-mongoose.model("users", userSchema);
+      })
+    })
+  })
+}
+mongoose.model("users", userSchema)

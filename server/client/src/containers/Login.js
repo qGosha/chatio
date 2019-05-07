@@ -1,12 +1,12 @@
-import React from "react";
-import {connect} from "react-redux";
-import {Link} from "react-router-dom";
-import {reduxForm, Field} from "redux-form";
-import {InputComponent} from "../helpers/common";
-import {Form, Grid, Header, Message, Segment, Icon} from "semantic-ui-react";
-import * as actions from "../actions";
-import {validate} from "../helpers/validation";
-import SocialButtons from "../components/socialButtons";
+import React from "react"
+import { connect } from "react-redux"
+import { Link } from "react-router-dom"
+import { reduxForm, Field } from "redux-form"
+import { InputComponent } from "../helpers/common"
+import { Form, Grid, Header, Message, Segment, Icon } from "semantic-ui-react"
+import * as actions from "../actions"
+import { validate } from "../helpers/validation"
+import SocialButtons from "../components/socialButtons"
 
 const Login = ({
   error,
@@ -24,7 +24,7 @@ const Login = ({
       divided
       columns={2}
       relaxed
-      style={{paddingTop: "2rem"}}
+      style={{ paddingTop: "2rem" }}
     >
       <Grid.Row>
         <Grid.Column>
@@ -36,7 +36,7 @@ const Login = ({
             onSubmit={handleSubmit(localLoginUser)}
             error={!!error}
           >
-            <Segment stacked style={{fontSize: '16px'}}>
+            <Segment stacked style={{ fontSize: "16px" }}>
               <Field
                 name="email"
                 fluid
@@ -66,7 +66,7 @@ const Login = ({
             </Segment>
 
             {error && (
-              <Message negative style={{textAlign: "left"}}>
+              <Message negative style={{ textAlign: "left" }}>
                 <Icon name="times circle" color="red" />
                 <span>{error.message}</span>
               </Message>
@@ -76,7 +76,7 @@ const Login = ({
             New to us? <Link to="/signup">Sign Up</Link>
           </Message>
           <Message>
-          <Link to="/password_recovery">Restore password</Link>
+            <Link to="/password_recovery">Restore password</Link>
           </Message>
         </Grid.Column>
         <Grid.Column>
@@ -84,12 +84,15 @@ const Login = ({
         </Grid.Column>
       </Grid.Row>
     </Grid>
-  );
-};
+  )
+}
 
-const ConnectedLogin = connect(null, actions)(Login);
+const ConnectedLogin = connect(
+  null,
+  actions
+)(Login)
 
 export default reduxForm({
   form: "loginForm",
   validate
-})(ConnectedLogin);
+})(ConnectedLogin)

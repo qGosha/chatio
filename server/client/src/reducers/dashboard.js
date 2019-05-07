@@ -18,7 +18,7 @@ import {
   SORT_PEER_IDS,
   PEER_CHANGESTATUS,
   DELETE_DIALOG
-} from "../actions/types";
+} from "../actions/types"
 
 const initialState = {
   socket: null,
@@ -30,12 +30,18 @@ const initialState = {
   haveAllMessagesBeenFetched: false,
   newMsgNotifictions: {},
   randomUsers: []
-};
+}
 export function dashboard(state = initialState, action) {
-  const payload = action.payload;
+  const payload = action.payload
   switch (action.type) {
     case GET_PEERS:
-      const {messagesForEveryContact, newMsgNotifictions, iHaveDialogWith, randomUsers, sortedPeerListForSidePanel} = payload;
+      const {
+        messagesForEveryContact,
+        newMsgNotifictions,
+        iHaveDialogWith,
+        randomUsers,
+        sortedPeerListForSidePanel
+      } = payload
       return {
         ...state,
         messagesForEveryContact,
@@ -43,24 +49,27 @@ export function dashboard(state = initialState, action) {
         iHaveDialogWith,
         randomUsers,
         sortedPeerListForSidePanel
-      };
+      }
     case PEER_CHANGESTATUS:
-      const {id, online} = payload;
-      return {...state, iHaveDialogWith: {
-        ...state.iHaveDialogWith,
-        [id]: {
-          ...state.iHaveDialogWith[id],
-          online
+      const { id, online } = payload
+      return {
+        ...state,
+        iHaveDialogWith: {
+          ...state.iHaveDialogWith,
+          [id]: {
+            ...state.iHaveDialogWith[id],
+            online
+          }
         }
-      }};
+      }
     case SET_SOCKET:
-      return {...state, socket: payload};
+      return { ...state, socket: payload }
     case OPEN_DIALOG:
       return {
         ...state,
         activeDialogWith: payload.peerId,
         haveAllMessagesBeenFetched: false
-      };
+      }
     case OPEN_DIALOG_WITH_STRANGER: {
       return {
         ...state,
@@ -74,10 +83,10 @@ export function dashboard(state = initialState, action) {
           [payload.peerId]: []
         },
         haveAllMessagesBeenFetched: false
-      };
+      }
     }
     case CLOSE_DIALOG:
-      return {...state, activeDialogWith: null};
+      return { ...state, activeDialogWith: null }
     case UPLOAD_MESSAGES_ONSCROLL:
       return {
         ...state,
@@ -87,77 +96,92 @@ export function dashboard(state = initialState, action) {
             ...state.messagesForEveryContact[payload.id],
             ...payload.messages
           ]
-         }
-      };
+        }
+      }
     case ADD_MESSAGE:
-    const {sender, message} = payload;
-    const doesExist = state.messagesForEveryContact[sender];
-      return {...state, messagesForEveryContact: {
-        ...state.messagesForEveryContact,
-        [sender]: doesExist && doesExist.length ?
-        [
-          message,
-          ...state.messagesForEveryContact[sender],
-        ] : [message]
-      }};
+      const { sender, message } = payload
+      const doesExist = state.messagesForEveryContact[sender]
+      return {
+        ...state,
+        messagesForEveryContact: {
+          ...state.messagesForEveryContact,
+          [sender]:
+            doesExist && doesExist.length
+              ? [message, ...state.messagesForEveryContact[sender]]
+              : [message]
+        }
+      }
     case SORT_PEER_IDS:
-      return {...state, sortedPeerListForSidePanel: payload};
+      return { ...state, sortedPeerListForSidePanel: payload }
     case ADD_IMAGE_URL:
-      const {idForUpdate} = payload;
-      return {...state, messagesForEveryContact: {
-        ...state.messagesForEveryContact,
-        [idForUpdate]: state.messagesForEveryContact[idForUpdate].map(m => {
-          if (m._id === payload.message._id) {
-            return {...m, ...payload.message};
-          }
-          return m;
-        })
-      }}
+      const { idForUpdate } = payload
+      return {
+        ...state,
+        messagesForEveryContact: {
+          ...state.messagesForEveryContact,
+          [idForUpdate]: state.messagesForEveryContact[idForUpdate].map(m => {
+            if (m._id === payload.message._id) {
+              return { ...m, ...payload.message }
+            }
+            return m
+          })
+        }
+      }
     case UPLOAD_MESSAGES_END:
-      return {...state, haveAllMessagesBeenFetched: true};
+      return { ...state, haveAllMessagesBeenFetched: true }
     case MARK_MSG_READ:
-      return {...state, messagesForEveryContact: {
-        ...state.messagesForEveryContact,
-        [payload.whose]: state.messagesForEveryContact[payload.whose].map( msg => {
-          if (payload.ids.includes(msg._id)) msg.read = true;
-          return msg;
-        })
-      }};
+      return {
+        ...state,
+        messagesForEveryContact: {
+          ...state.messagesForEveryContact,
+          [payload.whose]: state.messagesForEveryContact[payload.whose].map(
+            msg => {
+              if (payload.ids.includes(msg._id)) msg.read = true
+              return msg
+            }
+          )
+        }
+      }
     case MSG_FROM_UNKNOWN:
       return {
         ...state,
         iHaveDialogWith: {
-        ...state.iHaveDialogWith,
-        [payload._id]: payload
+          ...state.iHaveDialogWith,
+          [payload._id]: payload
         },
-        newMsgNotifictions: {...state.newMsgNotifictions, [payload._id]: 1}
-      };
+        newMsgNotifictions: { ...state.newMsgNotifictions, [payload._id]: 1 }
+      }
     case DELETE_DIALOG:
-      let {[payload]: omitD, ...resD} = state.iHaveDialogWith
-      let {[payload]: omitM, ...resM} = state.messagesForEveryContact
-      let newSideList = state.sortedPeerListForSidePanel.filter( i => i !== payload)
+      let { [payload]: omitD, ...resD } = state.iHaveDialogWith
+      let { [payload]: omitM, ...resM } = state.messagesForEveryContact
+      let newSideList = state.sortedPeerListForSidePanel.filter(
+        i => i !== payload
+      )
       return {
         ...state,
         iHaveDialogWith: resD,
         messagesForEveryContact: resM,
         sortedPeerListForSidePanel: newSideList
-        };
+      }
     case REMOVE_NOTIFICATIONS:
       return {
         ...state,
-        newMsgNotifictions: {...state.newMsgNotifictions, [payload]: undefined}
-      };
+        newMsgNotifictions: {
+          ...state.newMsgNotifictions,
+          [payload]: undefined
+        }
+      }
     case NEW_MSG_NOTIFICATION:
-      let peer = state.newMsgNotifictions[payload];
-      const newValue = peer ? ++peer : 1;
+      let peer = state.newMsgNotifictions[payload]
+      const newValue = peer ? ++peer : 1
       return {
         ...state,
-        newMsgNotifictions: {...state.newMsgNotifictions, [payload]: newValue}
-      };
+        newMsgNotifictions: { ...state.newMsgNotifictions, [payload]: newValue }
+      }
     case LOGOUT_USER:
-      return initialState;
+      return initialState
 
     default:
-      return state;
+      return state
   }
 }

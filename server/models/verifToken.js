@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const {Schema} = mongoose;
+const mongoose = require("mongoose")
+const { Schema } = mongoose
 
 const tokenSchema = new Schema({
   _userId: {
@@ -12,7 +12,7 @@ const tokenSchema = new Schema({
     required: true
   },
   pin: {
-    type: String,
+    type: String
   },
   createdAt: {
     type: Date,
@@ -20,30 +20,30 @@ const tokenSchema = new Schema({
     default: Date.now,
     expires: 43200
   }
-});
+})
 
 tokenSchema.statics.findByToken = function(token) {
-  const Token = this;
+  const Token = this
 
-  return Token.findOne({token}).then(token => {
+  return Token.findOne({ token }).then(token => {
     if (!token) {
-      throw new Error("Token is not valid");
+      throw new Error("Token is not valid")
     } else {
-      return Promise.resolve(token);
+      return Promise.resolve(token)
     }
-  });
-};
+  })
+}
 
 tokenSchema.statics.findByPin = function(pin) {
-  const Token = this;
+  const Token = this
 
-  return Token.findOne({pin}).then(pin => {
+  return Token.findOne({ pin }).then(pin => {
     if (!pin) {
-      throw new Error("Pin is not valid");
+      throw new Error("Pin is not valid")
     } else {
-      return Promise.resolve(pin);
+      return Promise.resolve(pin)
     }
-  });
-};
+  })
+}
 
-mongoose.model("verifTokens", tokenSchema);
+mongoose.model("verifTokens", tokenSchema)

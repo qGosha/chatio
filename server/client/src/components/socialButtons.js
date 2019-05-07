@@ -1,12 +1,12 @@
-import React, {Fragment} from "react";
-import {Button, Icon} from "semantic-ui-react";
+import React, { Fragment } from "react"
+import { Button, Icon } from "semantic-ui-react"
 
-const SocialButtons = ({showLoadingScreen}) => {
+const SocialButtons = ({ showLoadingScreen }) => {
   const loginWith = path => {
-    showLoadingScreen();
-    window.location = path;
-    return;
-  };
+    showLoadingScreen()
+    window.location = path
+    return
+  }
   return (
     <Fragment>
       <Button
@@ -16,22 +16,26 @@ const SocialButtons = ({showLoadingScreen}) => {
         fluid
         size="large"
       >
-        <Icon style={{float: "left"}} name="google plus square" size="large" />
+        <Icon
+          style={{ float: "left" }}
+          name="google plus square"
+          size="large"
+        />
         Sign in with Google
       </Button>
       <Button
         icon
-        style={{marginTop: "10px"}}
+        style={{ marginTop: "10px" }}
         onClick={() => loginWith("/auth/facebook")}
         color="facebook"
         fluid
         size="large"
       >
-        <Icon style={{float: "left"}} name="facebook" size="large" />
+        <Icon style={{ float: "left" }} name="facebook" size="large" />
         Sign in with Facebook
       </Button>
     </Fragment>
-  );
-};
+  )
+}
 
-export default SocialButtons;
+export default SocialButtons

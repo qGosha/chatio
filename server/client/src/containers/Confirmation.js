@@ -1,15 +1,15 @@
-import React, {Component} from "react";
-import {connect} from "react-redux";
-import ReCAPTCHA from "react-google-recaptcha";
-import * as actions from "../actions";
-import {Button, Grid, Form, Message, Icon} from "semantic-ui-react";
-import axios from "axios";
-import {reduxForm, Field, SubmissionError} from "redux-form";
-import {validate} from "../helpers/validation";
-import {normalizeNumber} from "../helpers/normalizing";
-import {InputComponent} from "../helpers/common";
-import ChangeEmailForm from "../components/ChangeEmailForm";
-import PageHeader from "../components/Header";
+import React, { Component } from "react"
+import { connect } from "react-redux"
+import ReCAPTCHA from "react-google-recaptcha"
+import * as actions from "../actions"
+import { Button, Grid, Form, Message, Icon } from "semantic-ui-react"
+import axios from "axios"
+import { reduxForm, Field, SubmissionError } from "redux-form"
+import { validate } from "../helpers/validation"
+import { normalizeNumber } from "../helpers/normalizing"
+import { InputComponent } from "../helpers/common"
+import ChangeEmailForm from "../components/ChangeEmailForm"
+import PageHeader from "../components/Header"
 
 class Confirmation extends Component {
   state = {
@@ -18,57 +18,57 @@ class Confirmation extends Component {
     showRecaptcha: false,
     isChangeEmailFormVisible: false,
     showChangeEmailSuccess: false
-  };
+  }
 
   logout = () => {
-    const {socket} = this.props.dashboard;
+    const { socket } = this.props.dashboard
     if (socket) {
-      socket.disconnect();
+      socket.disconnect()
     }
-    this.props.logoutUser();
-  };
+    this.props.logoutUser()
+  }
 
   onCapthaSubmit = () => {
-    this.sendResendReq();
-    this.setState({showRecaptcha: false});
-  };
+    this.sendResendReq()
+    this.setState({ showRecaptcha: false })
+  }
 
   hideChangeEmailForm = () => {
-    this.setState({isChangeEmailFormVisible: false});
-  };
+    this.setState({ isChangeEmailFormVisible: false })
+  }
 
   showChnageEmailSuccess = () => {
-    this.setState({showChangeEmailSuccess: true});
-    setTimeout(() => this.setState({showChangeEmailSuccess: false}), 2500);
-  };
+    this.setState({ showChangeEmailSuccess: true })
+    setTimeout(() => this.setState({ showChangeEmailSuccess: false }), 2500)
+  }
 
   handleChangeEmailForm = async values => {
-    await this.props.changeEmail(values);
-    this.hideChangeEmailForm();
-    this.showChnageEmailSuccess();
-  };
+    await this.props.changeEmail(values)
+    this.hideChangeEmailForm()
+    this.showChnageEmailSuccess()
+  }
 
   sendResendReq = async () => {
     try {
-      const res = await axios.get("/api/resendToken");
-      const {data} = res;
+      const res = await axios.get("/api/resendToken")
+      const { data } = res
       if (data.success) {
-        this.setState({showResendSuccess: true});
-        setTimeout(() => this.setState({showResendSuccess: false}), 2500);
-      } else throw Error(data.message);
+        this.setState({ showResendSuccess: true })
+        setTimeout(() => this.setState({ showResendSuccess: false }), 2500)
+      } else throw Error(data.message)
     } catch (err) {
-      throw new SubmissionError({_error: err});
+      throw new SubmissionError({ _error: err })
     }
-  };
+  }
   resendConfirmToken = () => {
-    let counts = this.state.resendCounts;
+    let counts = this.state.resendCounts
     if (counts > 0) {
-      this.setState({showRecaptcha: true});
-      return;
+      this.setState({ showRecaptcha: true })
+      return
     }
-    this.setState({resendCounts: counts + 1});
-    this.sendResendReq();
-  };
+    this.setState({ resendCounts: counts + 1 })
+    this.sendResendReq()
+  }
 
   render() {
     const {
@@ -78,29 +78,34 @@ class Confirmation extends Component {
       confirmUser,
       auth,
       location
-    } = this.props;
+    } = this.props
     const successMessage = message => {
       return (
-        <Message positive style={{textAlign: "left"}}>
+        <Message positive style={{ textAlign: "left" }}>
           <Icon name="check circle" color="green" />
           <span>{message}</span>
         </Message>
-      );
-    };
+      )
+    }
     const topStyleForHeader = {
       headerButtonJustify: {
-        justifyContent: 'flex-end'
+        justifyContent: "flex-end"
       }
     }
     return (
       <div>
-        <PageHeader auth={auth} logout={this.logout} location={location} topStyle={topStyleForHeader}/>
+        <PageHeader
+          auth={auth}
+          logout={this.logout}
+          location={location}
+          topStyle={topStyleForHeader}
+        />
 
         <Grid
           textAlign="center"
           verticalAlign="middle"
           container
-          style={{paddingTop: "3rem"}}
+          style={{ paddingTop: "3rem" }}
         >
           <Grid.Row>
             <Form onSubmit={handleSubmit(confirmUser)} error={!!error}>
@@ -114,14 +119,14 @@ class Confirmation extends Component {
               />
               <Form.Button
                 color="blue"
-                style={{width: "125px"}}
+                style={{ width: "125px" }}
                 loading={submitting}
                 disabled={submitting}
               >
                 Send
               </Form.Button>
               {error && (
-                <Message negative style={{textAlign: "left"}}>
+                <Message negative style={{ textAlign: "left" }}>
                   <Icon name="times circle" color="red" />
                   <span>{error.message}</span>
                 </Message>
@@ -132,7 +137,7 @@ class Confirmation extends Component {
           </Grid.Row>
           <Grid.Row>
             <Button
-              style={{width: "125px"}}
+              style={{ width: "125px" }}
               disabled={this.state.showRecaptcha}
               onClick={this.resendConfirmToken}
             >
@@ -150,7 +155,9 @@ class Confirmation extends Component {
           <Grid.Row>
             {!this.state.isChangeEmailFormVisible ? (
               <a
-                onClick={() => this.setState({isChangeEmailFormVisible: true})}
+                onClick={() =>
+                  this.setState({ isChangeEmailFormVisible: true })
+                }
               >
                 Change email
               </a>
@@ -172,17 +179,20 @@ class Confirmation extends Component {
           )}
         </Grid>
       </div>
-    );
+    )
   }
 }
 
-function mapStateToProps({auth, dashboard}) {
-  return {auth, dashboard};
+function mapStateToProps({ auth, dashboard }) {
+  return { auth, dashboard }
 }
 
-const connectedConfirmation = connect(mapStateToProps, actions)(Confirmation);
+const connectedConfirmation = connect(
+  mapStateToProps,
+  actions
+)(Confirmation)
 
 export default reduxForm({
   form: "confirmationForm",
   validate
-})(connectedConfirmation);
+})(connectedConfirmation)

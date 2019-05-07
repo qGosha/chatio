@@ -1,13 +1,13 @@
-import React from "react";
-import debounce from "lodash.debounce";
-import axios from "axios";
-import {SearchComponent} from "../helpers/common";
-import {Field} from "redux-form";
+import React from "react"
+import debounce from "lodash.debounce"
+import axios from "axios"
+import { SearchComponent } from "../helpers/common"
+import { Field } from "redux-form"
 
-const SearchCity = ({change, setResults, results, ...other}) => {
+const SearchCity = ({ change, setResults, results, ...other }) => {
   const searchCity = async value => {
-    const res = await axios.post("/api/search/city", {value});
-    const {data} = res;
+    const res = await axios.post("/api/search/city", { value })
+    const { data } = res
     if (data.success && data.results.length > 0) {
       const results = data.results.map(i => {
         i = {
@@ -15,20 +15,20 @@ const SearchCity = ({change, setResults, results, ...other}) => {
           key: i.id,
           title: i.description,
           description: ""
-        };
-        return i;
-      });
-      setResults(results);
+        }
+        return i
+      })
+      setResults(results)
     }
-  };
-  const onDebouncedInput = debounce(searchCity, 300, {leading: true});
+  }
+  const onDebouncedInput = debounce(searchCity, 300, { leading: true })
   const handleSearchChange = value => {
     if (!value) {
-      setResults([]);
-      return;
+      setResults([])
+      return
     }
-    onDebouncedInput(value);
-  };
+    onDebouncedInput(value)
+  }
   return (
     <Field
       handleSelectResult={change}
@@ -40,7 +40,7 @@ const SearchCity = ({change, setResults, results, ...other}) => {
       component={SearchComponent}
       {...other}
     />
-  );
-};
+  )
+}
 
-export default SearchCity;
+export default SearchCity

@@ -3,8 +3,8 @@ export const normalizeNumber = value => {
     return value
   }
 
-  const onlyNums = value.replace(/[^\d]/g, '')
+  const onlyNums = value.replace(/[^\d]/g, "")
   if (onlyNums.length <= 4) {
     return onlyNums
   }
-};
+}

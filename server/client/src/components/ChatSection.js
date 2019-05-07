@@ -1,9 +1,9 @@
-import React, {Fragment} from "react";
-import {Segment, Icon, Ref} from "semantic-ui-react";
-import Messages from "../components/Messages";
-import {useEffect} from "react";
-import history from "../helpers/history";
-import { Redirect } from 'react-router'
+import React, { Fragment } from "react"
+import { Segment, Icon, Ref } from "semantic-ui-react"
+import Messages from "../components/Messages"
+import { useEffect } from "react"
+import history from "../helpers/history"
+import { Redirect } from "react-router"
 
 const styles = {
   dialog: {
@@ -13,7 +13,7 @@ const styles = {
   close: {
     cursor: "pointer"
   }
-};
+}
 
 const ChatSection = props => {
   const {
@@ -26,53 +26,61 @@ const ChatSection = props => {
     removeNotifications,
     standartImage,
     topStyle
-  } = props;
-  const {messagesForEveryContact, activeDialogWith, newMsgNotifictions} = dashboard;
-  if(!activeDialogWith) {
-    return  <Redirect to="/dashboard"/>;
+  } = props
+  const {
+    messagesForEveryContact,
+    activeDialogWith,
+    newMsgNotifictions
+  } = dashboard
+  if (!activeDialogWith) {
+    return <Redirect to="/dashboard" />
   }
-  const user = auth.user;
-  const currentMessages = messagesForEveryContact[activeDialogWith];
+  const user = auth.user
+  const currentMessages = messagesForEveryContact[activeDialogWith]
   const notReadMsg = currentMessages.some(
     msg => msg.recipient === user._id && !msg.read
-  );
-  let dialog;
+  )
+  let dialog
   const assignRef = element => {
-    dialog = element;
-    handleRef(element);
-  };
-  useEffect(
-    () => {
-      if (notReadMsg) {
-        let timer = setTimeout(() => {
-          let ids = [];
-          currentMessages.forEach(msg => {
-            if (msg.recipient === user._id && !msg.read) {
-              ids.push(msg._id);
-            }
-          });
-          if (newMsgNotifictions[activeDialogWith]) {
-            removeNotifications(activeDialogWith);
+    dialog = element
+    handleRef(element)
+  }
+  useEffect(() => {
+    if (notReadMsg) {
+      let timer = setTimeout(() => {
+        let ids = []
+        currentMessages.forEach(msg => {
+          if (msg.recipient === user._id && !msg.read) {
+            ids.push(msg._id)
           }
-          markMsgRead(ids, activeDialogWith);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-      if (dialog) {
-        dialog.scrollTop = dialog.scrollHeight;
-      }
-    },
-    [activeDialogWith]
-  );
+        })
+        if (newMsgNotifictions[activeDialogWith]) {
+          removeNotifications(activeDialogWith)
+        }
+        markMsgRead(ids, activeDialogWith)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+    if (dialog) {
+      dialog.scrollTop = dialog.scrollHeight
+    }
+  }, [activeDialogWith])
   return (
-    <div style={{gridArea: "main"}}>
+    <div style={{ gridArea: "main" }}>
       <Fragment>
-        <Icon name="times" style={styles.close} onClick={() => {
-          history.goBack();
-          closeDialog();
-        }} />
+        <Icon
+          name="times"
+          style={styles.close}
+          onClick={() => {
+            history.goBack()
+            closeDialog()
+          }}
+        />
         <Ref innerRef={assignRef}>
-          <Segment style={{...styles.dialog, ...topStyle.chatWindow}} onScroll={handleDialogScroll}>
+          <Segment
+            style={{ ...styles.dialog, ...topStyle.chatWindow }}
+            onScroll={handleDialogScroll}
+          >
             <Messages
               messages={currentMessages}
               dashboard={dashboard}
@@ -84,7 +92,7 @@ const ChatSection = props => {
         </Ref>
       </Fragment>
     </div>
-  );
-};
+  )
+}
 
-export default ChatSection;
+export default ChatSection

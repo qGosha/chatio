@@ -1,13 +1,12 @@
-import React from "react";
-import { SelectComponent } from "../helpers/common";
-import { Field } from 'redux-form';
-
+import React from "react"
+import { SelectComponent } from "../helpers/common"
+import { Field } from "redux-form"
 
 const SelectGender = props => {
   const genderOptions = [
-    {key: "m", text: "Male", value: "male"},
-    {key: "f", text: "Female", value: "female"}
-  ];
+    { key: "m", text: "Male", value: "male" },
+    { key: "f", text: "Female", value: "female" }
+  ]
   return (
     <Field
       name="gender"
@@ -20,4 +19,4 @@ const SelectGender = props => {
   )
 }
 
-export default SelectGender;
+export default SelectGender

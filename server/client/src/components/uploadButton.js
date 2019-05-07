@@ -1,8 +1,8 @@
-import React from "react";
-import ImageUploader from "react-images-upload";
-import {Button, Divider} from "semantic-ui-react";
+import React from "react"
+import ImageUploader from "react-images-upload"
+import { Button, Divider } from "semantic-ui-react"
 
-const Uploader = ({onClose, onDrop, visible, onUpload}) => {
+const Uploader = ({ onClose, onDrop, visible, onUpload }) => {
   return (
     <div
       style={{
@@ -22,7 +22,7 @@ const Uploader = ({onClose, onDrop, visible, onUpload}) => {
           padding: "10px"
         }}
       >
-        <Button.Group style={{marginRight: "10px"}}>
+        <Button.Group style={{ marginRight: "10px" }}>
           <Button onClick={onClose}>Cancel</Button>
           <Button.Or />
           <Button positive onClick={onUpload}>
@@ -40,7 +40,7 @@ const Uploader = ({onClose, onDrop, visible, onUpload}) => {
         withPreview={true}
       />
     </div>
-  );
-};
+  )
+}
 
-export default Uploader;
+export default Uploader

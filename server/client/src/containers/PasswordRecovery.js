@@ -1,12 +1,12 @@
-import React from "react";
-import {connect} from "react-redux";
-import {Link} from "react-router-dom";
-import {reduxForm, Field, SubmissionError} from "redux-form";
-import {InputComponent} from "../helpers/common";
-import {Form, Grid, Header, Message, Segment, Icon} from "semantic-ui-react";
-import * as actions from "../actions";
-import {validate} from "../helpers/validation";
-import axios from "axios";
+import React from "react"
+import { connect } from "react-redux"
+import { Link } from "react-router-dom"
+import { reduxForm, Field, SubmissionError } from "redux-form"
+import { InputComponent } from "../helpers/common"
+import { Form, Grid, Header, Message, Segment, Icon } from "semantic-ui-react"
+import * as actions from "../actions"
+import { validate } from "../helpers/validation"
+import axios from "axios"
 
 const ResetPassword = ({
   error,
@@ -18,13 +18,13 @@ const ResetPassword = ({
 }) => {
   const sendLink = async value => {
     try {
-      const res = await axios.post('/api/reset_password_email', value);
-      const {data} = res;
+      const res = await axios.post("/api/reset_password_email", value)
+      const { data } = res
       if (data.success) {
-        clearFields(form, false, 'email');
-      } else throw Error(data.message);
+        clearFields(form, false, "email")
+      } else throw Error(data.message)
     } catch (err) {
-      throw new SubmissionError({_error: err});
+      throw new SubmissionError({ _error: err })
     }
   }
   return (
@@ -36,17 +36,18 @@ const ResetPassword = ({
       divided
       relaxed
     >
-      <Grid.Row style={{maxWidth: '500px'}}>
+      <Grid.Row style={{ maxWidth: "500px" }}>
         <Grid.Column>
-          <Header as="h2" color="teal" textAlign="center" style={{marginTop: '2rem'}}>
+          <Header
+            as="h2"
+            color="teal"
+            textAlign="center"
+            style={{ marginTop: "2rem" }}
+          >
             Reset your password
           </Header>
-          <Form
-            size="large"
-            onSubmit={handleSubmit(sendLink)}
-            error={!!error}
-          >
-            <Segment stacked style={{fontSize: '16px'}}>
+          <Form size="large" onSubmit={handleSubmit(sendLink)} error={!!error}>
+            <Segment stacked style={{ fontSize: "16px" }}>
               <Field
                 name="email"
                 fluid
@@ -67,13 +68,15 @@ const ResetPassword = ({
               </Form.Button>
             </Segment>
             {submitSucceeded && (
-              <Message positive style={{textAlign: "left"}}>
+              <Message positive style={{ textAlign: "left" }}>
                 <Icon name="check circle" color="green" />
-                <span>Success! A password reset email has been sent to your email</span>
+                <span>
+                  Success! A password reset email has been sent to your email
+                </span>
               </Message>
             )}
             {error && (
-              <Message negative style={{textAlign: "left"}}>
+              <Message negative style={{ textAlign: "left" }}>
                 <Icon name="times circle" color="red" />
                 <span>{error.message}</span>
               </Message>
@@ -85,12 +88,15 @@ const ResetPassword = ({
         </Grid.Column>
       </Grid.Row>
     </Grid>
-  );
-};
+  )
+}
 
-const ConnectedResetPassword = connect(null, actions)(ResetPassword);
+const ConnectedResetPassword = connect(
+  null,
+  actions
+)(ResetPassword)
 
 export default reduxForm({
   form: "resetPassword",
   validate
-})(ConnectedResetPassword);
+})(ConnectedResetPassword)

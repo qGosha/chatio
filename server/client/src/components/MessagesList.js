@@ -1,7 +1,7 @@
-import React, {useState, Fragment} from "react";
-import {Image, Icon, Segment} from "semantic-ui-react";
-import ModalWindow from "../components/modal";
-const moment = require("moment");
+import React, { useState, Fragment } from "react"
+import { Image, Icon, Segment } from "semantic-ui-react"
+import ModalWindow from "../components/modal"
+const moment = require("moment")
 
 const styles = {
   container: {
@@ -30,8 +30,8 @@ const styles = {
     margin: "10px 0",
     cursor: "pointer"
   },
-  name: {fontWeight: "bold"},
-  messageText: {marginBottom: "5px"},
+  name: { fontWeight: "bold" },
+  messageText: { marginBottom: "5px" },
   contentContainer: {
     display: "flex",
     flexDirection: "column",
@@ -48,47 +48,47 @@ const styles = {
     right: "0px",
     fontSize: "12px"
   }
-};
+}
 
-const MessagesList = ({dashboard, openDialog, removeConversation}) => {
-  const {messagesForEveryContact, iHaveDialogWith} = dashboard;
-  const [modalOpen, modalStatusChange] = useState(false);
-  const [hoveredItem, changeHoveredItem] = useState(null);
-  const [isTimesHovered, changeTimesHover] = useState(false);
-  const [idForDeleting, changeIdForDeleting] = useState(null);
-  const allMessages = {};
+const MessagesList = ({ dashboard, openDialog, removeConversation }) => {
+  const { messagesForEveryContact, iHaveDialogWith } = dashboard
+  const [modalOpen, modalStatusChange] = useState(false)
+  const [hoveredItem, changeHoveredItem] = useState(null)
+  const [isTimesHovered, changeTimesHover] = useState(false)
+  const [idForDeleting, changeIdForDeleting] = useState(null)
+  const allMessages = {}
   Object.keys(messagesForEveryContact).forEach(key => {
-    let m = messagesForEveryContact[key];
-    allMessages[key] = m[0];
-  });
+    let m = messagesForEveryContact[key]
+    allMessages[key] = m[0]
+  })
   const sortedMessagesKeys = Object.keys(allMessages)
     .filter(i => allMessages[i])
     .sort((a, b) => {
       return (
         new Date(allMessages[b].timestamp) - new Date(allMessages[a].timestamp)
-      );
-    });
+      )
+    })
   const messages = sortedMessagesKeys.map(id => {
-    const peer = iHaveDialogWith[id];
-    const isImageMessage = allMessages[id].message.image.image;
-    const timestamp = allMessages[id].timestamp;
-    let date;
+    const peer = iHaveDialogWith[id]
+    const isImageMessage = allMessages[id].message.image.image
+    const timestamp = allMessages[id].timestamp
+    let date
     if (moment(new Date()).isSame(timestamp, "day")) {
-      date = moment(timestamp).format("h:mm a");
+      date = moment(timestamp).format("h:mm a")
     } else {
-      date = moment(timestamp).format("MMM D");
+      date = moment(timestamp).format("MMM D")
     }
-    let message;
+    let message
     if (isImageMessage) {
-      message = <em>Image</em>;
+      message = <em>Image</em>
     } else {
       const text = allMessages[id].message.text,
         width = window.innerWidth,
         standardLength = 38,
         standardWidth = 375,
-        number = Math.floor((width / standardWidth) * standardLength);
+        number = Math.floor((width / standardWidth) * standardLength)
 
-      message = text.length > number ? text.slice(0, number - 3) + "..." : text;
+      message = text.length > number ? text.slice(0, number - 3) + "..." : text
     }
     const deleteIcon = (
       <Icon
@@ -100,17 +100,17 @@ const MessagesList = ({dashboard, openDialog, removeConversation}) => {
         onMouseEnter={() => changeTimesHover(true)}
         onMouseLeave={() => changeTimesHover(false)}
         onClick={e => {
-          e.stopPropagation();
-          changeIdForDeleting(id);
-          modalStatusChange(true);
+          e.stopPropagation()
+          changeIdForDeleting(id)
+          modalStatusChange(true)
         }}
       />
-    );
-    let deleteSign;
+    )
+    let deleteSign
     if (window.innerWidth > 780) {
-      deleteSign = hoveredItem === id ? deleteIcon : null;
+      deleteSign = hoveredItem === id ? deleteIcon : null
     } else {
-      deleteSign = deleteIcon;
+      deleteSign = deleteIcon
     }
     return (
       <div
@@ -133,8 +133,8 @@ const MessagesList = ({dashboard, openDialog, removeConversation}) => {
           {deleteSign}
         </div>
       </div>
-    );
-  });
+    )
+  })
   return (
     <Fragment>
       <Segment style={styles.container}>{messages}</Segment>
@@ -149,7 +149,7 @@ const MessagesList = ({dashboard, openDialog, removeConversation}) => {
         onPositive={() => removeConversation(idForDeleting)}
       />
     </Fragment>
-  );
-};
+  )
+}
 
-export default MessagesList;
+export default MessagesList

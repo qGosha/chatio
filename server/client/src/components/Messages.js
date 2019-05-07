@@ -1,83 +1,107 @@
-import React, { Fragment } from "react";
-import { Image, Divider } from 'semantic-ui-react';
+import React, { Fragment } from "react"
+import { Image, Divider } from "semantic-ui-react"
 
-const moment = require('moment');
+const moment = require("moment")
 
 const styles = {
   messageContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginBottom: '10px',
-    alignItems: 'center',
-    overflowX: 'hidden'
+    display: "flex",
+    flexDirection: "row",
+    marginBottom: "10px",
+    alignItems: "center",
+    overflowX: "hidden"
   },
   avatar: {
-    height: '3em',
-    width: '3em',
+    height: "3em",
+    width: "3em"
   },
   text: {
-    wordBreak: 'break-all',
+    wordBreak: "break-all"
   },
   timestamp: {
-    fontSize: '9px',
-    color: 'gray'
+    fontSize: "9px",
+    color: "gray"
   },
   dynamicImageStyle: {
-     minWidth: '80px',
-     minHeight: '80px',
-     maxWidth: '300px',
-     maxHeight: '300px',
-     overflow: 'hidden'
-   },
-   imgS: {
-     objectFit: "cover",
-   }
+    minWidth: "80px",
+    minHeight: "80px",
+    maxWidth: "300px",
+    maxHeight: "300px",
+    overflow: "hidden"
+  },
+  imgS: {
+    objectFit: "cover"
+  }
 }
 
-const Messages = ({messages, dashboard, auth, standartImage}) => {
-  if(!dashboard || !auth || !messages.length) return null;
-  const sortedMessages = [...messages].reverse();
-  const { activeDialogWith, iHaveDialogWith } = dashboard;
-  const { user } = auth;
-  const myAvatar = user.photos.length ? user.photos[0] : standartImage;
-  const peer = iHaveDialogWith[activeDialogWith];
-  const peerAvatar = (peer && peer.photos.length) ? peer.photos[0] : standartImage;
-  let shouldUseAvatar = true;
-  let lastMessageFrom = sortedMessages[0].sender;
-  let currentDate = 0;
-  const message = sortedMessages.map( (item, i) => {
+const Messages = ({ messages, dashboard, auth, standartImage }) => {
+  if (!dashboard || !auth || !messages.length) return null
+  const sortedMessages = [...messages].reverse()
+  const { activeDialogWith, iHaveDialogWith } = dashboard
+  const { user } = auth
+  const myAvatar = user.photos.length ? user.photos[0] : standartImage
+  const peer = iHaveDialogWith[activeDialogWith]
+  const peerAvatar = peer && peer.photos.length ? peer.photos[0] : standartImage
+  let shouldUseAvatar = true
+  let lastMessageFrom = sortedMessages[0].sender
+  let currentDate = 0
+  const message = sortedMessages.map((item, i) => {
     if (lastMessageFrom === item.sender && i) {
-      shouldUseAvatar = false;
+      shouldUseAvatar = false
     } else {
-      shouldUseAvatar = true;
-      lastMessageFrom = item.sender;
+      shouldUseAvatar = true
+      lastMessageFrom = item.sender
     }
-    const formattedDate = moment(item.timestamp).format('MM-DD-YYYY');
+    const formattedDate = moment(item.timestamp).format("MM-DD-YYYY")
 
-    const shouldShowDivider = (currentDate !== formattedDate) ? true : false;
-    currentDate = formattedDate;
-    const mine = (item.sender === activeDialogWith) ? false : true;
+    const shouldShowDivider = currentDate !== formattedDate ? true : false
+    currentDate = formattedDate
+    const mine = item.sender === activeDialogWith ? false : true
     const dynamicTextStyle = {
-      marginLeft: shouldUseAvatar ? '8px' : '48px',
-    };
+      marginLeft: shouldUseAvatar ? "8px" : "48px"
+    }
 
-    const content = item.message.image.image ?
-    <div style={styles.dynamicImageStyle}><Image style={styles.imgS} src={item.message.text ? item.message.text : standartImage}/></div>
-    : <div>{item.message && item.message.text}</div>;
-    return(
+    const content = item.message.image.image ? (
+      <div style={styles.dynamicImageStyle}>
+        <Image
+          style={styles.imgS}
+          src={item.message.text ? item.message.text : standartImage}
+        />
+      </div>
+    ) : (
+      <div>{item.message && item.message.text}</div>
+    )
+    return (
       <Fragment key={item._id}>
-        { shouldShowDivider ? <Divider horizontal><span style={styles.timestamp}>{currentDate}</span></Divider> : null }
-        <div style={{...styles.messageContainer, backgroundColor: item.read ? '#fff' : 'beige'}}>
-         { shouldUseAvatar ? <Image src={mine ? myAvatar : peerAvatar} style={styles.avatar} avatar/> : null }
-         <div style={{...styles.text, ...dynamicTextStyle}}>
-           { content }
-           <span style={styles.timestamp}>{moment(item.timestamp).format('HH:mm')}</span>
-         </div>
+        {shouldShowDivider ? (
+          <Divider horizontal>
+            <span style={styles.timestamp}>{currentDate}</span>
+          </Divider>
+        ) : null}
+        <div
+          style={{
+            ...styles.messageContainer,
+            backgroundColor: item.read ? "#fff" : "beige"
+          }}
+        >
+          {shouldUseAvatar ? (
+            <Image
+              src={mine ? myAvatar : peerAvatar}
+              style={styles.avatar}
+              avatar
+            />
+          ) : null}
+          <div style={{ ...styles.text, ...dynamicTextStyle }}>
+            {content}
+            <span style={styles.timestamp}>
+              {moment(item.timestamp).format("HH:mm")}
+            </span>
+          </div>
         </div>
       </Fragment>
     )
   })
- return message;
+  return message
 }
 
-export default Messages;
+export default Messages

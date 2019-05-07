@@ -4,12 +4,12 @@ import {
   ERROR,
   CHANGE_SETTINGS,
   HIDE_SUCCESS_SETTINGS_UPDATE
-} from "../actions/types";
+} from "../actions/types"
 
 const initialState = {
   isAvatarUploading: false,
-  showSuccessUpdate: false,
-};
+  showSuccessUpdate: false
+}
 
 export function settings(state = initialState, action) {
   switch (action.type) {
@@ -17,25 +17,25 @@ export function settings(state = initialState, action) {
       return {
         ...state,
         isAvatarUploading: true
-      };
+      }
     case CHANGE_AVATAR:
       return {
         ...state,
         isAvatarUploading: false
-      };
+      }
     case CHANGE_SETTINGS:
       return {
         ...state,
         showSuccessUpdate: true
-      };
+      }
     case HIDE_SUCCESS_SETTINGS_UPDATE:
       return {
         ...state,
         showSuccessUpdate: false
-      };
+      }
     case ERROR:
-      return initialState;
+      return initialState
     default:
-      return state;
+      return state
   }
 }

@@ -1,5 +1,5 @@
-import React from "react";
-import { Modal, Button } from 'semantic-ui-react';
+import React from "react"
+import { Modal, Button } from "semantic-ui-react"
 
 const ModalWindow = ({
   open,
@@ -13,7 +13,6 @@ const ModalWindow = ({
   size,
   closeIcon
 }) => {
-
   return (
     <Modal
       open={open}
@@ -22,7 +21,7 @@ const ModalWindow = ({
       closeOnDimmerClick={closeOnDimmerClick}
       size={size}
       closeIcon={closeIcon}
-      style={{zIndex: 1000}}
+      style={{ zIndex: 1000 }}
     >
       <Modal.Header>{headertext}</Modal.Header>
       <Modal.Content image scrolling>
@@ -35,9 +34,9 @@ const ModalWindow = ({
         <Button
           onClick={() => onPositive()}
           positive
-          labelPosition='right'
-          icon='checkmark'
-          content='Yes'
+          labelPosition="right"
+          icon="checkmark"
+          content="Yes"
         />
       </Modal.Actions>
     </Modal>
@@ -47,10 +46,10 @@ const ModalWindow = ({
 Modal.defaultProps = {
   closeOnEscape: true,
   closeOnDimmerClick: false,
-  headertext: 'Confirmation',
-  contenttext: 'Are you sure?',
-  size: 'small',
+  headertext: "Confirmation",
+  contenttext: "Are you sure?",
+  size: "small",
   closeIcon: true
-};
+}
 
-export default ModalWindow;
+export default ModalWindow

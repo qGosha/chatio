@@ -1,17 +1,17 @@
-const mongoose = require("mongoose");
-const User = mongoose.model("users");
-const pick = require("lodash.pick");
-const omit = require("lodash.omit");
-const moment = require("moment");
-const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose")
+const User = mongoose.model("users")
+const pick = require("lodash.pick")
+const omit = require("lodash.omit")
+const moment = require("moment")
+const bcrypt = require("bcryptjs")
 
 const loggedIn = (req, res, next) => {
   if (req.user) {
-    next();
+    next()
   } else {
-    return res.send(null);
+    return res.send(null)
   }
-};
+}
 
 const userInputCheck = async (req, res, next) => {
   let userData = pick(req.body, [
@@ -22,58 +22,58 @@ const userInputCheck = async (req, res, next) => {
     "email",
     "password",
     "oldPassword"
-  ]);
-  const isDataComplete = Object.keys(userData).every(i => userData[i]);
+  ])
+  const isDataComplete = Object.keys(userData).every(i => userData[i])
   try {
     if (!isDataComplete) {
-      throw new Error("Please complete the form");
+      throw new Error("Please complete the form")
     }
     if (userData.hasOwnProperty("email")) {
-      await User.uniqEmailCheck(userData.email);
+      await User.uniqEmailCheck(userData.email)
     }
     if (userData.hasOwnProperty("oldPassword")) {
       //we change password here because findOneAndUpdate doesn't trigger presave function on model
-      const user = await User.findById(req.user._id);
-      const match = await bcrypt.compare(userData.oldPassword, user.password);
+      const user = await User.findById(req.user._id)
+      const match = await bcrypt.compare(userData.oldPassword, user.password)
       if (match) {
-        user.password = userData.password;
-        await user.save();
-        userData = omit(userData, ["oldPassword"], ["password"]);
+        user.password = userData.password
+        await user.save()
+        userData = omit(userData, ["oldPassword"], ["password"])
       } else {
-        throw new Error("Current password is wrong");
+        throw new Error("Current password is wrong")
       }
     }
     if (req.body.hasOwnProperty("mute")) {
-      userData = {...userData, mute: req.body.mute};
+      userData = { ...userData, mute: req.body.mute }
       if (typeof userData.mute !== "boolean") {
-        throw new Error("Check your checkbox field");
+        throw new Error("Check your checkbox field")
       }
     }
     if (userData.hasOwnProperty("dateOfBirth")) {
-      const date = userData.dateOfBirth;
-      let dateError;
+      const date = userData.dateOfBirth
+      let dateError
       if (!moment(date, "MM-DD-YYYY", true).isValid()) {
-        dateError = "Incorrect date";
+        dateError = "Incorrect date"
       } else if (new Date(date).getFullYear() < 1900) {
-        dateError = "The date is too far in the past";
+        dateError = "The date is too far in the past"
       } else if (moment(date, "MM-DD-YYYY").isAfter(new Date())) {
-        dateError = "The date is in the future";
+        dateError = "The date is in the future"
       }
       if (dateError) {
-        throw new Error(dateError);
+        throw new Error(dateError)
       }
     }
-    res.locals.userData = userData;
-    next();
+    res.locals.userData = userData
+    next()
   } catch (error) {
     return res.send({
       success: false,
       message: error.message
-    });
+    })
   }
-};
+}
 
 module.exports = {
   loggedIn,
   userInputCheck
-};
+}

@@ -1,7 +1,7 @@
-import React, {useState, Fragment, useEffect} from "react";
-import {connect} from "react-redux";
-import * as actions from "../actions";
-import ModalWindow from "../components/modal";
+import React, { useState, Fragment, useEffect } from "react"
+import { connect } from "react-redux"
+import * as actions from "../actions"
+import ModalWindow from "../components/modal"
 import {
   Segment,
   Form,
@@ -12,20 +12,20 @@ import {
   Icon,
   Button,
   Checkbox
-} from "semantic-ui-react";
-import {InputComponent, DatePickComponent} from "../helpers/common";
-import {reduxForm, Field, SubmissionError} from "redux-form";
-import {validate} from "../helpers/validation";
-import SearchCity from "../components/SearchCity";
-import SelectGender from "../components/SelectGender";
-import FileButton from "../components/FileButton";
-import PasswordChangeField from "../components/PasswordChangeField";
-const moment = require("moment");
-const omit = require("lodash.omit");
+} from "semantic-ui-react"
+import { InputComponent, DatePickComponent } from "../helpers/common"
+import { reduxForm, Field, SubmissionError } from "redux-form"
+import { validate } from "../helpers/validation"
+import SearchCity from "../components/SearchCity"
+import SelectGender from "../components/SelectGender"
+import FileButton from "../components/FileButton"
+import PasswordChangeField from "../components/PasswordChangeField"
+const moment = require("moment")
+const omit = require("lodash.omit")
 const styles = {
   container: {
     fontFamily: "Roboto, sans-serif",
-    gridArea: 'menu / main / main / main'
+    gridArea: "menu / main / main / main"
   },
   saveButton: {
     marginTop: "30px"
@@ -45,7 +45,7 @@ const styles = {
     fontStyle: "italic",
     fontSize: "12px"
   }
-};
+}
 
 const Settings = props => {
   const {
@@ -58,14 +58,14 @@ const Settings = props => {
     standartImage,
     deleteUser,
     clearSubmitErrors
-  } = props;
+  } = props
 
-  const {user} = auth;
+  const { user } = auth
   if (user.dateOfBirth) {
-    user.dateOfBirth = moment.utc(user.dateOfBirth).format("MM/DD/YYYY");
+    user.dateOfBirth = moment.utc(user.dateOfBirth).format("MM/DD/YYYY")
   }
-  const {isAvatarUploading, showSuccessUpdate} = settings;
-  const myAvatar = user.photos.length ? user.photos[0] : standartImage;
+  const { isAvatarUploading, showSuccessUpdate } = settings
+  const myAvatar = user.photos.length ? user.photos[0] : standartImage
 
   const aliaces = {
     name: "Name",
@@ -73,59 +73,56 @@ const Settings = props => {
     gender: "Gender",
     city: "City",
     dateOfBirth: "Date of birth"
-  };
-  const [modalOpen, modalStatusChange] = useState(false);
-  const [results, setResults] = useState([]);
+  }
+  const [modalOpen, modalStatusChange] = useState(false)
+  const [results, setResults] = useState([])
   const defualtSettingsPositions = {
     name: false,
     email: false,
     gender: false,
     city: false,
     dateOfBirth: false
-  };
-  const [passwordField, passwordFieldStatus] = useState(false);
+  }
+  const [passwordField, passwordFieldStatus] = useState(false)
   const [settingsStatus, settingsStatusChange] = useState(
     defualtSettingsPositions
-  );
+  )
 
-  useEffect(
-    () => {
-      let timer;
-      if (error && error.message) {
-        timer = setTimeout(() => {
-          clearSubmitErrors(form);
-        }, 1500);
+  useEffect(() => {
+    let timer
+    if (error && error.message) {
+      timer = setTimeout(() => {
+        clearSubmitErrors(form)
+      }, 1500)
+    }
+    return () => {
+      if (timer) {
+        clearTimeout(timer)
       }
-      return () => {
-        if (timer) {
-          clearTimeout(timer);
-        }
-      };
-    },
-    [submitting]
-  );
+    }
+  }, [submitting])
 
   const submitForm = values => {
-    const valArr = Object.keys(values);
-    if (!valArr.length) return;
+    const valArr = Object.keys(values)
+    if (!valArr.length) return
     if (values.hasOwnProperty("city")) {
-      const isCityPicked = results.some(i => i.title === values.city);
+      const isCityPicked = results.some(i => i.title === values.city)
       if (!isCityPicked) {
-        throw new SubmissionError({city: "Select your city"});
+        throw new SubmissionError({ city: "Select your city" })
       }
     }
     if (values.hasOwnProperty("repPassword")) {
-      values = omit(values, ["repPassword"]);
+      values = omit(values, ["repPassword"])
     }
-    settingsStatusChange(defualtSettingsPositions);
-    passwordFieldStatus({password: false});
-    props.clearFields(form, false, ...valArr);
-    return props.changeSettings(values);
-  };
+    settingsStatusChange(defualtSettingsPositions)
+    passwordFieldStatus({ password: false })
+    props.clearFields(form, false, ...valArr)
+    return props.changeSettings(values)
+  }
 
   const fields = Object.keys(settingsStatus).map((field, i) => {
-    const value = settingsStatus[field];
-    let component = null;
+    const value = settingsStatus[field]
+    let component = null
     if (field === "city") {
       component = (
         <SearchCity
@@ -133,9 +130,9 @@ const Settings = props => {
           setResults={setResults}
           results={results}
         />
-      );
+      )
     } else if (field === "gender") {
-      component = <SelectGender />;
+      component = <SelectGender />
     } else if (field === "dateOfBirth") {
       component = (
         <Field
@@ -143,10 +140,10 @@ const Settings = props => {
           placeholder={`Type new date`}
           component={DatePickComponent}
         />
-      );
+      )
     } else {
       if (field === "email" && user.isOauth) {
-        return;
+        return
       }
       component = (
         <Field
@@ -154,27 +151,27 @@ const Settings = props => {
           placeholder={`Type new ${aliaces[field]}`}
           component={InputComponent}
         />
-      );
+      )
     }
     return (
       <Grid.Row key={i} style={styles.row}>
-        <Grid.Column width={2} style={{textAlign: "left"}}>
+        <Grid.Column width={2} style={{ textAlign: "left" }}>
           <div style={styles.title}>{`${aliaces[field]}:`}</div>
         </Grid.Column>
         <Grid.Column width={6}>
           {value ? component : <div>{user[field] ? user[field] : ""}</div>}
         </Grid.Column>
-        <Grid.Column width={2} style={{textAlign: "left"}}>
+        <Grid.Column width={2} style={{ textAlign: "left" }}>
           <div>
             <a
               onClick={() => {
                 if (value) {
                   if (settingsStatus.city) {
-                    setResults([]);
+                    setResults([])
                   }
-                  props.clearFields(form, false, field);
+                  props.clearFields(form, false, field)
                 }
-                settingsStatusChange({...settingsStatus, [field]: !value});
+                settingsStatusChange({ ...settingsStatus, [field]: !value })
               }}
               style={styles.link}
             >
@@ -183,8 +180,8 @@ const Settings = props => {
           </div>
         </Grid.Column>
       </Grid.Row>
-    );
-  });
+    )
+  })
 
   const generalPane = (
     <Form
@@ -204,8 +201,8 @@ const Settings = props => {
             form={form}
           />
         ) : null}
-        <Grid.Row style={{justifyContent: "flex-end"}}>
-          <Grid.Column width={5} style={{textAlign: "right"}}>
+        <Grid.Row style={{ justifyContent: "flex-end" }}>
+          <Grid.Column width={5} style={{ textAlign: "right" }}>
             <Button
               negative
               onClick={() => modalStatusChange(true)}
@@ -217,13 +214,13 @@ const Settings = props => {
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
-          <Grid.Column width={8} style={{textAlign: "left"}}>
+          <Grid.Column width={8} style={{ textAlign: "left" }}>
             <div style={styles.title}>Mute notifications:</div>
           </Grid.Column>
-          <Grid.Column width={2} style={{textAlign: "left"}}>
+          <Grid.Column width={2} style={{ textAlign: "left" }}>
             <Field
               name={"mute"}
-              component={({input: {value, onChange, ...input}}) => {
+              component={({ input: { value, onChange, ...input } }) => {
                 return (
                   <Form.Field>
                     <Checkbox
@@ -234,7 +231,7 @@ const Settings = props => {
                       toggle
                     />
                   </Form.Field>
-                );
+                )
               }}
             />
           </Grid.Column>
@@ -263,7 +260,7 @@ const Settings = props => {
         </Message>
       )}
     </Form>
-  );
+  )
   const avatarPane = (
     <Grid stackable>
       <Grid.Column>
@@ -272,18 +269,18 @@ const Settings = props => {
           <FileButton
             onSelect={props.changeAvatar}
             primary
-            style={{marginTop: "1em"}}
+            style={{ marginTop: "1em" }}
             disabled={isAvatarUploading}
             loading={isAvatarUploading}
           />
         </Segment>
       </Grid.Column>
     </Grid>
-  );
+  )
   const panes = [
-    {menuItem: "General", render: () => <Tab.Pane>{generalPane}</Tab.Pane>},
-    {menuItem: "Avatar", render: () => <Tab.Pane>{avatarPane}</Tab.Pane>}
-  ];
+    { menuItem: "General", render: () => <Tab.Pane>{generalPane}</Tab.Pane> },
+    { menuItem: "Avatar", render: () => <Tab.Pane>{avatarPane}</Tab.Pane> }
+  ]
   return (
     <Fragment>
       <ModalWindow
@@ -296,22 +293,25 @@ const Settings = props => {
       />
       <Tab panes={panes} style={styles.container} />
     </Fragment>
-  );
-};
+  )
+}
 
 const ConnectedSettings = reduxForm({
   form: "settingsForm",
   validate
-})(Settings);
+})(Settings)
 
-function mapStateToProps({auth, settings}) {
+function mapStateToProps({ auth, settings }) {
   return {
     auth,
     settings,
     initialValues: {
       mute: auth.user.mute
     }
-  };
+  }
 }
 
-export default connect(mapStateToProps, actions)(ConnectedSettings);
+export default connect(
+  mapStateToProps,
+  actions
+)(ConnectedSettings)
