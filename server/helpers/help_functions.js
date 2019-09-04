@@ -21,7 +21,7 @@ const changeUserStatus = async (id, online) => {
   })
 }
 
-const sendTokenEmail = async (req, user, options) => {
+const sendTokenEmail = async (req, user, options = {}) => {
   let pin
   if (options.type === "verifToken") {
     pin = Math.floor(Math.random() * 1000000000 + 1)

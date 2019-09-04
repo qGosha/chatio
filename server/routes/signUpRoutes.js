@@ -120,10 +120,8 @@ module.exports = app => {
         return res.status(400).send("This user has already been verified.")
       }
       user.isConfirmed = true
-      const [newUser, ...rest] = Promise.all([
-        user.save(),
-        Token.findOneAndRemove({ _id: token._id })
-      ])
+      const newUser = await user.save()
+      Token.findOneAndRemove({ _id: token._id })
 
       return res.status(200).send({
         success: true,

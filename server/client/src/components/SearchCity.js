@@ -1,5 +1,5 @@
 import React from "react"
-import debounce from "lodash.debounce"
+import debounce from "lodash/debounce"
 import axios from "axios"
 import { SearchComponent } from "../helpers/common"
 import { Field } from "redux-form"

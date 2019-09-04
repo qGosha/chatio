@@ -59,7 +59,7 @@ module.exports = app => {
           { new: true, fields: { password: 0 } }
         )
         if (email) {
-          await sendTokenEmail(req, newUser)
+          await sendTokenEmail(req, newUser, { type: "verifToken", email })
         }
         res.send({
           success: true,
@@ -88,7 +88,7 @@ module.exports = app => {
         )
         await Promise.all([
           Token.findOneAndRemove({ _userId: id }),
-          sendTokenEmail(req, newUser)
+          sendTokenEmail(req, newUser, { type: "verifToken", email: newUser.email })
         ])
         res.send({
           success: true,
